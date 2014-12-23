@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/entryLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darkPurple"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/newNameLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/newName"
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/newNameHint"
+            android:inputType="textPersonName"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#F5F6CE" >
+
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/dateInputLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/dateText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/dateHint"
+            android:inputType="date"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#F5F6CE" />
+
+        <Button
+            android:id="@+id/calcAgeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="#FFFFFF"
+            android:text="@string/calculateAge" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/dateLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/currAgeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="70sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/miniProfilePictureLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniProfilePicture"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="2.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2.5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/profilepictureCD" />
+
+        <Button
+            android:id="@+id/profilePictureButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:background="@color/yellow"
+            android:text="@string/profilePicture"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/miniDriversLicenceLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniDriversLicence"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="2.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2.5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/driverslicencepictureCD" />
+
+        <Button
+            android:id="@+id/driversLicenceButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:background="@color/yellow"
+            android:text="@string/driverslicence"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/miniCheckitCardLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniCheckitCard"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="2.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2.5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/checkitcardpictureCD" />
+
+        <Button
+            android:id="@+id/checkitcardButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:background="@color/yellow"
+            android:text="@string/checkitcard"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/miniOebbCardLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniOebbCard"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="2.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2.5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/oebbpictureCD" />
+
+        <Button
+            android:id="@+id/oebbcardButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:background="@color/yellow"
+            android:text="@string/oebbcard"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/miniPassportLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniPassport"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="2.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2.5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/passportpictureCD" />
+
+        <Button
+            android:id="@+id/passportButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:background="@color/yellow"
+            android:text="@string/passport"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@color/brightPurple" />
+
+    <LinearLayout
+        android:id="@+id/miniPersonalidLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniPersonalIDfront"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/personalidpictureCD" />
+
+        <Button
+            android:id="@+id/idFrontsideButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:background="@color/yellow"
+            android:text="@string/front"
+            android:textSize="30sp" />
+
+        <ImageView
+            android:id="@+id/miniPersonalIDback"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/personalidpictureCD" />
+
+        <Button
+            android:id="@+id/idBacksideButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:background="@color/yellow"
+            android:text="@string/back"
+            android:textSize="30sp" />
+    </LinearLayout>
+
+    <EditText
+        android:id="@+id/personDetails"
+        android:layout_width="582dp"
+        android:layout_height="158dp"
+        android:layout_marginLeft="7dp"
+        android:ems="10"
+        android:hint="@string/personDetailsHint"
+        android:inputType="textMultiLine"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#F5F6CE" />
+
+    <LinearLayout
+        android:id="@+id/confirmationLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageButton
+            android:id="@+id/isBannedButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="7dp"
+            android:src="@drawable/ic_house_banned_grey" />
+
+        <Button
+            android:id="@+id/saveButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.00"
+            android:background="#FFFFFF"
+            android:text="@string/save" />
+    </LinearLayout>
+
+</LinearLayout>

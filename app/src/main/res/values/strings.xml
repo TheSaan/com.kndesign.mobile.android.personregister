@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="action_settings">Settings</string>
+    <string name="min16_decr">Minimum Datum</string>
+    <string name="logoCD">Key West Logo</string>
+    <string name="default_minDate">Kein Datum verfügbar</string>
+
+     <string name="app_name">KW Jugend Register</string>
+    <string name="weiter">Weiter</string>
+    <string name="title_activity_search">Key West Jugend Registrierung</string>
+    <string name="cameraDescr">Camera Button</string>
+    
+    <string name="searchLinearLayoutPersonRegisterButton">Suche in Register</string>
+    <string name="personMatches"> Treffer</string>
+    
+    <string name="personMatchesAmount"></string>
+    
+    <string name="newPersonEntry">Neuer Eintrag</string>
+    <string name="takePictureInfo">Foto(s) aufnehmen</string>
+	
+    <!-- Personal identification cards which are allowed -->
+    <string name="driverslicence">Führerschein</string>
+    <string name="checkitcard">Check it Card</string>
+    <string name="oebbcard">ÖBB Schein</string>
+    <string name="passport">Reisepass</string>
+    <string name="personalidcard">Personalausweis</string>
+
+    <!-- Photo status texts -->
+    <string name="photosshot">0</string>
+    <string name="photostoshoot">0</string>
+    <string name="photoslash">/</string>
+
+    <string name="title_activity_entry">Neuer Eintrag</string>
+    <string name="profilepictureCD">Profilbild</string>
+	
+	<!-- Content Descriptions -->
+	<string name="personsNameInboxDescription">Dieter Pock</string>
+	<string name="photostatusdescription"> wurden aufgenommen.</string>
+	<string name="oebbpictureCD">ÖBB Card Bild</string>
+	<string name="passportpictureCD">Reisepass Bild</string>
+	<string name="checkitcardpictureCD">Check It Card Bild</string>
+	<string name="personalidpictureCD">Personalausweis Bild</string>
+	<string name="driverslicencepictureCD">Führerschein Bild</string>
+	<string name="frontCD">Vorderseite jedes Ausweises</string>
+	<string name="profilePicture">Profilbild</string>
+	<string name="back">Rückseite</string>
+	<string name="front">Personalausweis</string>
+	<string name="titleSearch">Einträge durchsuchen nach</string>
+	<string name="save">Speichern</string>
+	<string name="currentAge"/>
+	<string name="calculateAge">Alter berechnen</string>
+	<string name="calcProgressAge">Alter wird berechnet</string>
+	<string name="newNameHint">Vorname Nachname</string>
+	<string name="dateHint">TTMMYYYY</string>
+	<string name="showUnder18">16+</string>
+	<string name="showOver18">18+</string>
+	<string name="showAll">Alle</string>
+	<string name="showAllCD">Zeigt alle Einträge an</string>
+	<string name="showUnder18CD">Zeigt 16+ Einträge an</string>
+	<string name="showOver18CD">Zeigt 18+ Einträge an</string>
+	<string name="showBannedPersons">Hausverbot</string>
+	<string name="showBannedCD">Zeigt Einträge mit Haus verbot an</string>
+	<string name="personDetailsCD">Personen Details</string>
+	<string name="personDetailsHint">Details hinzufügen...</string>
+	<string name="thumbnailCD">Profilbild Vorschau</string>
+	<string name="bannedImageCD">Hausverbot Icon</string>
+	<string name="detailsImageCD">Enthält weitere Details zur Person</string>
+</resources>
