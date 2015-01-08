@@ -327,7 +327,7 @@ public class DateCalculator {
 			case 2:
 				return "Februar";
 			case 3:
-				return "März";
+				return "MÃ¤rz";
 			case 4:
 				return "April";
 			case 5:

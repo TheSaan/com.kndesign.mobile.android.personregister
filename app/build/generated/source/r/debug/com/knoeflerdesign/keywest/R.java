@@ -34,13 +34,14 @@ public final class R {
         public static final int ic_look_for_all=0x7f02000b;
         public static final int ic_look_for_over_16=0x7f02000c;
         public static final int ic_look_for_over_18=0x7f02000d;
-        public static final int intro=0x7f02000e;
+        public static final int ic_person=0x7f02000e;
+        public static final int intro=0x7f02000f;
     }
     public static final class id {
-        public static final int action_search=0x7f0a002d;
-        public static final int action_user_add=0x7f0a002e;
+        public static final int action_search=0x7f0a002e;
+        public static final int action_user_add=0x7f0a002f;
         public static final int analogClock1=0x7f0a0024;
-        public static final int bannedImage=0x7f0a0027;
+        public static final int bannedImage=0x7f0a0028;
         public static final int calcAgeButton=0x7f0a0005;
         public static final int checkitcardButton=0x7f0a0010;
         public static final int confirmationLL=0x7f0a001d;
@@ -48,17 +49,18 @@ public final class R {
         public static final int dateInputLL=0x7f0a0003;
         public static final int dateLL=0x7f0a0006;
         public static final int dateText=0x7f0a0004;
-        public static final int detailsImage=0x7f0a0028;
+        public static final int detailsImage=0x7f0a0029;
         public static final int driversLicenceButton=0x7f0a000d;
         public static final int entryLayout=0x7f0a0000;
-        public static final int icon_all=0x7f0a0029;
-        public static final int icon_banned=0x7f0a002c;
-        public static final int icon_plus16=0x7f0a002a;
-        public static final int icon_plus18=0x7f0a002b;
+        public static final int icon_all=0x7f0a002a;
+        public static final int icon_banned=0x7f0a002d;
+        public static final int icon_plus16=0x7f0a002b;
+        public static final int icon_plus18=0x7f0a002c;
         public static final int idBacksideButton=0x7f0a001b;
         public static final int idFrontsideButton=0x7f0a0019;
         public static final int imageView1=0x7f0a0021;
         public static final int isBannedButton=0x7f0a001e;
+        public static final int list_item=0x7f0a0025;
         public static final int minAgeDescription=0x7f0a0022;
         public static final int miniCheckitCard=0x7f0a000f;
         public static final int miniCheckitCardLL=0x7f0a000e;
@@ -77,13 +79,13 @@ public final class R {
         public static final int newNameLL=0x7f0a0001;
         public static final int oebbcardButton=0x7f0a0013;
         public static final int passportButton=0x7f0a0016;
-        public static final int personDescription=0x7f0a0026;
+        public static final int personDescription=0x7f0a0027;
         public static final int personDetails=0x7f0a001c;
         public static final int profilePictureButton=0x7f0a000a;
         public static final int resultList=0x7f0a0020;
         public static final int saveButton=0x7f0a001f;
         public static final int textfield_MIN_AGE=0x7f0a0023;
-        public static final int thumbnail=0x7f0a0025;
+        public static final int thumbnail=0x7f0a0026;
     }
     public static final class layout {
         public static final int activity_newentry=0x7f030000;

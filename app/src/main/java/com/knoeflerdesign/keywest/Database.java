@@ -27,6 +27,7 @@ public class Database extends SQLiteOpenHelper {
 	public static final String ALL = "all";
 
 	// table values
+    //TODO umlaute in utf schreiben
 	public static final String PATH_MAX_VARCHAR_LENGTH = "250";
 	public static final String SELECT_ALL = "*";
 	public static final String COL_ID = "_id";
@@ -35,10 +36,10 @@ public class Database extends SQLiteOpenHelper {
 	public static final String COL_FIRSTNAME = "vorname";
 	public static final String COL_BIRTHDATE = "geburtsdatum";
 	public static final String COL_PROFILEPICTURE = "profilbild";
-	public static final String COL_DRIVERSLICENCE = "führerschein";
+	public static final String COL_DRIVERSLICENCE = "fï¿½hrerschein";
 	public static final String COL_CHECKITCARD = "checkitcard";
 	public static final String COL_PASSPORT = "reisepass";
-	public static final String COL_OEBBCARD = "öbbcard";
+	public static final String COL_OEBBCARD = "ï¿½bbcard";
 	public static final String COL_PERSO_FRONT = "personalausweis_vs";
 	public static final String COL_PERSO_BACK = "personalausweis_rs";
 	public static final String COL_DETAILS = "details";
@@ -52,7 +53,7 @@ public class Database extends SQLiteOpenHelper {
 			COL_PERSO_FRONT, COL_PERSO_BACK, COL_DETAILS, COL_BANNED };
 
 	protected static final String DATABASE_NAME = "KEY_WEST_DATABASE";
-	private static final String DATABASE_TABEL_PASSWORDS = "passwörter";
+	private static final String DATABASE_TABEL_PASSWORDS = "passwï¿½rter";
 	protected static final String DATABASE_TABEL_PERSONS = "personen";
 
 	private static final String TAG = "KeyWestDatabase";
@@ -87,7 +88,7 @@ public class Database extends SQLiteOpenHelper {
 					+ " INTEGER  ) ";
 			db.execSQL(sql1);
 
-			// create table 'passwörter'
+			// create table 'passwï¿½rter'
 
 			String sql2 = "CREATE TABLE " + DATABASE_TABEL_PASSWORDS
 					+ "( _id INTEGER PRIMARY KEY AUTOINCREMENT,"

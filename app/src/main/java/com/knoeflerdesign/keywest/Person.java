@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class Person {
 	DateCalculator datecalc;
@@ -66,9 +67,20 @@ public class Person {
 		// set Text of TextView
 		// TODO possible i don't need to parse (memory???)
 		String age = Integer.toString(this.age);
+	    String fullText = age + "\t" + firstname + ", " + lastname;
+		/*if the text has more than 20 letters/digits
+		* show the text as "17, Firstname La..."
+		* */
+        if(fullText.toCharArray().length > 20){
+            fullText.split(null,17); //cuts the text at 20 signs, so actually at 17 but plus 3 dots
+            fullText += "...";
+        }
 		description
-				.setText(age + "\t" + firstname + ", " + lastname);
-
+				.setText(fullText);
+        //TODO delete new Activity for saving resources
+        //gets the text which should be shown as the persons data in a listview element
+        Toast.makeText(new SearchActivity(),
+                description.getText().toString(), Toast.LENGTH_SHORT).show();
 		// set the house for banned status to grey or red
 
 		// isBanned only can be 1 or 0
