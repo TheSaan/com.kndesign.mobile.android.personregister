@@ -1,17 +1,6 @@
 package com.knoeflerdesign.keywest;
 
-import java.io.Console;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Locale;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.graphics.Color;
@@ -30,12 +19,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class EntryActivity extends Activity {
 
     public static final int REQUEST_TAKE_PICTURE = 1;
+    final int DATE_UNFORMATTED = 8;
+    final int DATE_FORMATTED = 10;
+    // banned from company is guest (Hausverbot 0 = no, 1 = yes)
+    protected int isBanned = 0;
+
     PrintStream c = System.out;
-
-
     ImageView CurrentViewForImage;
     Database db;
     CursorFactory cf;
@@ -47,26 +47,19 @@ public class EntryActivity extends Activity {
             saveButton, calcButton;
     TextView text;
     EditText newNameText, dateText;
-    private Uri imageUri, temporary;
-    int currYear;
-    int age;
-    final int DATE_UNFORMATTED = 8;
-    final int DATE_FORMATTED = 10;
-    // banned from company is guest (Hausverbot 0 = no, 1 = yes)
-    protected int isBanned = 0;
-    String datestring, sMonth, sYear, sDay, personName;
-    String formattedDate;
-    String firstname, lastname;
-    String imageKind;
-    String profilePicturePath, driverslicencePath, checkitcardPath, oebbPath,
+    int age, testCounter;
+    String datestring, sMonth, sYear, sDay, personName, formattedDate, firstname, lastname, imageKind, profilePicturePath, driverslicencePath, checkitcardPath, oebbPath,
             passportPath, idcardPath_front, idcardPath_back;
-    boolean dateIsCurrentDate = true;
     // Database array to recieve the selected cards as booleans
-    protected String[] imagePaths = {profilePicturePath, driverslicencePath,
-            checkitcardPath, oebbPath, passportPath, idcardPath_front,
-            idcardPath_back};
-    File detailsFile, photo;
-    int testCounter;
+    protected String[] imagePaths = {
+            profilePicturePath, driverslicencePath,
+            checkitcardPath, oebbPath, passportPath,
+            idcardPath_front, idcardPath_back
+    };
+    boolean dateIsCurrentDate = true;
+    File detailsFile, photo, photo_tmp, absolutPath;
+    private Uri imageUri, temporary;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -80,7 +73,7 @@ public class EntryActivity extends Activity {
 
         // DEVELOPERS MODE
         /*
-		 * the values are only settet to test ordinary input values without
+         * the values are only settet to test ordinary input values without
 		 * having to type them in all the time
 		 */
         // name
@@ -209,12 +202,12 @@ public class EntryActivity extends Activity {
 
             // root directory of the app data
 
-            File KWIMG = new File(getApplication().getApplicationContext()
-                    .getFilesDir() + "/KWIMG");
+            File KWIMG = new File(Environment.getExternalStorageDirectory() + "/KWIMG");
+            c.println("KWIMG path: "+KWIMG.getPath());
             KWIMG.mkdir();
             KWIMG.setWritable(true);
-            String kwPath = KWIMG.getPath().toString()+"/";
-
+            String kwPath = KWIMG.getPath().toString() + "/";
+            c.println("kwPath: "+kwPath);
             if (KWIMG.exists())
                 System.err.println("KWIMG created.");
 			/*
@@ -222,15 +215,17 @@ public class EntryActivity extends Activity {
 			 * and its birthday
 			 */
             PERSON_FOLDER = firstAndLastName[0].toUpperCase(Locale.GERMAN) + "_"
-                            + firstAndLastName[1].toUpperCase(Locale.GERMAN) + "_"
-                            + datestring;
+                    + firstAndLastName[1].toUpperCase(Locale.GERMAN) + "_"
+                    + datestring;
+            c.println("PERSON_FOLDER: "+ PERSON_FOLDER);
 
             // assumption of all firstname1,firstname2(if available) and
             // lastname
             fullName = firstAndLastName[0] + " " + firstAndLastName[1];
 
-            personDIR = new File(Environment.getExternalStorageDirectory()
-                    .toString() + kwPath + PERSON_FOLDER + "/");
+            personDIR = new File(kwPath + PERSON_FOLDER + "/");
+            c.println("personDIR(& absolutPath): "+ personDIR.getPath());
+            absolutPath = personDIR;
 
             personDIR.mkdirs();
             personDIR.canWrite();
@@ -303,11 +298,16 @@ public class EntryActivity extends Activity {
 			 * which was given by the users input
 			 */
             String path = firstAndLastName[0].toUpperCase(Locale.GERMANY)
+                    +"_"
                     + firstAndLastName[1].toUpperCase(Locale.GERMANY);
 
             // clear first
             photo = null;
-            photo = new File(personDIR.getPath(), path + IDCARD + ".jpg");
+            //photo = new File(personDIR.getPath(), path + IDCARD + ".jpg");
+            //test
+            photo = new File(personDIR.getPath(), path + IDCARD);
+            photo_tmp = photo;
+            c.println("photo_tmp Path: "+photo_tmp.getPath());
 
             // clear first
             detailsFile = null;
@@ -318,16 +318,16 @@ public class EntryActivity extends Activity {
             try {
                 testCounter++;
                 Toast.makeText(EntryActivity.this,
-                        "Test Counter = "+testCounter,
+                        "Test Counter = " + testCounter,
                         Toast.LENGTH_SHORT).show();
                 String date = dateText.getText().toString();
                 String name = newNameText.getText().toString();
                 // age output
                 String output = text.getText().toString();
                 int dateLength = dateText.getText().toString().toCharArray().length;
-                c.println("TRY block");
+
                 if (name == "" || date == "" || output == "" || dateLength == 8) {
-                    c.println("first if");
+
                     if (name == "") {
                         Toast.makeText(EntryActivity.this, "Name ist leer!",
                                 Toast.LENGTH_SHORT).show();
@@ -342,24 +342,11 @@ public class EntryActivity extends Activity {
 
                 }
                 if (name != "" && date != "" && output != "" && dateLength == 10) {
-                    Toast.makeText(EntryActivity.this,
-                            "Taking picture if[data is fine] entered...",
-                            Toast.LENGTH_SHORT).show();
-                    Toast.makeText(EntryActivity.this,
-                            "Photo Uri: "+photo.toURI().toString(),
-                            Toast.LENGTH_LONG).show();
-                    takePicture(Uri.fromFile(photo));
-
+                    takePicture();
                 } else {
-                    Toast.makeText(EntryActivity.this,
-                            "Taking picture if[data is wrong] entered...",
-                            Toast.LENGTH_SHORT).show();
                     onRestart();
                 }
             } catch (Exception ex) {
-                Toast.makeText(EntryActivity.this,
-                        "DEV: Taking " + imageKind + " failed!",
-                        Toast.LENGTH_SHORT).show();
                 System.err.println("TAKE PICTURE EXCEPTION: " + ex);
             }
         } else {
@@ -370,65 +357,29 @@ public class EntryActivity extends Activity {
         // KWIMG.setReadable(false);
     }
 
-    private void takePicture(Uri uri) {
-        Log.v("start TAKEPICTURE", "takePicture() started");
+    private void takePicture() {
         // call the device camera
         final Intent takePictureIntent = new Intent(
                 MediaStore.ACTION_IMAGE_CAPTURE);
+        //test
+        takePictureIntent.putExtras(takePictureIntent);
+        //test end
 
-        if (uri != null) {
             if (takePictureIntent != null) {
-                Toast.makeText(EntryActivity.this,
-                        "Start taking picture...",
-                        Toast.LENGTH_SHORT).show();
 
-                Log.v("intent not null in [takePicture]", "Bundle: "
-                        + takePictureIntent.getExtras());
-                Log.v("intent not null in [takePicture]", "intent: "
-                        + takePictureIntent);
-                // Test
-                /*
-                Thread camShot = new Thread(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        Toast.makeText(EntryActivity.this,
-                                "CamShot thread runs...",
-                                Toast.LENGTH_SHORT).show();
-                        try {
-                            startActivityForResult(takePictureIntent,
-                                    REQUEST_TAKE_PICTURE);
-                            Toast.makeText(EntryActivity.this,
-                                    "Taking picture successfully...",
-                                    Toast.LENGTH_SHORT).show();
-                        } catch (ActivityNotFoundException ex) {
-                            Log.v("ActivityNotFoundEX", "" + ex);
-                            Toast.makeText(EntryActivity.this,
-                                    "Taking picture failed. Please check LOG!",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    }
-                });
-                // Test End
-                camShot.run();
-                Toast.makeText(EntryActivity.this,
-                        "Stop thread...",
-                        Toast.LENGTH_SHORT).show();
-                camShot.stop();
-                */
-                startActivityForResult(takePictureIntent,REQUEST_TAKE_PICTURE);
-                onTrimMemory(TRIM_MEMORY_UI_HIDDEN);
-                Toast.makeText(EntryActivity.this,
-                        "Taking picture method ran through...",
-                        Toast.LENGTH_SHORT).show();
+                ///////////////////////////////////////////////////////////////////////////////
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PICTURE);
+                    onTrimMemory(TRIM_MEMORY_UI_HIDDEN);
+                }
+                ///////////////////////////////////////////////////////////////////////////////
                 c.println("EntryActivity paused");
 
             } else {
-                Log.v("Uri in [takePicture]", "uri: " + uri);
+                c.println("TakePicture else called");
             }
         }
-    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -437,29 +388,27 @@ public class EntryActivity extends Activity {
 		 */
         try {
             super.onActivityResult(requestCode, resultCode, data);
-            c.println("307");
             if (data == null) {
-                Log.v("data is null in [onActivityResult]", "data: " + data);
+                c.println("data is null in [onActivityResult], data: " + data);
+
             } else {
-                Log.v("data not null in [onActivityResult]", "data: " + data);
-                c.println("337");
+                c.println("data not null in [onActivityResult], data: " + data);
+                c.println("RQCode: " + requestCode + "  RCode: " + resultCode);
+
                 if (requestCode == REQUEST_TAKE_PICTURE
                         && resultCode == Activity.RESULT_OK) {
-
-                    Uri tmp = temporary;
-                    // notify everything that the image is about to change
-                    getContentResolver().notifyChange(tmp, null);
-
-                    c.println("345");
-                    ImageView imageView = getCurrentViewForImage();
-                    c.println("347");
-                    // Toast "Photo taken"
-                    Toast.makeText(EntryActivity.this, "Photo taken",
-                            Toast.LENGTH_SHORT).show();
-
+                    getContentResolver().notifyChange(temporary, null);
                     // set the picture to the ImageView
-                    imageView.setBackgroundResource(R.drawable.ic_action_done);
-                    c.println("354");
+                    c.println("Set 'Done' image as Background resource");
+
+                    getCurrentViewForImage().setBackgroundResource(R.drawable.ic_action_done);
+                    File picture = new File(absolutPath,photo_tmp.getName());
+                    c.println("absolutPath: " + absolutPath.toString());
+                    c.println("photo_tmp Name: "+ photo_tmp.getName());
+
+
+
+                }
                 }
 				/*
 				 * if you throw the picture away which was taken to make a new
@@ -469,19 +418,19 @@ public class EntryActivity extends Activity {
                     c.println("Nehme neues Foto auf.");
                     createLocation(getCurrentViewForImage(), 1);
                 }
-            }
+
         } catch (Exception ex) {
             System.err.println("ON ATIVITY RESULT EXCEPTION: " + ex);
         }
     }
 
-    private void setCurrentViewForImage(ImageView i) {
-        CurrentViewForImage = i;
-    }
-
     private ImageView getCurrentViewForImage() {
 
         return CurrentViewForImage;
+    }
+
+    private void setCurrentViewForImage(ImageView i) {
+        CurrentViewForImage = i;
     }
 
     private void addDetailsToFile(File f, int id) {
@@ -605,16 +554,23 @@ public class EntryActivity extends Activity {
                 EditText dateEditText = (EditText) findViewById(R.id.dateText);
                 String inputText = dateEditText.getText().toString();
                 String day, month, year;
-
-                day = inputText.substring(0, 2);
-                month = inputText.substring(2, 4);
-                year = inputText.substring(4, 8);
-
+                if(inputText.toCharArray().length == 8) {
+                    day = inputText.substring(0, 2);
+                    month = inputText.substring(2, 4);
+                    year = inputText.substring(4, 8);
+                }else if(inputText.toCharArray().length == 10){
+                    day = inputText.substring(0, 2);
+                    month = inputText.substring(3, 5);
+                    year = inputText.substring(6, 10);
+                }else{
+                    dateEditText.setText("? Jahre alt");
+                    day = month = year = "";
+                }
                 int d = Integer.parseInt(day);
                 int m = Integer.parseInt(month);
                 int y = Integer.parseInt(year);
 
-                if (inputText.toCharArray().length == 8) {
+                if (inputText.toCharArray().length == 8 || inputText.toCharArray().length == 10) {
                     // check that the user cannot input invalid numbers for day
                     // in month
                     if (d <= date.getDaysOfMonth(m, y) && d > 0) {
