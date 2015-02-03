@@ -99,8 +99,22 @@ public class StartActivity extends Activity {
 		d.setMinDate(minAge);
 
 		TextView tfMinAge = (TextView) findViewById(R.id.textfield_MIN_AGE);
+        //add "0" if number is less than 10
+        String dayString, monthString;
+        int day = d.getDayOfMonth();
+        int month = d.getMonth()+1;
 
-		tfMinAge.setText(d.getDayOfMonth() + "." + (d.getMonth() + 1) + "."
+        if(day<10){
+            dayString = "0"+day;
+        }else{
+            dayString = ""+day;
+        }
+        if(month<10){
+            monthString = "0"+month;
+        }else{
+            monthString= ""+month;
+        }
+		tfMinAge.setText(dayString + "." + monthString + "."
 				+ d.getYear());
 
 		// if(d.getMinDate() != d.getMaxDate()){
