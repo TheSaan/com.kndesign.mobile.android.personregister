@@ -1,6 +1,7 @@
 package com.knoeflerdesign.keywest;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.graphics.Color;
@@ -45,6 +46,7 @@ public class EntryActivity extends Activity {
     Button profilePictureButton, driversLicenceButton, checkitcardButton,
             oebbCardButton, passportButton, idFrontButton, idBackButton,
             saveButton, calcButton;
+    Uri personUri;
     TextView text;
     EditText newNameText, dateText;
     int age, testCounter;
@@ -81,7 +83,7 @@ public class EntryActivity extends Activity {
         // DEVELOPERS MODE END
     }
 
-    private void createLocation(View v, int id) {
+    private synchronized void createLocation(View v, int id) {
 
         String PERSON_FOLDER;
         String inputText;
@@ -124,6 +126,9 @@ public class EntryActivity extends Activity {
         } catch (Exception e) {
             c.println("Exception:\t" + e);
         }
+
+
+
         // chooses the kind of card which has been taken as image
         String IDCARD = checkKindOfImage(getCurrentViewForImage());
         // add the path of the image to the database object
@@ -132,12 +137,16 @@ public class EntryActivity extends Activity {
         newNameText = (EditText) findViewById(R.id.newName);
         datecalc = new DateCalculator();
 
+
+
         // get selected date
         EditText dateEditText = (EditText) findViewById(R.id.dateText);
         inputText = dateEditText.getText().toString();
         int inputTextLength = inputText.toCharArray().length;
-        // count with or without splitting dots
 
+
+
+        // count with or without splitting dots
         switch (inputTextLength) {
             case DATE_UNFORMATTED: {
                 dateEditText.setHintTextColor(Color.parseColor("#F5F6CE"));
@@ -161,12 +170,16 @@ public class EntryActivity extends Activity {
             }
         }
 
+
+
         // merge
         datestring = sDay + sMonth + sYear;
         formattedDate = sDay + "." + sMonth + "." + sYear;
 
+
+
 		/*
-		 * TODO activating the timestamp funcionality to create a unique folder
+		 * TODO activating the timestamp functionality to create a unique folder
 		 * name
 		 */
         // String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new
@@ -174,13 +187,18 @@ public class EntryActivity extends Activity {
 
         // regular expression settings
         NAME_PATTERN = "[öÖäÄüÜßA-Za-z]{3,20}\\s+[öÖäÄüÜßA-Za-z]{2,40}";
+
+
 		/*
 		 * Split the name into first & last name and send it to a vector (if a
 		 * second first name is available)
 		 */
+
+
         inputText = newNameText.getText().toString();
-        // String[] firstAndLastName = new String[inputText.split(" ").length];
+
         String[] firstAndLastName = new String[3];
+
         try {
 
             c.println("Array Lenght: " + firstAndLastName.length);
@@ -200,16 +218,14 @@ public class EntryActivity extends Activity {
                         + " set as Name.");
             }
 
-            // root directory of the app data
 
-            File KWIMG = new File(Environment.getExternalStorageDirectory() + "/KWIMG");
+
+            // root directory of the app data
+            File KWIMG = new File(Environment.getExternalStorageDirectory(), "KWIMG");
             c.println("KWIMG path: "+KWIMG.getPath());
             KWIMG.mkdir();
             KWIMG.setWritable(true);
-            String kwPath = KWIMG.getPath().toString() + "/";
-            c.println("kwPath: "+kwPath);
-            if (KWIMG.exists())
-                System.err.println("KWIMG created.");
+
 			/*
 			 * create individualized folder with named by the persons full name
 			 * and its birthday
@@ -223,13 +239,13 @@ public class EntryActivity extends Activity {
             // lastname
             fullName = firstAndLastName[0] + " " + firstAndLastName[1];
 
-            personDIR = new File(kwPath + PERSON_FOLDER + "/");
+            personDIR = new File(KWIMG.getPath()+"/" + PERSON_FOLDER);
+            personUri = Uri.fromFile(personDIR);
             c.println("personDIR(& absolutPath): "+ personDIR.getPath());
             absolutPath = personDIR;
 
             personDIR.mkdirs();
             personDIR.canWrite();
-            System.err.println("Creating locations successfully.");
 
         } catch (IndexOutOfBoundsException ex) {
             Toast.makeText(EntryActivity.this,
@@ -247,28 +263,36 @@ public class EntryActivity extends Activity {
         Pattern p = Pattern.compile(NAME_PATTERN);
         Matcher m = p.matcher(fullName);
 
-        c.println("Check FULLNAME: " + fullName);
 
         if (m.matches()) {
             c.println("Matcher startet with " + fullName);
 
             newNameText.setHintTextColor(Color.parseColor("#F5F6CE"));
-            c.println("Picture Path:\t" + personDIR.getPath());
+
+
+
             // save path to array to send it to database
             String filePath = personDIR.getPath()
                     + firstAndLastName[0].toUpperCase(Locale.GERMANY)
                     + firstAndLastName[1].toUpperCase(Locale.GERMANY) + IDCARD
                     + ".jpg";
+            c.println("FILE Path:\t" + filePath.toString());
+
+
 
             // database dispatches
             firstname = firstAndLastName[0];
             lastname = firstAndLastName[1];
+
 
             // Button IDs
             final int[] PHOTO_BUTTON_IDS = {profilePictureButton.getId(),
                     driversLicenceButton.getId(), checkitcardButton.getId(),
                     oebbCardButton.getId(), passportButton.getId(),
                     idFrontButton.getId(), idBackButton.getId()};
+
+
+
             // set the file path to array for database
             for (int i = 0; i < 7; i++) {
                 if (PHOTO_BUTTON_IDS[i] == LayoutContainer.getChildAt(1)
@@ -301,27 +325,40 @@ public class EntryActivity extends Activity {
                     +"_"
                     + firstAndLastName[1].toUpperCase(Locale.GERMANY);
 
+
+
             // clear first
             photo = null;
-            //photo = new File(personDIR.getPath(), path + IDCARD + ".jpg");
+
+
             //test
             photo = new File(personDIR.getPath(), path + IDCARD);
             photo_tmp = photo;
             c.println("photo_tmp Path: "+photo_tmp.getPath());
 
+
+
             // clear first
             detailsFile = null;
             detailsFile = new File(personDIR.getPath(), path + "_DETAILS.txt");
+
+
 
             // declare imageUri as the Uri of photo
             temporary = Uri.fromFile(photo);
             try {
                 testCounter++;
+
                 Toast.makeText(EntryActivity.this,
                         "Test Counter = " + testCounter,
                         Toast.LENGTH_SHORT).show();
+
                 String date = dateText.getText().toString();
+
                 String name = newNameText.getText().toString();
+
+
+
                 // age output
                 String output = text.getText().toString();
                 int dateLength = dateText.getText().toString().toCharArray().length;
@@ -344,7 +381,9 @@ public class EntryActivity extends Activity {
                 if (name != "" && date != "" && output != "" && dateLength == 10) {
                     takePicture();
                 } else {
-                    onRestart();
+                    Toast.makeText(EntryActivity.this, "[createLocation() -> onRestart()]",
+                            Toast.LENGTH_SHORT).show();
+                    this.onRestart();
                 }
             } catch (Exception ex) {
                 System.err.println("TAKE PICTURE EXCEPTION: " + ex);
@@ -353,17 +392,23 @@ public class EntryActivity extends Activity {
             c.println("Full Name Variable doesn't match: " + fullName);
         }
 
-        // KWIMG.setWritable(false);
-        // KWIMG.setReadable(false);
     }
 
-    private void takePicture() {
+    //TODO war vorher final, ich tausche jetzt die MediaStore Option
+    Intent takePictureIntent = new Intent(
+            MediaStore.ACTION_IMAGE_CAPTURE);
+
+
+    private synchronized void takePicture() {
         // call the device camera
-        final Intent takePictureIntent = new Intent(
-                MediaStore.ACTION_IMAGE_CAPTURE);
+
+
+
         //test
         takePictureIntent.putExtras(takePictureIntent);
         //test end
+
+
 
             if (takePictureIntent != null) {
 
@@ -389,26 +434,37 @@ public class EntryActivity extends Activity {
         try {
             super.onActivityResult(requestCode, resultCode, data);
             if (data == null) {
-                c.println("data is null in [onActivityResult], data: " + data);
+                c.println("ERROR data is null in [onActivityResult], data: " + data);
 
             } else {
                 c.println("data not null in [onActivityResult], data: " + data);
                 c.println("RQCode: " + requestCode + "  RCode: " + resultCode);
 
-                if (requestCode == REQUEST_TAKE_PICTURE
-                        && resultCode == Activity.RESULT_OK) {
-                    getContentResolver().notifyChange(temporary, null);
-                    // set the picture to the ImageView
-                    c.println("Set 'Done' image as Background resource");
+                if (requestCode == REQUEST_TAKE_PICTURE) {
+                    c.println("Request Code OK\n");
 
-                    getCurrentViewForImage().setBackgroundResource(R.drawable.ic_action_done);
-                    File picture = new File(absolutPath,photo_tmp.getName());
-                    c.println("absolutPath: " + absolutPath.toString());
-                    c.println("photo_tmp Name: "+ photo_tmp.getName());
+                    if (resultCode == Activity.RESULT_OK) {
+                        c.println("Result Code OK\n");
+                        getContentResolver().notifyChange(temporary, null);
+                        // set the picture to the ImageView
+                        c.println("Set 'Done' image as Background resource");
+                        getCurrentViewForImage().setBackgroundResource(R.drawable.ic_action_done);
+                        File picture = new File(absolutPath, photo_tmp.getName());
 
+                        Toast.makeText(this, "Image saved to:\n" +
+                                data.getData(), Toast.LENGTH_LONG).show();
+                        c.println("absolutPath: " + absolutPath.toString());
+                        c.println("photo_tmp Name: " + photo_tmp.getName());
 
+                    } else {
+                        c.println("Result Code FAILED\n");
+                    }
 
-                }
+                } else {
+                    c.println("Request Code FAILED\n");
+                    Toast.makeText(EntryActivity.this, "Fehlgeschlagen! Bitte erneut versuchen.",
+                            Toast.LENGTH_SHORT).show();
+                    startActivityForResult(takePictureIntent, REQUEST_TAKE_PICTURE);
                 }
 				/*
 				 * if you throw the picture away which was taken to make a new
@@ -418,6 +474,7 @@ public class EntryActivity extends Activity {
                     c.println("Nehme neues Foto auf.");
                     createLocation(getCurrentViewForImage(), 1);
                 }
+            }
 
         } catch (Exception ex) {
             System.err.println("ON ATIVITY RESULT EXCEPTION: " + ex);
@@ -462,12 +519,20 @@ public class EntryActivity extends Activity {
 
             // add details to textfile
             addDetailsToFile(detailsFile, R.id.personDetails);
-
+            //info
+            try {
+                System.err.println("db.addPerson("+age + "," + firstname + "," + lastname + "," + formattedDate + "," + imagePaths[0] + "," + imagePaths[1] + "," + imagePaths[2] + "," + imagePaths[3] + "," + imagePaths[4] + "," + imagePaths[5] + "," + imagePaths[6] + "," + detailsFile.getPath() + "," + isBanned + ");");
+            }catch(Exception exx){
+                System.err.println("Zugriffsfehler auf Datenbank: \n"+exx);
+            }
+            //info end
             db.addPerson(age, firstname, lastname, formattedDate,
                     imagePaths[0], imagePaths[1], imagePaths[2], imagePaths[3],
                     imagePaths[4], imagePaths[5], imagePaths[6],
                     detailsFile.getPath(), isBanned);
-
+            Person p = db.getPerson(1);
+            System.err.println("Print First Person in Table:\n");
+            p.printAll();
             // TODO change text to smaller user information
             Toast.makeText(
                     EntryActivity.this,

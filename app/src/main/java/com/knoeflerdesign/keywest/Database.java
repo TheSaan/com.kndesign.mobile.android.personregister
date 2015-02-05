@@ -274,8 +274,9 @@ public class Database extends SQLiteOpenHelper {
 							c.getString(11),// id back path
 							c.getString(12),// details path)
 							Integer.parseInt(c.getString(13)));// isBanned
-
+                    person.printAll();
 					persons.add(person);
+
 				} while (c.moveToNext());
 			}
 		} else {

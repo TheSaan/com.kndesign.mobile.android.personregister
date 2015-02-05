@@ -2,10 +2,12 @@ package com.knoeflerdesign.keywest;
 
 import com.knoeflerdesign.keywest.R.color;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,7 +29,8 @@ public class StartActivity extends Activity {
 		setMinAgeDate();
 
 		db = new Database(this, Database.DATABASE_TABEL_PERSONS, cf, 1);
-	
+        //TODO Diese Funktion wird später in den "Informationen" aufgelistet und ist nur dem Entwickler und dem Chef zugängig
+
 	}
 
 	protected void onResume() {
@@ -56,7 +59,8 @@ public class StartActivity extends Activity {
 		} else {
 			
 			Log.v("SearchView not found",
-					"The search button is not linked to a SearchView!");
+					"The search button is not linked to a SearchView!\n" +
+                            "StartActivity onCreateOptionsMenu(Menu)");
 			return true;
 		}
 	}
@@ -76,6 +80,17 @@ public class StartActivity extends Activity {
 			addPerson();
 			return true;
 		}
+       /* case R.id.action_entry_count:{
+            showMoreInformation();
+            return true;
+        }*/
+        case R.id.action_action_show_all_entries:{
+            //showAllEntries();
+            db.getAllEntries();
+        }
+        case R.id.action_back:{
+            setContentView(R.layout.activity_start);
+        }
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -129,6 +144,13 @@ public class StartActivity extends Activity {
 
 	}
 
+    private void showAllEntries(){
+        Intent i = new Intent(getApplicationContext(), SearchActivity.class);
+        i.putExtra("query",Database.ALL);
+        startActivity(i);
+        onPause();
+    }
+
 	@Override
 	public boolean onSearchRequested(){
 		Bundle appData = new Bundle();
@@ -136,5 +158,25 @@ public class StartActivity extends Activity {
 		startSearch(null,false,appData,false);
 		return true;
 	}
-	
+
+  /*  private int showMoreInformation(){
+        setContentView(R.layout.activity_info);
+        checkForHomeToActivateBackButton(R.layout.activity_info);
+        db.getReadableDatabase();
+        TextView amountText = (TextView)findViewById(R.id.textviewAmountOfEntriesNumber);
+        amountText.setText(""+db.countPersons());
+        return R.layout.activity_info;
+    }*/
+	/*private boolean checkForHomeToActivateBackButton(int cv_id){
+        int id = R.id.startContentView;
+        MenuItem back = (MenuItem)findViewById(R.id.action_back);
+
+        if(cv_id != id){
+            //back.setVisible(true);
+            return false;
+        }else{
+            //back.setVisible(false);
+            return true;
+        }
+    }*/
 }

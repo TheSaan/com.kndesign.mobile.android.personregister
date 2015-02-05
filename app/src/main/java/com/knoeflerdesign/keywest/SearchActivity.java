@@ -64,7 +64,7 @@ public class SearchActivity extends Activity {
         }
     }
 
-    private void search(String query) {
+    protected        void search(String query) {
         Toast.makeText(SearchActivity.this, "Query: " + query,
                 Toast.LENGTH_SHORT).show();
         final String QUERY = query;
@@ -97,7 +97,18 @@ public class SearchActivity extends Activity {
                 // if(cursor != null){
                 Person p = db.getPerson(db.findIdByQuery(QUERY));
 
-
+                //Test output///////////////////////////////////////////////////////////
+                /*String testbanned = "nein";
+                if(p.isBanned == 1){
+                    testbanned = "ja";
+                }
+                Toast.makeText(SearchActivity.this,
+                        "Ausgewählte Person:\n"
+                                + p.firstname
+                                + " "+p.lastname+"\n"
+                                + "Alter: "+ p.age+"\n"
+                                + "Hausverbot: "+ testbanned, Toast.LENGTH_SHORT).show();*/
+                //Test output end///////////////////////////////////////////////////////////
                 // list item children
                 ImageView thumbnail = (ImageView) findViewById(R.id.thumbnail);
                 TextView description = (TextView) findViewById(R.id.personDescription);
