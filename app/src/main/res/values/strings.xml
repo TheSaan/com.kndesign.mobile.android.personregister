@@ -66,4 +66,7 @@
 	<string name="thumbnailCD">Profilbild Vorschau</string>
 	<string name="bannedImageCD">Hausverbot Icon</string>
 	<string name="detailsImageCD">Enthält weitere Details zur Person</string>
+    <string name="designedForDescription">Key West Personen Register Entwickelt von Michael Knöfler. \n\nEntwicklert für Android API Version 4.4.2, eingestellt auf 7 Zoll Displays. Optische Abweichungen entstehen durch installieren auf nicht gewährleistete Hardware.</string>
+    <string name="buildNumberTitle">Build Number</string>
+    <string name="AmountOfEntriesDesciption">Einträge</string>
 </resources>

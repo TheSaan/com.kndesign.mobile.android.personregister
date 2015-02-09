@@ -1,6 +1,7 @@
 package com.knoeflerdesign.keywest;
 
 import android.app.Activity;
+import android.app.LauncherActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -22,29 +23,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
 public class SearchActivity extends Activity {
 
+    final String PLUS_SIXTEEN = "16+";
+    final String PLUS_EIGHTEEN = "18+";
+    final String BANNED = "hausverbot";
+    // search selection criteria
+    protected Database db;
     ListView personList;
     SearchView searchText;
     ArrayAdapter<String> adapter;
     CursorFactory cf;
-    // search selection criteria
-
-    final String PLUS_SIXTEEN = "16+";
-    final String PLUS_EIGHTEEN = "18+";
-    final String ALL = "alle";
-    final String BANNED = "hausverbot";
-
-    protected Database db;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,17 +52,19 @@ public class SearchActivity extends Activity {
         // The list of the results
         personList = (ListView) findViewById(R.id.resultList);
 
+
+
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             search(query);
         }
+
     }
 
-    protected        void search(String query) {
-        Toast.makeText(SearchActivity.this, "Query: " + query,
-                Toast.LENGTH_SHORT).show();
+    protected void search(String query) {
+
         final String QUERY = query;
         // TODO check if first name or last name is on first place
 
@@ -74,99 +72,46 @@ public class SearchActivity extends Activity {
          * returns the correct cursor decided by a: + default name search +
 		 * query equals '16+' + query equals '18+' + query equals 'hausverbot'
 		 */
-        Cursor c = getSearchCursor(query);
-        CursorAdapter ca = new CursorAdapter(getApplicationContext(), c,
-                CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER) {
+        Cursor cursor;
 
-            @Override
-            public View newView(Context context, Cursor cursor, ViewGroup parent) {
-                int item_view_id = R.layout.search_list_item;
+        if(QUERY == Database.ALL ||QUERY == PLUS_SIXTEEN ||QUERY == PLUS_EIGHTEEN ||QUERY == BANNED){
+            cursor = getSearchCursor(QUERY);
+        }else {
+            cursor = db.readData();
+        }
+        //columns from database
+        final String[] select_from = {Database.COL_ID,Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME};
 
-                // inflate item view to list view holder
-                LinearLayout holderView = new LinearLayout(context);
-                String inflaterName = Context.LAYOUT_INFLATER_SERVICE;
-                LayoutInflater inflater = (LayoutInflater) context
-                        .getSystemService(inflaterName);
-                inflater.inflate(item_view_id, holderView, true);
-
-                return holderView;
-            }
-
-            @Override
-            public void bindView(View view, Context context, Cursor cursor) {
-                // if(cursor != null){
-                Person p = db.getPerson(db.findIdByQuery(QUERY));
-
-                //Test output///////////////////////////////////////////////////////////
-                /*String testbanned = "nein";
-                if(p.isBanned == 1){
-                    testbanned = "ja";
-                }
-                Toast.makeText(SearchActivity.this,
-                        "Ausgewählte Person:\n"
-                                + p.firstname
-                                + " "+p.lastname+"\n"
-                                + "Alter: "+ p.age+"\n"
-                                + "Hausverbot: "+ testbanned, Toast.LENGTH_SHORT).show();*/
-                //Test output end///////////////////////////////////////////////////////////
-                // list item children
-                ImageView thumbnail = (ImageView) findViewById(R.id.thumbnail);
-                TextView description = (TextView) findViewById(R.id.personDescription);
-                ImageView banned = (ImageView) findViewById(R.id.bannedImage);
-                ImageView moreDetails = (ImageView) findViewById(R.id.detailsImage);
-
-                //the list item
-                LinearLayout list_item;
-
-                ListView list = (ListView) findViewById(R.id.resultList);
-                int list_length = list.getCount();
-
-                Vector<LinearLayout> list_items = new Vector<LinearLayout>();
-
-                try {
-                    //check if the list has one or more entries and add them to a vector
-                    //TODO normally here the items cannot be null because they only get called if the list length is more than 0
-
-                    if (list_length > 0) {
-                        int i;
-                        for (i = 0; i < list_length; i++) {
-                            list_items.add((LinearLayout) list.getChildAt(i));
-                        }
-
-                        //TODO ich muss den text für alle listen elemente anpassen, also mit schleife durch vector list_items
-                        String personsData = description.getText().toString();
-
-
-                        Toast.makeText(SearchActivity.this,
-                                "bindView wurde aufgerufen mit " + personsData, Toast.LENGTH_SHORT).show();
-
-                        p.showInformationInList(thumbnail, description, banned,
-                                moreDetails);
-
-                        System.out.println("in bindView person is:\n");
-                        p.printAll();
-
-                    } else {
-                        Toast.makeText(SearchActivity.this,
-                                "ListItem was NULL", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (NullPointerException ex) {
-                    System.err.println("thumbnail:  " + thumbnail + "\n"
-                            + "description:  " + description + "\n"
-                            + "banned:  " + banned + "\n" + "moreDetails:  "
-                            + moreDetails + "\n\n NPE!!");
-                }
-            }
+        //view to add the data in each list item
+        int[] add_to = new int[]{
+                R.id.personListIndex,
+                R.id.personAge,
+                R.id.personFirstname,
+                R.id.personLastname
         };
+        //the adapter which adds the data to the views
+        SimpleCursorAdapter ca = new SimpleCursorAdapter(SearchActivity.this,R.layout.search_list_item,cursor,select_from,add_to);
+
+        ca.notifyDataSetChanged();
+        //check for banned icon to show or not
+        setBannedIconState(personList, QUERY);
         personList.setAdapter(ca);
+
+
     }
+    private void setBannedIconState(ListView lv, String query){
+        try {
+            Cursor c = getSearchCursor(query);
+            for (int i = 0; i < lv.getCount(); i++) {
 
-    /**
-     * @see <a
-     * href="http://developer.android.com/training/camera/photobasics.html#TaskScalePhoto">Android/Taking
-     * Photos Simply/Scale Photos</a>
-     */
+                lv.getChildAt(i).setVisibility(View.VISIBLE);
 
+            }
+        }catch (NullPointerException npe){
+
+        }
+
+    }
     private void setPicAsThumbnail(ImageView mImageView,
                                    String mCurrentPhotoPath) {
         // Get the dimensions of the View
@@ -193,40 +138,35 @@ public class SearchActivity extends Activity {
     }
 
     private Cursor getSearchCursor(String command) {
-        System.out.println("getSearchCursor startet");
-
+        System.out.println("getSearchCursor startet mit: " + command);
+        //the coumns to select
         String[] columns = {Database.COL_ID, Database.COL_PROFILEPICTURE,
                 Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME};
 
-
         String[] selection = {
-                Database.COL_AGE+"<18",
-                Database.COL_AGE+">=18",
-                Database.COL_BANNED+"=1",
+                Database.COL_AGE + "<18",
+                Database.COL_AGE + ">=18",
+                Database.COL_BANNED + "=1",
                 Database.COL_FIRSTNAME + "=? AND " + Database.COL_LASTNAME
                         + "=?"};
 
 
         db = new Database(this, Database.DATABASE_TABEL_PERSONS, cf, 1);
-    /*
-        Cursor c = db.getReadableDatabase().rawQuery(
-                "SELECT * FROM " + Database.DATABASE_TABEL_PERSONS,
-                new String[]{});
-     */
+
         Cursor c;
 
         // Show all
-        if (command == ALL) {
-            Log.v("getSearchCursor", "ALL, [" + command + "]");
-
-            c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
-                    columns, null, null, null, null, Database.COL_LASTNAME);
+        if (command == Database.ALL) {
+            Log.v("getSearchCursor", "ALL, [" + command + "]\n" +
+                    "\n");
+            c = db.readData();
             c.moveToFirst();
             return c;
         } else
             // show 16+
             if (command == PLUS_SIXTEEN) {
-                Log.v("getSearchCursor", "PLUS_SIXTEEN, [" + command + "]");
+                Log.v("getSearchCursor", "PLUS_SIXTEEN, [" + command + "]\n" +
+                        "\n");
                 c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                         columns, selection[0], null, null, null,
                         Database.COL_LASTNAME);
@@ -234,7 +174,8 @@ public class SearchActivity extends Activity {
             } else
                 // show 18+
                 if (command == PLUS_EIGHTEEN) {
-                    Log.v("getSearchCursor", "PLUS_EIGHTEEN, [" + command + "]");
+                    Log.v("getSearchCursor", "PLUS_EIGHTEEN, [" + command + "]\n" +
+                            "\n");
                     c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                             columns, selection[1], null, null, null,
                             Database.COL_LASTNAME);
@@ -242,7 +183,8 @@ public class SearchActivity extends Activity {
                 } else
                     // show banned persons
                     if (command == BANNED) {
-                        Log.v("getSearchCursor", "BANNED, [" + command + "]");
+                        Log.v("getSearchCursor", "BANNED, [" + command + "]\n" +
+                                "\n");
                         c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                                 columns, selection[2], null, null, null,
                                 Database.COL_LASTNAME);
@@ -250,8 +192,8 @@ public class SearchActivity extends Activity {
                     } else {
                         // show result of input text search (ordinary name search)
 
-                        Log.v("getSearchCursor", "ELSE, [" + command + "]");
                         String[] query_parts = command.split(" ");
+                        Log.v("getSearchCursor", "Name recognized , [" + command + "]\n\n");
                         c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                                 columns, selection[3], query_parts, null, null,
                                 Database.COL_LASTNAME);
@@ -285,46 +227,28 @@ public class SearchActivity extends Activity {
         }
     }
 
-    private void addListeners() {
-        MenuItem itemAll = (MenuItem) findViewById(R.id.icon_all);
-        MenuItem item16plus = (MenuItem) findViewById(R.id.icon_plus16);
-        MenuItem item18plus = (MenuItem) findViewById(R.id.icon_plus18);
-        MenuItem itemBanned = (MenuItem) findViewById(R.id.icon_banned);
 
-        final int allID, plus16ID, plus18ID, bannedID;
-        allID = itemAll.getItemId();
-        plus16ID = item16plus.getItemId();
-        plus18ID = item18plus.getItemId();
-        bannedID = itemBanned.getItemId();
-
-        itemAll.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-            public boolean onMenuItemClick(MenuItem item) {
-                search(ALL);
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch (item.getItemId()){
+            case R.id.icon_all:{
+                search(Database.ALL);
                 return false;
             }
-        });
-        item16plus.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-            public boolean onMenuItemClick(MenuItem item) {
+            case R.id.icon_plus16:{
                 search(PLUS_SIXTEEN);
                 return false;
             }
-        });
-        item18plus.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-            public boolean onMenuItemClick(MenuItem item) {
+            case R.id.icon_plus18:{
                 search(PLUS_EIGHTEEN);
                 return false;
             }
-        });
-        itemBanned.setOnMenuItemClickListener(new OnMenuItemClickListener() {
-
-            public boolean onMenuItemClick(MenuItem item) {
+            case R.id.icon_banned:{
                 search(BANNED);
                 return false;
             }
-        });
-
+            default:
+                return false;
+        }
     }
 }

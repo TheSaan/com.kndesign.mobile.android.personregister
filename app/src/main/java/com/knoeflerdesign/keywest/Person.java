@@ -57,7 +57,7 @@ public class Person {
 
 	}
 
-	public void showInformationInList(ImageView thumbnail,TextView description,ImageView banned,ImageView information) {
+	public void showInformationInList(int index,TextView indexView,ImageView thumbnail,TextView description,ImageView banned,ImageView information) {
 
 		// set thumbnail of profile picture
 		
@@ -77,6 +77,7 @@ public class Person {
         }
 		description
 				.setText(fullText);
+        indexView.setText(index+". ");
         //TODO delete new Activity for saving resources
         //gets the text which should be shown as the persons data in a listview element
         Toast.makeText(new SearchActivity(),
@@ -93,7 +94,7 @@ public class Person {
 		// set the information status to grey (has no info) or black (has
 		// information)
 
-		if (getDetails(detailspath) == "") {
+		if (getDetails(detailspath).isEmpty()) {
 			information.setImageResource(R.drawable.ic_info_grey);
 		} else {
 			information.setImageResource(R.drawable.ic_info_black);

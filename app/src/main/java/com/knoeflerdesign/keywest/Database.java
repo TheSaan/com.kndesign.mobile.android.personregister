@@ -28,7 +28,7 @@ public class Database extends SQLiteOpenHelper {
 
 	// table values
     //TODO umlaute in utf schreiben
-	public static final String PATH_MAX_VARCHAR_LENGTH = "250";
+	public static final String PATH_MAX_VARCHAR_LENGTH = "500";
 	public static final String SELECT_ALL = "*";
 	public static final String COL_ID = "_id";
 	public static final String COL_AGE = "_alter";
@@ -36,10 +36,10 @@ public class Database extends SQLiteOpenHelper {
 	public static final String COL_FIRSTNAME = "vorname";
 	public static final String COL_BIRTHDATE = "geburtsdatum";
 	public static final String COL_PROFILEPICTURE = "profilbild";
-	public static final String COL_DRIVERSLICENCE = "f�hrerschein";
+	public static final String COL_DRIVERSLICENCE = "führerschein";
 	public static final String COL_CHECKITCARD = "checkitcard";
 	public static final String COL_PASSPORT = "reisepass";
-	public static final String COL_OEBBCARD = "�bbcard";
+	public static final String COL_OEBBCARD = "öbbcard";
 	public static final String COL_PERSO_FRONT = "personalausweis_vs";
 	public static final String COL_PERSO_BACK = "personalausweis_rs";
 	public static final String COL_DETAILS = "details";
@@ -52,8 +52,9 @@ public class Database extends SQLiteOpenHelper {
 			COL_DRIVERSLICENCE, COL_CHECKITCARD, COL_PASSPORT, COL_OEBBCARD,
 			COL_PERSO_FRONT, COL_PERSO_BACK, COL_DETAILS, COL_BANNED };
 
+
 	protected static final String DATABASE_NAME = "KEY_WEST_DATABASE";
-	private static final String DATABASE_TABEL_PASSWORDS = "passw�rter";
+	private static final String DATABASE_TABEL_PASSWORDS = "passwörter";
 	protected static final String DATABASE_TABEL_PERSONS = "personen";
 
 	private static final String TAG = "KeyWestDatabase";
@@ -137,14 +138,18 @@ public class Database extends SQLiteOpenHelper {
 				driverslicence, checkitcard, passport, oebbcard,
 				personalidcardfront, personalidcardback, details };
 
-		//
+        SQLiteDatabase db = this.getReadableDatabase();
 		ContentValues data = new ContentValues();
+
 		final int columnsSize = COLUMNS.length;
 		int k = 0;
 		// add to database
 		if (data != null) {
 			for (int i = 1; i < columnsSize; i++) {
-				if (i == 1) {
+                if(i==1){
+                    data.put(COLUMNS[i], this.countPersons()+1);
+                }
+				if (i == 2) {
 					// add age at correct position
 					data.put(COLUMNS[i], age);
 				}
@@ -153,7 +158,7 @@ public class Database extends SQLiteOpenHelper {
 					// (as boolean integer)
 					data.put(COLUMNS[i], banned);
 				}
-				if (i >= 2 && i < columnsSize - 1) {
+				if (i >= 3 && i < columnsSize - 1) {
 					data.put(COLUMNS[i], arguments[k]);
 					k++;
 				}
@@ -164,45 +169,7 @@ public class Database extends SQLiteOpenHelper {
 		}
 	}
 
-	public Person getPerson(int id) {
-		// TODO the method doesn't look for the id
-		// get the db reference
-		SQLiteDatabase db = this.getReadableDatabase();
-		Person person;
-		// create query
-		Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, "_id = ?",
-				new String[] { String.valueOf(id) }, null, null, null, null);
 
-		// if a result get the first one
-		if (c != null && c.getCount() > 0) {
-			c.moveToFirst();
-
-			person = new Person(Integer.parseInt(c.getString(0)),// id
-					c.getString(2),// firstname
-					c.getString(3),// lastname
-					c.getString(4),// date
-					c.getString(5),// profilepicture path
-					c.getString(6),// driverslicence path
-					c.getString(7),// checkitcard path
-					c.getString(8),// oebb path
-					c.getString(9),// passport path
-					c.getString(10),// id front path
-					c.getString(11),// id back path
-					c.getString(12),// details path)
-					Integer.parseInt(c.getString(13)));// isBanned
-
-			System.out.println("person:\n");
-			person.printAll();
-			c.close();
-			return person;
-		} else {
-			Log.v("Tabel EMPTY", "Table " + DATABASE_TABEL_PERSONS
-					+ " is empty");
-			person = null;
-			return person;
-		}
-
-	}
 
 	public Person getPerson(Cursor cursor) {
 		Person person;
@@ -243,52 +210,22 @@ public class Database extends SQLiteOpenHelper {
 		return count;
 	}
 
-	public Vector<Person> getAllEntries() {
-		Vector<Person> persons = new Vector<Person>();
+	public Cursor readData() {
 
-		// 1. build the query with order rules
-		String orderByDesc = " ORDER BY name DESC";
-		String query = "SELECT  * FROM " + DATABASE_TABEL_PERSONS + orderByDesc;
-
-		// 2. get reference to writable DB
 		SQLiteDatabase db = this.getWritableDatabase();
-		Cursor c = db.rawQuery(query, null);
-
-		// 3. go over each row, build book and add it to list
-		Person person = null;
-
-		if (c.getCount() > 0 && c != null) {
-			if (c.moveToFirst()) {
-				do {
-
-					person = new Person(Integer.parseInt(c.getString(0)),// id
-							c.getString(2),// firstname
-							c.getString(3),// lastname
-							c.getString(4),// date
-							c.getString(5),// profilepicture path
-							c.getString(6),// driverslicence path
-							c.getString(7),// checkitcard path
-							c.getString(8),// oebb path
-							c.getString(9),// passport path
-							c.getString(10),// id front path
-							c.getString(11),// id back path
-							c.getString(12),// details path)
-							Integer.parseInt(c.getString(13)));// isBanned
-                    person.printAll();
-					persons.add(person);
-
-				} while (c.moveToNext());
-			}
-		} else {
-			System.out.println("Cursor id empty or 0 and moveToFirst() is "
-					+ c.moveToFirst());
-		}
-
-		Log.d("get all Persons", persons.toString());
-
-		// return books
-		return persons;
+		Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, null, null, null, null, null);
+        if(c!=null)
+            c.moveToFirst();
+		return c;
 	}
+    public void removeData(int member_id){
+        db.delete(DATABASE_TABEL_PERSONS, Database.COL_ID+" = "+member_id,null);
+    }
+    public int getMemberID(Cursor cursor){
+        //test if first is 1 or 0
+        int index = Integer.parseInt(cursor.getString(1));
+        return index;
+    }
 
 	public Cursor getCursor(int button_id) {
 		String group_by, having, order_by;

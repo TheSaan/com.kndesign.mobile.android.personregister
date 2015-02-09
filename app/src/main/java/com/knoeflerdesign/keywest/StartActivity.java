@@ -2,7 +2,6 @@ package com.knoeflerdesign.keywest;
 
 import com.knoeflerdesign.keywest.R.color;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.app.SearchManager;
 import android.content.Context;
@@ -47,8 +46,8 @@ public class StartActivity extends Activity {
 		SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
 
 		SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
-		
-		
+
+
 		// Assumes current activity is the searchable activity
 		if (searchView != null) {
 			searchView.setSearchableInfo(searchManager
@@ -57,7 +56,7 @@ public class StartActivity extends Activity {
 			searchView.setSubmitButtonEnabled(true);
 			return true;
 		} else {
-			
+
 			Log.v("SearchView not found",
 					"The search button is not linked to a SearchView!\n" +
                             "StartActivity onCreateOptionsMenu(Menu)");
@@ -80,13 +79,9 @@ public class StartActivity extends Activity {
 			addPerson();
 			return true;
 		}
-       /* case R.id.action_entry_count:{
-            showMoreInformation();
-            return true;
-        }*/
         case R.id.action_action_show_all_entries:{
-            //showAllEntries();
-            db.getAllEntries();
+
+            showAllEntries();
         }
         case R.id.action_back:{
             setContentView(R.layout.activity_start);
