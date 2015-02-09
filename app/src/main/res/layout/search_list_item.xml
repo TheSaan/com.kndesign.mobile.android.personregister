@@ -28,6 +28,12 @@
         android:text="17 "
         android:textSize="38sp"
         />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1" />
+
     <TextView
         android:id="@+id/personFirstname"
         android:layout_width="wrap_content"
@@ -38,7 +44,7 @@
     <Space
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="0.21" />
+        android:layout_weight="0.1" />
 
     <TextView
         android:id="@+id/personLastname"
@@ -49,7 +55,7 @@
 
     <ImageView
         android:id="@+id/bannedImage"
-        android:visibility="invisible"
+        android:visibility="visible"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:contentDescription="@string/bannedImageCD"

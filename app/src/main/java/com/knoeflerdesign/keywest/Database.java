@@ -115,10 +115,6 @@ public class Database extends SQLiteOpenHelper {
 		onCreate(db);
 	}
 
-	public synchronized void onClose() {
-
-	}
-
 	/**
 	 * @param name
 	 *            The last name
@@ -145,11 +141,14 @@ public class Database extends SQLiteOpenHelper {
 		int k = 0;
 		// add to database
 		if (data != null) {
-			for (int i = 1; i < columnsSize; i++) {
-                if(i==1){
-                    data.put(COLUMNS[i], this.countPersons()+1);
+            for (int i = 0; i < columnsSize; i++) {
+                System.out.println(i+". Column:\t"+COLUMNS[i]);
+            }
+			for (int i = 0; i < columnsSize; i++) {
+                if(i==0){
+                    data.put(COLUMNS[i], (this.countPersons()+1));
                 }
-				if (i == 2) {
+				if (i == 1) {
 					// add age at correct position
 					data.put(COLUMNS[i], age);
 				}
@@ -158,7 +157,7 @@ public class Database extends SQLiteOpenHelper {
 					// (as boolean integer)
 					data.put(COLUMNS[i], banned);
 				}
-				if (i >= 3 && i < columnsSize - 1) {
+				if (i >= 2 && i < columnsSize - 1) {
 					data.put(COLUMNS[i], arguments[k]);
 					k++;
 				}

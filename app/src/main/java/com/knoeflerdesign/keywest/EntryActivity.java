@@ -92,9 +92,7 @@ public class EntryActivity extends Activity {
 		 * having to type them in all the time
 		 */
         isNewStart = true;
-        fillActivityWithTestData("Michael Knöfler","08111990");
-        // name
-        // fillActivityWithTestData("Michael Kn�fler", "08111990");
+        //fillActivityWithTestData("Michael Knöfler","08111990");
         // DEVELOPERS MODE END
     }
 

@@ -1,7 +1,6 @@
 package com.knoeflerdesign.keywest;
 
 import android.app.Activity;
-import android.app.LauncherActivity;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -11,24 +10,15 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MenuItem.OnMenuItemClickListener;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CursorAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import java.util.ListIterator;
-import java.util.Vector;
 
 public class SearchActivity extends Activity {
 
@@ -53,7 +43,6 @@ public class SearchActivity extends Activity {
         personList = (ListView) findViewById(R.id.resultList);
 
 
-
         // Get the intent, verify the action and get the query
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -74,44 +63,107 @@ public class SearchActivity extends Activity {
 		 */
         Cursor cursor;
 
-        if(QUERY == Database.ALL ||QUERY == PLUS_SIXTEEN ||QUERY == PLUS_EIGHTEEN ||QUERY == BANNED){
+        if (QUERY == Database.ALL || QUERY == PLUS_SIXTEEN || QUERY == PLUS_EIGHTEEN || QUERY == BANNED) {
             cursor = getSearchCursor(QUERY);
-        }else {
+        } else {
             cursor = db.readData();
         }
         //columns from database
-        final String[] select_from = {Database.COL_ID,Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME};
+        final String[] select_from = {/*Database.COL_ID,*/ Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME};
 
         //view to add the data in each list item
         int[] add_to = new int[]{
-                R.id.personListIndex,
+                /*R.id.personListIndex,*/
                 R.id.personAge,
                 R.id.personFirstname,
                 R.id.personLastname
         };
         //the adapter which adds the data to the views
-        SimpleCursorAdapter ca = new SimpleCursorAdapter(SearchActivity.this,R.layout.search_list_item,cursor,select_from,add_to);
-
+        SimpleCursorAdapter ca = new SimpleCursorAdapter(SearchActivity.this, R.layout.search_list_item, cursor, select_from, add_to);
         ca.notifyDataSetChanged();
         //check for banned icon to show or not
-        setBannedIconState(personList, QUERY);
+        //setIconAndImageStates(personList);
         personList.setAdapter(ca);
 
 
     }
-    private void setBannedIconState(ListView lv, String query){
-        try {
-            Cursor c = getSearchCursor(query);
-            for (int i = 0; i < lv.getCount(); i++) {
 
-                lv.getChildAt(i).setVisibility(View.VISIBLE);
+    private void setIconAndImageStates(ListView lv) {
+        /*
+        * if the ListView gets created by the database data,
+        * run through all items and set thier Profile Picture
+        * thumbnails and check the banned status
+        * */
+
+        //all columns for the settings
+        String[] column_banned = {Database.COL_ID, Database.COL_BANNED, Database.COL_PROFILEPICTURE};
+
+
+        try {
+
+            for (int i = 0; i < lv.getCount(); i++) {
+                //the current list item
+                View v = lv.getChildAt(i);
+
+                //get all children of the current list item
+                TextView firstname = (TextView) v.findViewById(R.id.personFirstname);
+                TextView lastname = (TextView) v.findViewById(R.id.personLastname);
+                ImageView banned_image = (ImageView) v.findViewById(R.id.bannedImage);
+                ImageView img = (ImageView) v.findViewById(R.id.thumbnail);
+                TextView id = (TextView) v.findViewById(R.id.personListIndex);
+                int mID = Integer.parseInt(id.getText().toString());
+                //options for selecting
+                String[] selection = {
+                        Database.COL_FIRSTNAME + "=?" + " AND " +
+                                Database.COL_LASTNAME + "=?" + " AND " +
+                                Database.COL_BANNED + "=" + 1 + " AND " +
+                                Database.COL_ID + "=" + mID
+                };
+
+                //selection args
+                String[] args = {firstname.getText().toString(), lastname.getText().toString()};
+
+                //setup the cursor
+                Cursor c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                        column_banned, selection[0], args, null, null,
+                        Database.COL_LASTNAME);
+
+                //check stats
+                if (c.getCount() > 0) {
+                    for (int it = 1; it < c.getCount(); it++) {
+                        if (c.getInt(c.getColumnIndex("hausverbot")) == 1) {
+                            img.setImageResource(R.drawable.ic_house_banned_black);
+                        }
+                    }
+                } else {
+                    System.out.println("Cursor is empty");
+                }
+/*
+                System.out.println("mID: "+mID);
+                System.out.println("bannedCursor.getCount(): "+bannedCursor.getCount());
+                if(bannedCursor.getCount() > 0) {
+                    try {
+                        System.out.println("Current Index: " + mID + "\tCurrent Cursor Index: " + bannedCursor.getInt(1));
+                        System.out.println("mID: "+mID);
+                        if (bannedCursor.getInt(1) == mID) {
+
+                            banned_image.setVisibility(View.VISIBLE);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Problem in Cursor finder:\n\n " + e);
+                    }
+                }else{
+                    System.err.println("Cursor is empty");
+                }*/
+
 
             }
-        }catch (NullPointerException npe){
+        } catch (NullPointerException npe) {
 
         }
 
     }
+
     private void setPicAsThumbnail(ImageView mImageView,
                                    String mCurrentPhotoPath) {
         // Get the dimensions of the View
@@ -229,21 +281,21 @@ public class SearchActivity extends Activity {
 
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch (item.getItemId()){
-            case R.id.icon_all:{
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.icon_all: {
                 search(Database.ALL);
                 return false;
             }
-            case R.id.icon_plus16:{
+            case R.id.icon_plus16: {
                 search(PLUS_SIXTEEN);
                 return false;
             }
-            case R.id.icon_plus18:{
+            case R.id.icon_plus18: {
                 search(PLUS_EIGHTEEN);
                 return false;
             }
-            case R.id.icon_banned:{
+            case R.id.icon_banned: {
                 search(BANNED);
                 return false;
             }
