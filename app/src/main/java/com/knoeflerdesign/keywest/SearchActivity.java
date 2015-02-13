@@ -7,18 +7,27 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import org.w3c.dom.Text;
+
+import java.io.FileNotFoundException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SearchActivity extends Activity {
 
@@ -31,6 +40,9 @@ public class SearchActivity extends Activity {
     SearchView searchText;
     ArrayAdapter<String> adapter;
     CursorFactory cf;
+
+    //include self written functions for path splitting, etc
+    FunctionalityFactory ff;
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +65,7 @@ public class SearchActivity extends Activity {
     }
 
     protected void search(String query) {
-
+        ff = new FunctionalityFactory();
         final String QUERY = query;
         // TODO check if first name or last name is on first place
 
@@ -61,32 +73,208 @@ public class SearchActivity extends Activity {
          * returns the correct cursor decided by a: + default name search +
 		 * query equals '16+' + query equals '18+' + query equals 'hausverbot'
 		 */
+
+        final String NAME_PATTERN = "[öÖäÄüÜßA-Za-z]{3,20}\\s+[öÖäÄüÜßA-Za-z]{2,40}";
+
+        Pattern p = Pattern.compile(NAME_PATTERN);
+        Matcher m = p.matcher(QUERY);
+
         Cursor cursor;
 
-        if (QUERY == Database.ALL || QUERY == PLUS_SIXTEEN || QUERY == PLUS_EIGHTEEN || QUERY == BANNED) {
-            cursor = getSearchCursor(QUERY);
-        } else {
-            cursor = db.readData();
-        }
-        //columns from database
-        final String[] select_from = {/*Database.COL_ID,*/ Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME};
+        String[] select_from = {Database.COL_ID, Database.COL_PROFILEPICTURE, Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME, Database.COL_BANNED};
 
         //view to add the data in each list item
         int[] add_to = new int[]{
-                /*R.id.personListIndex,*/
+                R.id.personListIndex,
+                R.id.thumbnail,
                 R.id.personAge,
                 R.id.personFirstname,
-                R.id.personLastname
+                R.id.personLastname,
+                R.id.bannedImage
         };
+
+
+        if (QUERY == PLUS_SIXTEEN || QUERY == PLUS_EIGHTEEN || QUERY == Database.COL_BANNED) {
+            cursor = getSearchCursor(QUERY);
+
+
+        }else
+        if(QUERY == Database.ALL){
+            cursor = db.readData();
+        }
+
+
+        //if ask for name
+        //this order is important
+        else if(m.matches()){
+            //search for name
+            cursor = getSearchCursor(QUERY);
+        }else{
+            Toast.makeText(SearchActivity.this,
+                    "Eingabe nicht erkannt!",
+                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(SearchActivity.this,
+                    "Es werden alle Einträge angezeigt!",
+                    Toast.LENGTH_LONG).show();
+            cursor = db.readData();
+        }
+
+
         //the adapter which adds the data to the views
         SimpleCursorAdapter ca = new SimpleCursorAdapter(SearchActivity.this, R.layout.search_list_item, cursor, select_from, add_to);
+
+        ca.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+            //calculates the length of the full name and
+            //if its bigger than 18 print "Max Musterm..."
+            int name_length;
+            int db_id,id;
+            String firstName,lastName;
+            //for checking if its the right entry to change the name
+            Cursor c;
+            String[] columns = {Database.COL_ID,Database.COL_FIRSTNAME,Database.COL_LASTNAME};
+
+
+            @Override
+            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+
+                db_id = cursor.getInt(0)+1;
+
+                if (!(view instanceof ImageView)) {
+                    if (view instanceof TextView) {
+
+                        if (view.getId() == R.id.personFirstname) {
+                            firstName = null;
+                            TextView text = (TextView) view;
+                            name_length = text.getText().toString().toCharArray().length;
+                            firstName = text.getText().toString();
+                            //System.out.println(text.getText().toString()+"("+name_length+")");
+                        }
+                        if (view.getId() == R.id.personLastname) {
+                            TextView text = (TextView) view;
+                            lastName = text.getText().toString();
+
+                            //cursor has to search for the name
+                            String[] args = {firstName, lastName};
+
+                            //+1 for the space character
+                            int thisLength = text.getText().toString().toCharArray().length;
+
+                            //System.out.println(text.getText().toString()+"("+thisLength+")");
+
+                            int end = thisLength - ((name_length + 1 + thisLength) - 17);
+                            if (name_length + thisLength + 1 > 17) {
+
+                                //testing if the String gets edited correctly
+                                String cut = (String) text.getText().subSequence(0, end);
+                                /*System.err.println("["+firstName+" "+text.getText().toString()+"]Text is too long!");
+                                System.err.println("["+firstName+" "+cut+"] lastname as cut");*/
+                                cut += "...";
+                                //System.err.println("["+firstName+" "+cut+"] lastname as cut(edited)");
+
+                                //cursor has to get the correct and current entry
+                                //which is in the ViewBinder loop at the moment
+                                c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS, columns, Database.COL_FIRSTNAME + "=? AND " + Database.COL_LASTNAME + "=?", args, null, null, null);
+                                c.moveToFirst();
+                                //c.moveToPosition();
+                                //get the (index=id) of the database entry
+                                id = c.getInt(0);
+                                System.err.println("ID: "+id);
+                                System.err.println("DB ID: "+db_id);
+                                //checks if the list_item is the correct one from the id
+                                if (id == db_id) {
+                                    System.err.println("\n\nSet "+text.getText().toString()+" to "+cut);
+                                    text.setText(cut);
+                                    System.err.println("Last name should be "+cut+" and is "+text.getText().toString()+"\n\n");
+                                }
+                            }
+                        }
+                    }
+                }
+                if (view instanceof ImageView) {
+                    if (view.getId() == R.id.thumbnail) {
+
+                        ImageView image = (ImageView) view;
+                        String path = cursor.getString(columnIndex);
+
+                        Bitmap bitmap = ff.getBitmap(path);
+
+                        if (bitmap != null) {
+                            int height = 128;
+                            double scaledWidth = height * 0.5625;
+                            int width = (int) scaledWidth;
+
+                            bitmap = ff.scaleBitmap(bitmap, height, width);
+                            bitmap = ff.rotateBitmap(bitmap, 90);
+
+                            image.setImageBitmap(bitmap);
+                        } else {
+                            System.out.println("Bitmap was empty or null");
+                        }
+                    }
+                    if (view.getId() == R.id.bannedImage) {
+                        ImageView image = (ImageView) view;
+                        int bannedState = (int) cursor.getInt(columnIndex);
+                        if (bannedState == 1) {
+                            image.setBackgroundResource(R.drawable.ic_house_banned_red);
+                        } else {
+                            image.setBackgroundResource(0);
+                        }
+                    }
+                    return true; //true because the data was bound to the view
+                }
+                return false;
+            }
+        });
+
         ca.notifyDataSetChanged();
-        //check for banned icon to show or not
-        //setIconAndImageStates(personList);
+
         personList.setAdapter(ca);
-
-
     }
+
+
+
+    private Cursor getListItemCursor() {
+        /*
+        * Returns the Cursor which is setup to get the list item settings
+        * */
+
+        //all columns for the settings
+        String[] column_banned = {Database.COL_ID, Database.COL_PROFILEPICTURE, Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME, Database.COL_BANNED};
+
+        Cursor c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                column_banned, null, null, null, null,
+                Database.COL_LASTNAME);
+
+        //test log method
+        //ff.logAllDataFromCursor(c);
+        return c;
+    }
+
+    private Map<String, String> getProfilePictureFilePathCacheMap() {
+        /*
+        * Saves every Bitmap of every entry with the index id as key
+        * */
+        final int CURSOR_ID_INDEX = 0;
+        Map map = new HashMap();
+        Cursor c = getListItemCursor();
+        String path;
+        int id;
+        if (c.getCount() > 0) {
+            c.moveToFirst();
+            for (int i = 0; i < c.getCount(); i++) {
+
+                path = c.getString(c.getColumnIndex("profilbild"));
+
+                id = c.getInt(CURSOR_ID_INDEX);
+
+                map.put(Integer.toString(id), path);
+            }
+        } else {
+            System.err.println("Cursor is empty in [getBitmapCacheList()].");
+        }
+        return map;
+    }
+
 
     private void setIconAndImageStates(ListView lv) {
         /*
@@ -138,25 +326,6 @@ public class SearchActivity extends Activity {
                 } else {
                     System.out.println("Cursor is empty");
                 }
-/*
-                System.out.println("mID: "+mID);
-                System.out.println("bannedCursor.getCount(): "+bannedCursor.getCount());
-                if(bannedCursor.getCount() > 0) {
-                    try {
-                        System.out.println("Current Index: " + mID + "\tCurrent Cursor Index: " + bannedCursor.getInt(1));
-                        System.out.println("mID: "+mID);
-                        if (bannedCursor.getInt(1) == mID) {
-
-                            banned_image.setVisibility(View.VISIBLE);
-                        }
-                    } catch (Exception e) {
-                        System.err.println("Problem in Cursor finder:\n\n " + e);
-                    }
-                }else{
-                    System.err.println("Cursor is empty");
-                }*/
-
-
             }
         } catch (NullPointerException npe) {
 
@@ -164,33 +333,9 @@ public class SearchActivity extends Activity {
 
     }
 
-    private void setPicAsThumbnail(ImageView mImageView,
-                                   String mCurrentPhotoPath) {
-        // Get the dimensions of the View
-        int targetW = mImageView.getWidth();
-        int targetH = mImageView.getHeight();
-
-        // Get the dimensions of the bitmap
-        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-        bmOptions.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        int photoW = bmOptions.outWidth;
-        int photoH = bmOptions.outHeight;
-
-        // Determine how much to scale down the image
-        int scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-
-        // Decode the image file into a Bitmap sized to fill the View
-        bmOptions.inJustDecodeBounds = false;
-        bmOptions.inSampleSize = scaleFactor;
-        bmOptions.inPurgeable = true;
-
-        Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-        mImageView.setImageBitmap(bitmap);
-    }
 
     private Cursor getSearchCursor(String command) {
-        System.out.println("getSearchCursor startet mit: " + command);
+        //System.out.println("getSearchCursor startet mit: " + command);
         //the coumns to select
         String[] columns = {Database.COL_ID, Database.COL_PROFILEPICTURE,
                 Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME};
@@ -209,16 +354,14 @@ public class SearchActivity extends Activity {
 
         // Show all
         if (command == Database.ALL) {
-            Log.v("getSearchCursor", "ALL, [" + command + "]\n" +
-                    "\n");
+            //Log.v("getSearchCursor", "ALL, [" + command + "]\n" +"\n");
             c = db.readData();
             c.moveToFirst();
             return c;
         } else
             // show 16+
             if (command == PLUS_SIXTEEN) {
-                Log.v("getSearchCursor", "PLUS_SIXTEEN, [" + command + "]\n" +
-                        "\n");
+                //Log.v("getSearchCursor", "PLUS_SIXTEEN, [" + command + "]\n" +"\n");
                 c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                         columns, selection[0], null, null, null,
                         Database.COL_LASTNAME);
@@ -226,17 +369,15 @@ public class SearchActivity extends Activity {
             } else
                 // show 18+
                 if (command == PLUS_EIGHTEEN) {
-                    Log.v("getSearchCursor", "PLUS_EIGHTEEN, [" + command + "]\n" +
-                            "\n");
+                   // Log.v("getSearchCursor", "PLUS_EIGHTEEN, [" + command + "]\n" +"\n");
                     c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                             columns, selection[1], null, null, null,
                             Database.COL_LASTNAME);
                     return c;
                 } else
                     // show banned persons
-                    if (command == BANNED) {
-                        Log.v("getSearchCursor", "BANNED, [" + command + "]\n" +
-                                "\n");
+                    if (command == Database.COL_BANNED) {
+                       // Log.v("getSearchCursor", "BANNED, [" + command + "]\n" +"\n");
                         c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                                 columns, selection[2], null, null, null,
                                 Database.COL_LASTNAME);
@@ -296,11 +437,13 @@ public class SearchActivity extends Activity {
                 return false;
             }
             case R.id.icon_banned: {
-                search(BANNED);
+                search(Database.COL_BANNED);
                 return false;
             }
             default:
                 return false;
         }
     }
+
+
 }

@@ -11,21 +11,19 @@
         android:id="@+id/personListIndex"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="1."
-        android:textSize="30sp"
+        android:textAlignment="center"
+        android:textSize="60sp"
         />
     <ImageView
         android:id="@+id/thumbnail"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
         android:contentDescription="@string/thumbnailCD"
-        android:src="@drawable/ic_person"
         />
     <TextView
         android:id="@+id/personAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="17 "
         android:textSize="38sp"
         />
 
@@ -38,7 +36,6 @@
         android:id="@+id/personFirstname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Max"
         android:textSize="38sp" />
 
     <Space
@@ -50,7 +47,6 @@
         android:id="@+id/personLastname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mustermann"
         android:textSize="38sp" />
 
     <ImageView
@@ -58,15 +54,12 @@
         android:visibility="visible"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:contentDescription="@string/bannedImageCD"
-        android:src="@drawable/ic_house_banned_grey" />
+        android:contentDescription="@string/bannedImageCD"/>
 
     <ImageView
         android:id="@+id/detailsImage"
-
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:contentDescription="@string/detailsImageCD"
-        android:src="@drawable/ic_info_grey" />
+        android:contentDescription="@string/detailsImageCD" />
 
 </LinearLayout>

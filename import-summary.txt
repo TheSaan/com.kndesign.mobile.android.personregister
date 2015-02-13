@@ -7,30 +7,28 @@ The following files were *not* copied into the new Gradle project; you
 should evaluate whether these are still needed in your project and if
 so manually move them:
 
-* ic_launcher-web.png
-* proguard-project.txt
-
-Replaced Jars with Dependencies:
---------------------------------
-The importer recognized the following .jar files as third party
-libraries and replaced them with Gradle dependencies instead. This has
-the advantage that more explicit version information is known, and the
-libraries can be updated automatically. However, it is possible that
-the .jar file in your project was of an older version than the
-dependency we picked, which could render the project not compileable.
-You can disable the jar replacement in the import wizard and try again:
-
-android-support-v4.jar => com.android.support:support-v4:19.1.0
+* .gitignore
+* README
+* obj\
+* obj\local\
+* obj\local\armeabi\
+* obj\local\armeabi\libndk1.so
+* obj\local\armeabi\objs\
+* obj\local\armeabi\objs\ndk1\
+* obj\local\armeabi\objs\ndk1\native.o
+* obj\local\armeabi\objs\ndk1\native.o.d
+* proguard.cfg
 
 Moved Files:
 ------------
 Android Gradle projects use a different directory structure than ADT
 Eclipse projects. Here's how the projects were restructured:
 
-* AndroidManifest.xml => app\src\main\AndroidManifest.xml
-* assets\ => app\src\main\assets\
-* res\ => app\src\main\res\
-* src\ => app\src\main\java\
+* AndroidManifest.xml => androidlibmagick\src\main\AndroidManifest.xml
+* libs\armeabi\libandroid-magick.so => androidlibmagick\src\main\jniLibs\armeabi\libandroid-magick.so
+* libs\armeabi\libndk1.so => androidlibmagick\src\main\jniLibs\armeabi\libndk1.so
+* res\ => androidlibmagick\src\main\res\
+* src\ => androidlibmagick\src\main\java\
 
 Next Steps:
 -----------

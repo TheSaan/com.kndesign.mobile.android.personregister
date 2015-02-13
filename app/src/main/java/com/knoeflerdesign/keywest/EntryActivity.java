@@ -281,9 +281,11 @@ public class EntryActivity extends Activity {
 
             // save path to array to send it to database
             String filePath = personDIR.getPath()
+                    +"IMG_"
                     + firstAndLastName[0].toUpperCase(Locale.GERMANY)
+                    +"_"
                     + firstAndLastName[1].toUpperCase(Locale.GERMANY) + IDCARD
-                    + ".jpg";
+                    + ".png";
             // c.println("FILE Path:\t" + filePath.toString());
 
 
@@ -335,7 +337,7 @@ public class EntryActivity extends Activity {
             // clear first
             photo = null;
 
-            photo = new File(personDIR, path + IDCARD + ".jpg");
+            photo = new File(personDIR, "IMG_" +path + IDCARD + ".png");
             photo_tmp = photo;
 
             // declare imageUri as the Uri of photo
@@ -513,11 +515,14 @@ public class EntryActivity extends Activity {
                             + imagePaths[2] + ",\n" + imagePaths[3] + ",\n"
                             + imagePaths[4] + ",\n" + imagePaths[5] + ",\n"
                             + imagePaths[6], Toast.LENGTH_LONG).show();
+
+
+            //deletes all temporary data
+            editor.clear();
+            isNewStart = true;
         } else {
             c.println("Database is was not found.");
         }
-        //deletes all temporary data
-        editor.clear();
 
         Intent i = new Intent(getApplicationContext(), StartActivity.class);
         startActivity(i);
@@ -860,9 +865,10 @@ public class EntryActivity extends Activity {
               * 3.set the background image to the "häckchen"
               * */
         TextView currAge = (TextView) findViewById(R.id.currAgeTextView);
-        ImageView i = (ImageView) findViewById(loadButtonIdFromMemory());
         int k = 0;
         if (!isNewStart) {
+
+            ImageView i = (ImageView) findViewById(loadButtonIdFromMemory());
             if (getCurrentViewForImage() == null) {
                 //TODO Letzter schritt
                 setCurrentViewForImage(i);

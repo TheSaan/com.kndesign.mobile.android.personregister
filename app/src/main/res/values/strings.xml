@@ -69,4 +69,6 @@
     <string name="designedForDescription">Key West Personen Register Entwickelt von Michael Knöfler. \n\nEntwicklert für Android API Version 4.4.2, eingestellt auf 7 Zoll Displays. Optische Abweichungen entstehen durch installieren auf nicht gewährleistete Hardware.</string>
     <string name="buildNumberTitle">Build Number</string>
     <string name="AmountOfEntriesDesciption">Einträge</string>
+    <string name="gallery_title">Profilbild Gallerie</string>
+    <string name="searchService">Suchen...</string>
 </resources>

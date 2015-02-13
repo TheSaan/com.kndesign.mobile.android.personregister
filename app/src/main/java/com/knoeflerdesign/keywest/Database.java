@@ -84,8 +84,8 @@ public class Database extends SQLiteOpenHelper {
 					+ PATH_MAX_VARCHAR_LENGTH + ") NOT NULL," + COL_PERSO_FRONT
 					+ " VARCHAR(" + PATH_MAX_VARCHAR_LENGTH + ") NOT NULL,"
 					+ COL_PERSO_BACK + " VARCHAR(" + PATH_MAX_VARCHAR_LENGTH
-					+ ") NOT NULL, " + COL_DETAILS + " VARCHAR("
-					+ PATH_MAX_VARCHAR_LENGTH + ") NOT NULL, " + COL_BANNED
+					+ ") NOT NULL," + COL_DETAILS + " VARCHAR("
+					+ PATH_MAX_VARCHAR_LENGTH + ") NOT NULL," + COL_BANNED
 					+ " INTEGER  ) ";
 			db.execSQL(sql1);
 
@@ -95,7 +95,7 @@ public class Database extends SQLiteOpenHelper {
 					+ "( _id INTEGER PRIMARY KEY AUTOINCREMENT,"
 					+ "username VARCHAR(20) NOT NULL,"
 					+ "password VARCHAR(20) NOT NULL,"
-					+ "kontotyp VARCHAR(25) NOT NULL)";
+					+ "kontotype VARCHAR(25) NOT NULL)";
 			db.execSQL(sql2);
 
 			System.out.println("Database Path:\t" + db.getPath());
