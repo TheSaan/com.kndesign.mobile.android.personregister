@@ -12,13 +12,17 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TableLayout;
+import android.widget.TextView;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by Michael on 12.02.2015.
@@ -235,6 +239,44 @@ public class FunctionalityFactory {
 
     }
 
+    /**
+     * E.g. you want to create a ListView of names
+     * and every list element can have only a
+     * max length of 20 letters.
+     *
+     * If a name has more than 20 letters, take the
+     * whole length of the full name and cut it off
+     * at letter 17 and add three dots '...' to it.
+     *
+     * Than you have always maximal 20 letters/digits.
+     *
+     * @param src
+     * @param wanted_length
+     * @return
+     */
+    public String cutStringIfTooLongAndAddDots(String src, int wanted_length){
+        String cut = src.subSequence(0, wanted_length-3)+"...";
+        return cut;
+    }
+
+    public boolean checkMultiplePatterns(String[] patterns,String stringToCheck) {
+
+        boolean isMatch = false;
+        Pattern p;
+        Matcher m;
+        for (int i = 0; i < patterns.length; i++) {
+            p = Pattern.compile(patterns[i]);
+            m = p.matcher(stringToCheck);
+
+            if (m.matches()) {
+                return true;
+            }else{
+                continue;
+            }
+        }
+        //TODO hier kann es passieren dass die methode immer false ausgibt AUFPASSEN!
+        return false;
+    }
 
 
 }

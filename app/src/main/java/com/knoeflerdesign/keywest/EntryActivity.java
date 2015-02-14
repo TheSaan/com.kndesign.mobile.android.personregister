@@ -13,6 +13,8 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -367,15 +369,23 @@ public class EntryActivity extends Activity {
                             Toast.LENGTH_SHORT).show();
                 }
                 if (dateLength == 8 && output == "") {
+                    //if age wasn't calculated, do it
                     calcButton.callOnClick();
+
+                    //and press the take picture button again
+                    v.callOnClick();
                 }
 
             }
-            if (name != "" && date != "" && output != "" && dateLength == 10) {
+            if (name.matches(NAME_PATTERN)  && name != "" && date != "" && output != "" && dateLength == 10) {
                 takePicture();
             } else {
-                Toast.makeText(EntryActivity.this, "Some field is still/again empty.",
+                if(name == "")
+                Toast.makeText(EntryActivity.this, "Bitte Namen angeben!",
                         Toast.LENGTH_SHORT).show();
+                if(date == "")
+                    Toast.makeText(EntryActivity.this, "Bitte Datum angeben!",
+                            Toast.LENGTH_SHORT).show();
                 onRestart();
             }
 
@@ -557,6 +567,30 @@ public class EntryActivity extends Activity {
 
     private void addListeners() {
 
+        /*
+            TextWatcher watcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+                 if(count == 2)
+                     dateText.setText(dateText.getText().toString()+".");
+                if(count == 5)
+                    dateText.setText(dateText.getText().toString()+".");
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        };
+
+        dateText.addTextChangedListener(watcher);
+        */
         // View Arrays
         Button[] buttons = {profilePictureButton, driversLicenceButton,
                 checkitcardButton, oebbCardButton, passportButton,

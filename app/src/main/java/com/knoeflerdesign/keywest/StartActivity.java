@@ -36,7 +36,11 @@ public class StartActivity extends Activity {
         Intent serviceIntent = new Intent(getApplicationContext(),SearchResultService.class);
 
         //start
-        getApplicationContext().startService(serviceIntent);
+        try {
+            getApplicationContext().startService(serviceIntent);
+        }catch (NullPointerException npe){
+            Log.e("Service Intent", "Service intent throws "+npe);
+        }
     }
 
     protected void onResume() {
@@ -166,24 +170,4 @@ public class StartActivity extends Activity {
         return true;
     }
 
-  /*  private int showMoreInformation(){
-        setContentView(R.layout.activity_info);
-        checkForHomeToActivateBackButton(R.layout.activity_info);
-        db.getReadableDatabase();
-        TextView amountText = (TextView)findViewById(R.id.textviewAmountOfEntriesNumber);
-        amountText.setText(""+db.countPersons());
-        return R.layout.activity_info;
-    }*/
-	/*private boolean checkForHomeToActivateBackButton(int cv_id){
-        int id = R.id.startContentView;
-        MenuItem back = (MenuItem)findViewById(R.id.action_back);
-
-        if(cv_id != id){
-            //back.setVisible(true);
-            return false;
-        }else{
-            //back.setVisible(false);
-            return true;
-        }
-    }*/
 }

@@ -17,7 +17,7 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
-    <android:uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:allowBackup="true"
@@ -28,9 +28,8 @@
             android:name=".SearchResultService"
             android:enabled="true"
             android:exported="true"
-            android:label="@string/searchService"
-            android:process=":search_process" >
-        </service>
+            android:label="@string/searchService">
+    </service>
 
         <activity
             android:name=".StartActivity"

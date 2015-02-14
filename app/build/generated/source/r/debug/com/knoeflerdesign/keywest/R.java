@@ -160,20 +160,21 @@ public final class R {
         public static final int profilepictureCD=0x7f070029;
         public static final int save=0x7f07002a;
         public static final int searchLinearLayoutPersonRegisterButton=0x7f07002b;
-        public static final int showAll=0x7f07002c;
-        public static final int showAllCD=0x7f07002d;
-        public static final int showBannedCD=0x7f07002e;
-        public static final int showBannedPersons=0x7f07002f;
-        public static final int showOver18=0x7f070030;
-        public static final int showOver18CD=0x7f070031;
-        public static final int showUnder18=0x7f070032;
-        public static final int showUnder18CD=0x7f070033;
-        public static final int takePictureInfo=0x7f070034;
-        public static final int thumbnailCD=0x7f070035;
-        public static final int titleSearch=0x7f070036;
-        public static final int title_activity_entry=0x7f070037;
-        public static final int title_activity_search=0x7f070038;
-        public static final int weiter=0x7f070039;
+        public static final int searchService=0x7f07002c;
+        public static final int showAll=0x7f07002d;
+        public static final int showAllCD=0x7f07002e;
+        public static final int showBannedCD=0x7f07002f;
+        public static final int showBannedPersons=0x7f070030;
+        public static final int showOver18=0x7f070031;
+        public static final int showOver18CD=0x7f070032;
+        public static final int showUnder18=0x7f070033;
+        public static final int showUnder18CD=0x7f070034;
+        public static final int takePictureInfo=0x7f070035;
+        public static final int thumbnailCD=0x7f070036;
+        public static final int titleSearch=0x7f070037;
+        public static final int title_activity_entry=0x7f070038;
+        public static final int title_activity_search=0x7f070039;
+        public static final int weiter=0x7f07003a;
     }
     public static final class style {
         /** 
