@@ -3,4 +3,5 @@
   <color name="darkPurple">#4b336f</color>
   <color name="brightPurple">#79336f</color>
   <color name="yellow">#ffdd17</color>
+  <color name="bannedRed">#FF0000</color>
 </resources>

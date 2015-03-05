@@ -2,22 +2,60 @@ package com.knoeflerdesign.keywest;
 
 import android.app.Activity;
 import android.app.SearchManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.SearchView;
+import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ViewSwitcher;
+
+import com.knoeflerdesign.keywest.Handler.DateHandler;
+
+import java.io.File;
 
 
 public class StartActivity extends Activity {
 
+
     CursorFactory cf;
     Database db;
+
+    ViewSwitcher viewSwitcher;
+
+    private SearchResultService srs;
+    private ServiceConnection SearchServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Toast.makeText(StartActivity.this,
+                    "Verbinde SRS...",
+                    Toast.LENGTH_SHORT).show();
+
+
+            SearchResultService.MyBinder binder = (SearchResultService.MyBinder) service;
+            srs = binder.getService();
+
+            Toast.makeText(StartActivity.this,
+                    "SRS Verbunden",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            srs = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,26 +63,69 @@ public class StartActivity extends Activity {
         setContentView(R.layout.activity_start);
         setMinAgeDate();
 
-        db = new Database(this, Database.DATABASE_TABEL_PERSONS, cf, 1);
-        //TODO Diese Funktion wird später in den "Informationen" aufgelistet und ist nur dem Entwickler und dem Chef zugängig
 
+        File sd = new File(Environment.getExternalStorageDirectory()+"/KWIMG/", "BACKUP");
+        sd.mkdir();
+
+
+
+        db = new Database(this);
+
+        System.out.println(db.getDatabaseName());
+
+        db.exportDatabase(Database.DATABASE_NAME);
+
+        viewSwitcher = (ViewSwitcher) findViewById(R.id.startViewSwitcher);
         /*
         * Starts to load all Entries from the database in an SimpleCursorAdapter. So
         * if I wanna see them, they don't have to be loaded at first.
         * */
 
-        Intent serviceIntent = new Intent(getApplicationContext(),SearchResultService.class);
 
+        Intent SearchServiceIntent = new Intent(this, SearchResultService.class);
+        Intent AgeServiceIntent = new Intent(this, AgeControlService.class);
         //start
         try {
-            getApplicationContext().startService(serviceIntent);
-        }catch (NullPointerException npe){
-            Log.e("Service Intent", "Service intent throws "+npe);
+            getApplicationContext().startService(SearchServiceIntent);
+            getApplicationContext().startService(AgeServiceIntent);
+        } catch (NullPointerException npe) {
+            Log.e("Service Intent", "Service intent throws " + npe);
         }
+
+        createAgbSwitches();
+
+    }
+
+    private void createAgbSwitches() {
+        final Switch agbSwitch = (Switch)findViewById(R.id.agbSwitch);
+        final Switch agbSwitch2 = (Switch)findViewById(R.id.agbSwitch2);
+
+
+        agbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    viewSwitcher.showNext();
+                    agbSwitch2.setChecked(true);
+                }
+            }
+        });
+        agbSwitch2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(!isChecked){
+                    viewSwitcher.showPrevious();
+                    agbSwitch.setChecked(false);
+                }
+            }
+        });
     }
 
     protected void onResume() {
         setMinAgeDate();
+        if(srs != null){
+            srs.restart();
+        }
         super.onResume();
     }
 
@@ -91,14 +172,7 @@ public class StartActivity extends Activity {
                 return true;
             }
             case R.id.action_action_show_all_entries: {
-
                 showAllEntries();
-            }
-            case R.id.action_entry_count: {
-
-            }
-            case R.id.action_back: {
-                setContentView(R.layout.activity_start);
             }
             default:
                 return super.onOptionsItemSelected(item);
@@ -106,12 +180,11 @@ public class StartActivity extends Activity {
     }
 
 
-
     private void setMinAgeDate() {
         DatePicker d = new DatePicker(getApplicationContext());
-        DateCalculator date = new DateCalculator();
+        DateHandler date = new DateHandler();
         /*
-		 * minAge is calculated by the default start date of the TimeZone class
+         * minAge is calculated by the default start date of the TimeZone class
 		 * (1.1.1970 00:00:00) minus the age of 16 in milliseconds at the
 		 * current date
 		 */
@@ -157,8 +230,8 @@ public class StartActivity extends Activity {
 
     private void showAllEntries() {
         Intent i = new Intent(getApplicationContext(), SearchActivity.class);
-        i.putExtra("query", Database.ALL);
         startActivity(i);
+
         onPause();
     }
 

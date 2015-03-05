@@ -1,52 +1,258 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/startContentView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/darkPurple"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.knoeflerdesign.keywest.StartActivity" >
+    android:id="@+id/startViewSwitcher"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent">
 
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:src="@drawable/intro" 
-        android:contentDescription="@string/logoCD"/>
+    <RelativeLayout
+        android:id="@+id/startContentView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/darkPurple"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.knoeflerdesign.keywest.StartActivity">
 
-    <TextView
-        android:id="@+id/minAgeDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/imageView1"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="27dp"
-        android:layout_marginTop="48dp"
-        android:text="@string/min16_decr"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textColor="#FFFFFF" />
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:contentDescription="@string/logoCD"
+            android:src="@drawable/intro" />
 
-    <TextView
-        android:id="@+id/textfield_MIN_AGE"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/minAgeDescription"
-        android:layout_below="@+id/minAgeDescription"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/default_minDate" 
-        android:textSize="70sp"
-        android:textColor="#FFFFFF"/>
+        <TextView
+            android:id="@+id/minAgeDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/imageView1"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="27dp"
+            android:layout_marginTop="48dp"
+            android:text="@string/min16_decr"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#FFFFFF" />
 
-    <AnalogClock
-        android:id="@+id/analogClock1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/imageView1"
-        android:layout_alignTop="@+id/minAgeDescription"/>
-    
-</RelativeLayout>
+        <TextView
+            android:id="@+id/textfield_MIN_AGE"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/minAgeDescription"
+            android:layout_below="@+id/minAgeDescription"
+            android:text="@string/default_minDate"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#FFFFFF"
+            android:textSize="70sp" />
+
+        <AnalogClock
+            android:id="@+id/analogClock1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@+id/imageView1"
+            android:layout_alignTop="@+id/minAgeDescription" />
+
+        <Switch
+            android:id="@+id/agbSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/minAgeDescription"
+            android:layout_alignParentTop="true"
+            android:layout_alignStart="@+id/minAgeDescription"
+            android:checked="false"
+            android:text="AGB Ansicht" />
+
+    </RelativeLayout>
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Switch
+                android:id="@+id/agbSwitch2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:checked="true"
+                android:text="AGB Ansicht" />
+
+            <TextView
+                android:id="@+id/agbTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbTitle"
+                android:textAlignment="center"
+                android:textSize="25sp" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="30dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderAufnahme_von_Daten"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderAufnahme_von_Daten"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb1" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderAushändigung_der_Daten"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderAushändigung_der_Daten"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb2" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderSichern_der_Daten_auf_weiterem_Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderSichern_der_Daten_auf_weiterem_Medium"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb3" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderHaftung"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderHaftung"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb4" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderHinweisungspflicht"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderHinweisungspflicht"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb5" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderEntfernen_des_Kunden_aus_dem_System"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderEntfernen_des_Kunden_aus_dem_System"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb6" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderSoftwarebedingte_Fehler"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderSoftwarebedingte_Fehler"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb7" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderNur_Offline_Nutzung_der_Daten"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderNur_Offline_Nutzung_der_Daten"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb8" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderBildinformationen_und_Inhalte"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agbHeaderBildinformationen_und_Inhalte"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/agb9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/agb9" />
+        </LinearLayout>
+    </ScrollView>
+</ViewSwitcher>

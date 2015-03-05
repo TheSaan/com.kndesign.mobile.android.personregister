@@ -49,13 +49,7 @@
             android:textColor="#FFFFFF"
             android:textColorHint="#F5F6CE" />
 
-        <Button
-            android:id="@+id/calcAgeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:background="#FFFFFF"
-            android:text="@string/calculateAge" />
+
     </LinearLayout>
 
     <View
@@ -275,7 +269,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/yellow"
+            android:background="@color/darkPurple"
             android:text="@string/back"
             android:textSize="30sp" />
     </LinearLayout>

@@ -5,20 +5,16 @@
     <string name="min16_decr">Minimum Datum</string>
     <string name="logoCD">Key West Logo</string>
     <string name="default_minDate">Kein Datum verfügbar</string>
-
-     <string name="app_name">KW Jugend Register</string>
+    <string name="app_name">Key West Personen Register</string>
     <string name="weiter">Weiter</string>
     <string name="title_activity_search">Key West Jugend Registrierung</string>
     <string name="cameraDescr">Camera Button</string>
-    
     <string name="searchLinearLayoutPersonRegisterButton">Suche in Register</string>
     <string name="personMatches"> Treffer</string>
-    
     <string name="personMatchesAmount"></string>
-    
     <string name="newPersonEntry">Neuer Eintrag</string>
     <string name="takePictureInfo">Foto(s) aufnehmen</string>
-	
+
     <!-- Personal identification cards which are allowed -->
     <string name="driverslicence">Führerschein</string>
     <string name="checkitcard">Check it Card</string>
@@ -30,45 +26,79 @@
     <string name="photosshot">0</string>
     <string name="photostoshoot">0</string>
     <string name="photoslash">/</string>
-
-    <string name="title_activity_entry">Neuer Eintrag</string>
+    <string name="title_activity_entry">Neuen Eintrag erstellen</string>
     <string name="profilepictureCD">Profilbild</string>
-	
-	<!-- Content Descriptions -->
-	<string name="personsNameInboxDescription">Dieter Pock</string>
-	<string name="photostatusdescription"> wurden aufgenommen.</string>
-	<string name="oebbpictureCD">ÖBB Card Bild</string>
-	<string name="passportpictureCD">Reisepass Bild</string>
-	<string name="checkitcardpictureCD">Check It Card Bild</string>
-	<string name="personalidpictureCD">Personalausweis Bild</string>
-	<string name="driverslicencepictureCD">Führerschein Bild</string>
-	<string name="frontCD">Vorderseite jedes Ausweises</string>
-	<string name="profilePicture">Profilbild</string>
-	<string name="back">Rückseite</string>
-	<string name="front">Personalausweis</string>
-	<string name="titleSearch">Einträge durchsuchen nach</string>
-	<string name="save">Speichern</string>
-	<string name="currentAge"/>
-	<string name="calculateAge">Alter berechnen</string>
-	<string name="calcProgressAge">Alter wird berechnet</string>
-	<string name="newNameHint">Vorname Nachname</string>
-	<string name="dateHint">TTMMYYYY</string>
-	<string name="showUnder18">16+</string>
-	<string name="showOver18">18+</string>
-	<string name="showAll">Alle</string>
-	<string name="showAllCD">Zeigt alle Einträge an</string>
-	<string name="showUnder18CD">Zeigt 16+ Einträge an</string>
-	<string name="showOver18CD">Zeigt 18+ Einträge an</string>
-	<string name="showBannedPersons">Hausverbot</string>
-	<string name="showBannedCD">Zeigt Einträge mit Haus verbot an</string>
-	<string name="personDetailsCD">Personen Details</string>
-	<string name="personDetailsHint">Details hinzufügen...</string>
-	<string name="thumbnailCD">Profilbild Vorschau</string>
-	<string name="bannedImageCD">Hausverbot Icon</string>
-	<string name="detailsImageCD">Enthält weitere Details zur Person</string>
+
+    <!-- Content Descriptions -->
+    <string name="oebbpictureCD">ÖBB Card</string>
+    <string name="passportpictureCD">Reisepass</string>
+    <string name="checkitcardpictureCD">Check-It-Card</string>
+    <string name="personalidpictureCD">Personalausweis</string>
+    <string name="driverslicencepictureCD">Führerschein</string>
+    <string name="profilePicture">Profilbild</string>
+    <string name="back">Rückseite</string>
+    <string name="front">Personalausweis</string>
+
+
+    <string name="titleSearch">Einträge durchsuchen nach</string>
+    <string name="save">Speichern</string>
+    <string name="currentAge"></string>
+    <string name="calculateAge">Alter berechnen</string>
+    <string name="calcProgressAge">Alter wird berechnet</string>
+    <string name="newNameHint">Vorname Nachname</string>
+    <string name="dateHint">TTMMYYYY</string>
+    <string name="showUnder18">16+</string>
+    <string name="showOver18">18+</string>
+    <string name="showAll">Alle</string>
+    <string name="showAllCD">Zeigt alle Einträge an</string>
+    <string name="showUnder18CD">Zeigt 16+ Einträge an</string>
+    <string name="showOver18CD">Zeigt 18+ Einträge an</string>
+    <string name="showBannedPersons">Hausverbot</string>
+    <string name="showBannedCD">Zeigt Einträge mit Haus verbot an</string>
+    <string name="personDetailsCD">Personen Details</string>
+    <string name="personDetailsHint">Details hinzufügen...</string>
+    <string name="thumbnailCD">Profilbild Vorschau</string>
+    <string name="bannedImageCD">Hausverbot Icon</string>
+    <string name="detailsImageCD">Enthält weitere Details zur Person</string>
     <string name="designedForDescription">Key West Personen Register Entwickelt von Michael Knöfler. \n\nEntwicklert für Android API Version 4.4.2, eingestellt auf 7 Zoll Displays. Optische Abweichungen entstehen durch installieren auf nicht gewährleistete Hardware.</string>
     <string name="buildNumberTitle">Build Number</string>
     <string name="AmountOfEntriesDesciption">Einträge</string>
     <string name="gallery_title">Profilbild Gallerie</string>
     <string name="searchService">Suchen...</string>
+    <string name="keepAndAbort"><![CDATA[Beibehalten & abbrechen]]></string>
+    <string name="title_activity_person_info">Informationen über diese Person</string>
+
+    <!--Allgemeine Geschäftsbedingungen-->
+    <string name="agbTitle">Allgemeine Geschäftsbedingungen</string>
+    <string name="agbHeaderAufnahme_von_Daten">Aufnahme von Daten</string>
+    <string name="agb1">Die Aufnahme der von den Kunden bereit gestellten Daten, in Österreich zugelassenen Ausweismittel und sonstige Bilder die im Zusammenhang mit der Wiedererkennungsfunktionalität der Mobilen Anwendung stehen dürfen nur für die dafür vorgesehenen und angegebenen Zwecke (Aufnahme der Personalien, Zuteilen von Markierungen, Hinzufügen von schriftlich erstellten Informationen)  verwendet und bearbeitet werden.
+Die aufgenommenen Daten und Bilder sind Eigentum des jeweiligen Kunden. Der Kunde erklärt sich jedoch durch die Aufnahme dieser Information mit dem Besitzwechsel an den Applikationseigentümer einverstanden und vertraut diesem den rechtmäßigen Gebrauch an.
+</string>
+    <string name="agbHeaderAushändigung_der_Daten">Aushändigung der Daten</string>
+    <string name="agb2">Der Kunde erklärt sich, zum Einhalt des laufenden Geschäftsflusses, damit einverstanden, die Ihm eigentümlich obliegenden Daten die in der Applikation gespeichert sind, auf das Vorzeigen der eigenen Daten durch die Person, die das Gerät zum gegebenen Zeitpunkt in Händen hält, oder dem Personal zu verzichten.
+</string>
+    <string name="agbHeaderSichern_der_Daten_auf_weiterem_Medium">Sichern der Daten auf weiterem Medium</string>
+    <string name="agb3">Das Speichern der Daten auf einem weiteren Speichermedium ist und darf nur als Sicherungskopie verwendet und hinterlegt werden. </string>
+    <string name="agbHeaderHaftung">Haftung</string>
+    <string name="agb4">Es wird keine Haftung für vorsätzliche Angabe von falschen Daten (Vorzeigen von gefälschten Dokumenten, falsche Personenangaben) und somit verbundenen gesetzlichen Strafen auf Seiten des Kunden übernommen. Der Kunde ist für jegliche Art von fehlerhaften oder vorsätzlich falsch angegebenen Daten zur Verantwortung zu ziehen.</string>
+    <string name="agbHeaderHinweisungspflicht">Hinweisungspflicht</string>
+    <string name="agb5">Die Person, die mit der Aufnahme der Kundendaten beauftragt wurde hat die Pflicht den Kunden über die Existenz der AGBs hinzuweisen und diesen auf Verlangen hin eine einmalige Kopie der AGB auszuhändigen.
+Werden die Daten des Kunden im System registriert hat sich der Kunde damit bereit erklärt den AGBs zu zustimmen und verpflichtet sich zur Einhaltung der darin enthaltenen Bedingungen.
+</string>
+    <string name="agbHeaderEntfernen_des_Kunden_aus_dem_System">Entfernen des Kunden aus dem System</string>
+    <string name="agb6">Hat der Kunde den Wunsch sich aus dem System entfernen zu lassen verpflichten wir uns mit der sofortigen Löschung aller zum Kunden zugehörigen Daten die zur App hinzu gefügt wurden.</string>
+    <string name="agbHeaderSoftwarebedingte_Fehler">Softwarebedingte Fehler</string>
+    <string name="agb7">Wir haften für keine Fehler oder Schäden die durch die Software entstehen oder verursacht wurden. Software bedingte Fehlangaben oder Verarbeitungen sind als Korrekturfall anzusehen und sofort dem Entwickler zu melden. Somit obliegt die Bereinigung des Softwaremangels dem Entwickler.
+Die Haftbarkeit des Entwicklers tritt nur dann ein wenn dieser nachweislich den Mangel oder die Information über den bestehenden Mangel missachtet oder vorsätzlich nicht beheben will.
+Zur Behebung von Software bedingten Mängeln stehen dem Entwickler die von Ihm voraus kalkulierten Zeiteinheiten zur Verfügung.
+</string>
+    <string name="agbHeaderNur_Offline_Nutzung_der_Daten">Nur Offline Nutzung der Daten</string>
+    <string name="agb8">Wir verpflichten und die gespeicherten Daten zu keinem Zeitpunkt auf irgendeine Weise online zu stellen oder für online Tätigkeiten zu verwenden.
+</string>
+    <string name="agbHeaderBildinformationen_und_Inhalte">Bildinformationen und Inhalte</string>
+    <string name="agb9">Für die Informationen und Inhalte der aufgenommenen Bilder ist im Falle von jeglichen exekutiven Maßnahmen der Kunde (und Eigentümer) der Informationen und Inhalte verantwortlich.
+</string>
+    <string name="search">Suche</string>
+    <string name="app_title">Key West Register</string>
+
 </resources>
