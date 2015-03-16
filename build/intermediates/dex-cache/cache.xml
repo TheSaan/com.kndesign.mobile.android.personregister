@@ -2,11 +2,25 @@
 <items version="2" >
 
     <item
-        jar="C:\Users\Michael Knöfler\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-v4\19.1.0\support-v4-19.1.0.jar"
+        jar="D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="85f201b380937e61a9dce6ca90ccf6872abbfb67">
-        <dex dex="D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\pre-dexed\debug\support-v4-19.1.0-ae342aaca39678dbdf90d85ba495f432420e9b9d.jar" />
+        sha1="4e86306289ace4aa0cfec44a05ed2b410d36989d">
+        <dex dex="D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\pre-dexed\debug\classes-0314d6ed35cda90881940b17d78517cf4ff4576b.jar" />
+    </item>
+    <item
+        jar="D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\exploded-aar\com.android.support\support-v4\22.0.0\libs\internal_impl-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="b5b92f469d515a13d778900f6d50c03d12f35504">
+        <dex dex="D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\pre-dexed\debug\internal_impl-22.0.0-2876661362c27832b2bf84464e68bfb992d3c5ef.jar" />
+    </item>
+    <item
+        jar="C:\Users\Michael Knöfler\AppData\Local\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\22.0.0\support-annotations-22.0.0.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="685d0b2c590447e85284ed84712cb363ba04eff8">
+        <dex dex="D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\pre-dexed\debug\support-annotations-22.0.0-88bb30ca51ae8796afe32fdd83b9d325f4664ff7.jar" />
     </item>
 
 </items>

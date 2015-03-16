@@ -27,11 +27,6 @@
         </EditText>
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
-
     <LinearLayout
         android:id="@+id/dateInputLL"
         android:layout_width="match_parent"
@@ -48,14 +43,7 @@
             android:inputType="date"
             android:textColor="#FFFFFF"
             android:textColorHint="#F5F6CE" />
-
-
     </LinearLayout>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
 
     <LinearLayout
         android:id="@+id/dateLL"
@@ -71,10 +59,7 @@
             android:textSize="70sp" />
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
+
 
     <LinearLayout
         android:id="@+id/miniProfilePictureLL"
@@ -93,19 +78,14 @@
             android:contentDescription="@string/profilepictureCD" />
 
         <Button
+            style="@style/defaultButton"
             android:id="@+id/profilePictureButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/yellow"
             android:text="@string/profilePicture"
-            android:textSize="30sp" />
+             />
     </LinearLayout>
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
 
     <LinearLayout
         android:id="@+id/miniDriversLicenceLL"
@@ -124,19 +104,16 @@
             android:contentDescription="@string/driverslicencepictureCD" />
 
         <Button
+            style="@style/defaultButton"
             android:id="@+id/driversLicenceButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/yellow"
-            android:text="@string/driverslicence"
-            android:textSize="30sp" />
+            android:text="@string/driverslicence"/>
+
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
+
 
     <LinearLayout
         android:id="@+id/miniCheckitCardLL"
@@ -155,19 +132,14 @@
             android:contentDescription="@string/checkitcardpictureCD" />
 
         <Button
+            style="@style/defaultButton"
             android:id="@+id/checkitcardButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/yellow"
-            android:text="@string/checkitcard"
-            android:textSize="30sp" />
+            android:text="@string/checkitcard"/>
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
 
     <LinearLayout
         android:id="@+id/miniOebbCardLL"
@@ -186,19 +158,14 @@
             android:contentDescription="@string/oebbpictureCD" />
 
         <Button
+            style="@style/defaultButton"
             android:id="@+id/oebbcardButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/yellow"
-            android:text="@string/oebbcard"
-            android:textSize="30sp" />
+            android:text="@string/oebbcard" />
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
 
     <LinearLayout
         android:id="@+id/miniPassportLL"
@@ -217,19 +184,14 @@
             android:contentDescription="@string/passportpictureCD" />
 
         <Button
+            style="@style/defaultButton"
             android:id="@+id/passportButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/yellow"
-            android:text="@string/passport"
-            android:textSize="30sp" />
+            android:text="@string/passport" />
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="2dp"
-        android:background="@color/brightPurple" />
 
     <LinearLayout
         android:id="@+id/miniPersonalidLL"
@@ -247,13 +209,12 @@
             android:contentDescription="@string/personalidpictureCD" />
 
         <Button
+            style="@style/defaultButton"
             android:id="@+id/idFrontsideButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/yellow"
-            android:text="@string/front"
-            android:textSize="30sp" />
+            android:text="@string/front" />
 
         <ImageView
             android:id="@+id/miniPersonalIDback"
@@ -264,14 +225,14 @@
             android:background="@drawable/ic_action_photo"
             android:contentDescription="@string/personalidpictureCD" />
 
-        <Button
+        <Button 
             android:id="@+id/idBacksideButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
             android:background="@color/darkPurple"
             android:text="@string/back"
-            android:textSize="30sp" />
+             />
     </LinearLayout>
 
     <EditText

@@ -2,17 +2,21 @@ package com.knoeflerdesign.keywest;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,9 +27,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.knoeflerdesign.keywest.Handler.AndroidHandler;
+import com.knoeflerdesign.keywest.Handler.BitmapHandler;
 import com.knoeflerdesign.keywest.Handler.DateHandler;
+import com.knoeflerdesign.keywest.Handler.FilesHandler;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -33,99 +40,151 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EntryActivity extends Activity {
+public class EntryActivity extends Activity implements KeyWestInterface{
 
-    public static final int REQUEST_TAKE_PICTURE = 1;
-    final static String[] pathNamesInOrder = {
+    private boolean isCameraActivated = false;
+    final private static String[] pathNamesInOrder = {
             "Profilbild", "Führerschein", "CheckItCard", "Pass", "ÖBB", "PersoF", "PersoB"
     };
+
     protected static boolean isPersonCreatedOrUpdated = false;
-    final int DATE_UNFORMATTED = 8;
-    final int DATE_FORMATTED = 10;
-    final String[] imagePathsKeys = {Database.COL_PROFILEPICTURE, Database.COL_DRIVERSLICENCE, Database.COL_CHECKITCARD, Database.COL_PASSPORT, Database.COL_OEBBCARD, Database.COL_PERSO_FRONT/*, Database.COL_PERSO_BACK*/};
+
+    //the factor how small the thumbnail is compares to the original
+    private static final double THUMBNAIL_SCALE_FACTOR = 0.16;
+
     // banned from company is guest (Hausverbot 0 = no, 1 = yes)
     protected int isBanned = 0;
-    PrintStream c = System.out;
-    Database db;
-    CursorFactory cf;
-    DateHandler datecalc;
+
     //Views
-    ImageView CurrentViewForImage;
-    ImageButton bannedImageButton;
-    Button profilePictureButton, driversLicenceButton, checkitcardButton,
+    private ImageView CurrentViewForImage;
+    private ImageButton bannedImageButton;
+    private Button profilePictureButton, driversLicenceButton, checkitcardButton,
             oebbCardButton, passportButton, idFrontButton, idBackButton,
             saveButton;
-    TextView text;
-    EditText newNameText, dateText;
-    int age, testCounter;
+    private TextView text;
+    private EditText newNameText, dateText;
+
+    //the final folder for this person to save the files
+    private File personDIR;
+
+    //the thumbnail folder of this person
+    private File personThumbnails;
+
+    //the person folder with the full sized images
+    private File personFullSizedImages;
+
+    //the root folder of all entries
+    private File KWIMG;
+
+    //the folder identifier as first name, last name and date
+    private String PERSON_FOLDER;
+
+    //the final name of the current file
+    private String fileName;
+
+    //the calculated age
+    //this value is only for the Database.addPerson Method as argument
+    private int age;
+
     //persons id from database when updating entry
-    int mId;
-    boolean isNewStart = true;
+    private int mId;
+
+    //checks if the activity has just started or is returned from camera after
+    //taking a picture
+    private boolean isNewStart = true;
+
     //Dialog elements
     boolean isUpdatable = false;//if the new entry can be updated in database
-    TextView tvFirst, tvLast, tvAge;
-    ImageView picture;
-    Button overwrite, keep;
-    File detailsFile, photo, photo_tmp, absolutPath;
-    Uri imageUri;
-    Intent takePictureIntent = new Intent(
-            MediaStore.ACTION_IMAGE_CAPTURE);
-    //test counter
-    int counter = 0;
+    private TextView tvFirst, tvLast, tvAge;
+    private ImageView picture;
+    private Button overwrite, keep;
+
+    //the file where to write the additional details of the person
+    private File detailsFile;
+
+    //the actual photo
+    private File photo;
+
+    //the photo URI
+    private Uri imageUri;
+
+
+
+    /*This cursor reads all entries of the person database and
+    * looks for an entry which has the given data from the views.
+    *
+    * If it contains at least one match, the next cursor opens with
+    * the required data (Image source, first & last name
+    * to show these data inside a Dialog for asking
+    * the User to overwrite or not
+    * */
+    private Cursor personDuplicateCursor;
     //
     private String datestring, sMonth, sYear, sDay, formattedDate, firstname, lastname, imageKind, profilePicturePath, driverslicencePath, checkitcardPath, oebbPath,
             passportPath, idcardPath_front, idcardPath_back, detailspath;
+
     // Database array to recieve the selected cards as booleans
     private String[] imagePaths = {
             profilePicturePath, driverslicencePath,
             checkitcardPath, passportPath, oebbPath,
             idcardPath_front/*, idcardPath_back*/
     };
+
+    //to save the input values of the views for returning from camera
+    //because this shots a screen orientation change-> activity restart
     private SharedPreferences memory;
     private SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        db = new Database(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_newentry);
         age = 0;
-        testCounter = 0; //counter to count how often the takePicture method gets called
+
+        init(this);
         findAllViewsByID();
-        // add listeners
+
         addListeners();
 
         memory = getApplicationContext().getSharedPreferences("temp", 0);
         editor = memory.edit();
-        // DEVELOPERS MODE
-        c.println("\n\nonCreate()\n\n");
+
         recreateData();
+
+        // DEVELOPERS MODE
         /*
          * the values are only settet to test ordinary input values without
 		 * having to type them in all the time
 		 */
-        //fillActivityWithTestData("Michael Knöfler","08111990");
-        isNewStart = true;
-        //fillActivityWithTestData("Michael Knöfler","08111990");
+        fillActivityWithTestData("Michael Knöfler","08111990",TEST_DETAILS);
+
         // DEVELOPERS MODE END
+        isNewStart = true;
+    }
+    /*
+        * initalize the Handlers for this activity
+        * */
+    Database db;
+    DateHandler dh;
+    FilesHandler fh;
+    BitmapHandler bh;
+    AndroidHandler ah;
+
+    private final void init(Context c){
+        db = new Database(c);
+        dh = new DateHandler();
+        fh = new FilesHandler();
+        bh = new BitmapHandler(c);
+        ah = new AndroidHandler(c);
     }
 
     private synchronized void createLocation(View v, int id) {
-
-        String PERSON_FOLDER;
-        String inputText;
-        String NAME_PATTERN;
-        LinearLayout LayoutContainer;
-        File personDIR;
-        String fullName;
-
-		/*
+        /*
          * If View v is the horizontal LinearLayout which includes the Button
 		 * and the ImageView than define as the ImageView of the touched element
 		 * parent
 		 */
-
-        LayoutContainer = (LinearLayout) findViewById(id);
+        LinearLayout LayoutContainer = (LinearLayout) findViewById(id);
         try {
             /*
              * id�s with ending "LL" are the horizontal LinearLayout Elements
@@ -158,16 +217,12 @@ public class EntryActivity extends Activity {
 
         // chooses the kind of card which has been taken as image
         String IDCARD = checkKindOfImage(getCurrentViewForImage());
-        // add the path of the image to the database object
-
-        // returns the persons name which is filled in
-        newNameText = (EditText) findViewById(R.id.newName);
-        datecalc = new DateHandler();
-
 
         // get selected date
         EditText dateEditText = (EditText) findViewById(R.id.dateText);
-        inputText = dateEditText.getText().toString();
+
+        String inputText = dateEditText.getText().toString();
+
         int inputTextLength = inputText.toCharArray().length;
 
 
@@ -198,9 +253,15 @@ public class EntryActivity extends Activity {
 
         // merge
         datestring = sDay + sMonth + sYear;
+
+        //format date from DDMMYYYY to DD.MM.YYYY
         formattedDate = sDay + "." + sMonth + "." + sYear;
 
-        NAME_PATTERN = "[öÖäÄüÜßA-Za-z]{3,20}\\s+[öÖäÄüÜßA-Za-z]{2,40}";
+        /*
+        * At the first name max length it can be up to 50 in case
+        * the Person has a second first name
+        * */
+        String NAME_PATTERN = "[öÖäÄüÜßA-Za-z]{3,50}\\s+[öÖäÄüÜßA-Za-z]{2,40}";
 
         inputText = newNameText.getText().toString();
 
@@ -214,18 +275,18 @@ public class EntryActivity extends Activity {
 
                 for (int i = 0; i < firstAndLastName.length; i++) {
                     firstAndLastName[i].replaceAll("\\s", "Unbekannt");
-                    c.println("Start replacing Array Content " + i
+                    /*c.println("Start replacing Array Content " + i
                             + " to 'Unbekannt'.\n" + "Content of Index " + i
-                            + ": " + firstAndLastName[i]);
+                            + ": " + firstAndLastName[i]);*/
                 }
             } else {
-                c.println(firstAndLastName[0] + ", " + firstAndLastName[1]
-                        + " set as Name.");
+                /*c.println(firstAndLastName[0] + ", " + firstAndLastName[1]
+                        + " set as Name.");*/
             }
 
             // root directory of the app data
-            File KWIMG = new File(Environment.getExternalStorageDirectory(), "KWIMG");
-            c.println("KWIMG path: " + KWIMG.getPath());
+            KWIMG = new File(Environment.getExternalStorageDirectory(), "KWIMG");
+            //c.println("KWIMG path: " + KWIMG.getPath());
             KWIMG.mkdir();
             KWIMG.setWritable(true);
 
@@ -236,21 +297,127 @@ public class EntryActivity extends Activity {
             PERSON_FOLDER = firstAndLastName[0].toUpperCase(Locale.GERMAN) + "_"
                     + firstAndLastName[1].toUpperCase(Locale.GERMAN) + "_"
                     + datestring;
-            c.println("PERSON_FOLDER: " + PERSON_FOLDER);
+            //c.println("PERSON_FOLDER: " + PERSON_FOLDER);
 
-            // assumption of all firstname1,firstname2(if available) and
-            // lastname
-            fullName = firstAndLastName[0] + " " + firstAndLastName[1];
+            // assumption of all firstname and lastname
+            String fullName = firstAndLastName[0] + " " + firstAndLastName[1];
 
             personDIR = new File(KWIMG.getPath() + "/" + PERSON_FOLDER);
 
-            //c.println("personDIR(& absolutPath): "+ personDIR.getPath());
-            absolutPath = personDIR;
-
-            personDIR.mkdirs();
             personDIR.canWrite();
+            personDIR.mkdirs();
 
-        } catch (IndexOutOfBoundsException ex) {
+            //create the person thumbnail folder
+            personThumbnails = new File(personDIR.getPath(), THUMBNAILS);
+            personThumbnails.canWrite();
+            personThumbnails.mkdir();
+
+            //create the person full sized images folder
+            personFullSizedImages = new File(personDIR.getPath(),IMAGES_LARGE);
+            personFullSizedImages.canWrite();
+            personFullSizedImages.mkdir();
+
+
+
+            Pattern p = Pattern.compile(NAME_PATTERN);
+            Matcher m = p.matcher(fullName);
+
+
+            if (m.matches()) {
+                newNameText.setHintTextColor(Color.parseColor("#F5F6CE"));
+
+                String path = firstAndLastName[0].toUpperCase(Locale.GERMANY)
+                        + "_"
+                        + firstAndLastName[1].toUpperCase(Locale.GERMANY);
+
+                fileName = "IMG"+ "_" + path + "_" +datestring+ IDCARD + FilesHandler.JPEG;
+
+                // save filepath and its name
+                String filePath = personFullSizedImages.getPath()+ fileName;
+
+                // database dispatches
+                firstname = firstAndLastName[0];
+                lastname = firstAndLastName[1];
+
+                // Button IDs
+                final int[] PHOTO_BUTTON_IDS = {profilePictureButton.getId(),
+                        driversLicenceButton.getId(), checkitcardButton.getId(),
+                        passportButton.getId(), oebbCardButton.getId(),
+                        idFrontButton.getId()/*, idBackButton.getId()*/};
+
+
+                // set the file path to array for database
+                for (int i = 0; i < PHOTO_BUTTON_IDS.length; i++) {
+                    //c.println("MAX: " + PHOTO_BUTTON_IDS.length);
+                    //c.println("i: " + i);
+                    if (PHOTO_BUTTON_IDS[i] == LayoutContainer.getChildAt(1)
+                            .getId()) {
+                        imagePaths[i] = filePath;
+                        //c.println("1 Set " + filePath + " to " + imagePaths[i] + "\n");
+
+                    } else
+                    //TODO Passport backside button error
+                /*if(PHOTO_BUTTON_IDS[i] == R.id.idBacksideButton){
+
+                    imagePaths[i] = filePath;
+                    c.println("2 Set "+filePath+" to "+imagePaths[i]+"\n");
+                }*/
+                        if (imagePaths[i] == "" || imagePaths[i] == null) {
+
+                            imagePaths[i] = "KEIN EINTRAG";
+                        }
+                    //c.println("Add [" + imagePathsKeys[i] + "]" + imagePaths[i] + " to memory" + "\n\n\n");
+                    editor.putString(imagePathsKeys[i], imagePaths[i]);
+                }
+
+
+
+                String date = dateText.getText().toString();
+                String name = newNameText.getText().toString();
+
+                // age output
+                String output = text.getText().toString();
+
+                int dateLength = dateText.getText().toString().toCharArray().length;
+
+                if (name == "" || date == "" || output == "" || dateLength == 8) {
+
+                    if (name == "")
+                        Toast.makeText(EntryActivity.this, "Bitte Namen angeben!",
+                                Toast.LENGTH_SHORT).show();
+                    if (date == "")
+                        Toast.makeText(EntryActivity.this, "Bitte Datum angeben!",
+                                Toast.LENGTH_SHORT).show();
+
+                    if (dateLength == 8) {
+                        //and press the take picture button again
+                        calculateAge();
+                        v.callOnClick();
+                    }
+                }
+                if (date != "" && output != "" && dateLength == 10) {
+                   /* Toast.makeText(EntryActivity.this, "Öffne Kamera...",
+                            Toast.LENGTH_SHORT).show();*/
+                    // clear first
+                    photo = null;
+
+
+                    photo = new File(personFullSizedImages,fileName );
+
+                    // declare imageUri as the Uri of photo
+                    imageUri = Uri.fromFile(photo);
+                    //saves the uri path temporary
+                    saveToMemory(imageUri);
+
+
+                    detailsFile = new File(personDIR.getPath(), path + "_"+datestring+"_"+"DETAILS.txt");
+                    detailspath = detailsFile.getAbsolutePath();
+
+                    takePicture(v);
+                }
+
+            }
+        } catch (Exception ex) {
             Toast.makeText(EntryActivity.this,
                     "Kein Name erkannt oder Nachname fehlt!",
                     Toast.LENGTH_SHORT).show();
@@ -260,120 +427,11 @@ public class EntryActivity extends Activity {
                         + firstAndLastName.length
                         + " Name was set to firstname, lastname = UNKNOWN ");
             }
-            fullName = "";
+
             personDIR = null;
         }
-        Pattern p = Pattern.compile(NAME_PATTERN);
-        Matcher m = p.matcher(fullName);
-
-
-        if (m.matches()) {
-            newNameText.setHintTextColor(Color.parseColor("#F5F6CE"));
-
-
-            // save filepath and its name
-            String filePath = personDIR.getPath()
-                    + "IMG_"
-                    + firstAndLastName[0].toUpperCase(Locale.GERMANY)
-                    + "_"
-                    + firstAndLastName[1].toUpperCase(Locale.GERMANY) + IDCARD
-                    + ".jpg";
-
-            // database dispatches
-            firstname = firstAndLastName[0];
-            lastname = firstAndLastName[1];
-
-            // Button IDs
-            final int[] PHOTO_BUTTON_IDS = {profilePictureButton.getId(),
-                    driversLicenceButton.getId(), checkitcardButton.getId(),
-                    passportButton.getId(), oebbCardButton.getId(),
-                    idFrontButton.getId()/*, idBackButton.getId()*/};
-
-
-            testCounter++;
-            c.println(testCounter);
-
-            // set the file path to array for database
-            for (int i = 0; i < PHOTO_BUTTON_IDS.length; i++) {
-                //c.println("MAX: " + PHOTO_BUTTON_IDS.length);
-                //c.println("i: " + i);
-                if (PHOTO_BUTTON_IDS[i] == LayoutContainer.getChildAt(1)
-                        .getId()) {
-                    imagePaths[i] = filePath;
-                    //c.println("1 Set " + filePath + " to " + imagePaths[i] + "\n");
-
-                } else
-                /*if(PHOTO_BUTTON_IDS[i] == R.id.idBacksideButton){
-
-                    imagePaths[i] = filePath;
-                    c.println("2 Set "+filePath+" to "+imagePaths[i]+"\n");
-                }*/
-                    if (imagePaths[i] == "" || imagePaths[i] == null) {
-
-                        imagePaths[i] = "KEIN EINTRAG";
-                    }
-                //c.println("Add [" + imagePathsKeys[i] + "]" + imagePaths[i] + " to memory" + "\n\n\n");
-                editor.putString(imagePathsKeys[i], imagePaths[i]);
-            }
-
-            /*
-             * The actual photo object
-			 *
-			 * includes directory and the file name
-			 *
-			 * the file name is based on the first & last name and the birthday
-			 * which was given by the users input
-			 */
-            String path = firstAndLastName[0].toUpperCase(Locale.GERMANY)
-                    + "_"
-                    + firstAndLastName[1].toUpperCase(Locale.GERMANY);
-
-            String date = dateText.getText().toString();
-            String name = newNameText.getText().toString();
-
-            // age output
-            String output = text.getText().toString();
-            int dateLength = dateText.getText().toString().toCharArray().length;
-
-            if (name == "" || date == "" || output == "" || dateLength == 8) {
-
-                if (name == "")
-                    Toast.makeText(EntryActivity.this, "Bitte Namen angeben!",
-                            Toast.LENGTH_SHORT).show();
-                if (date == "")
-                    Toast.makeText(EntryActivity.this, "Bitte Datum angeben!",
-                            Toast.LENGTH_SHORT).show();
-
-                if (dateLength == 8) {
-                    //and press the take picture button again
-                    calculateAge();
-                    v.callOnClick();
-                }
-            }
-            if (date != "" && output != "" && dateLength == 10) {
-                Toast.makeText(EntryActivity.this, "Öffne Kamera...",
-                        Toast.LENGTH_SHORT).show();
-                // clear first
-                photo = null;
-
-                photo = new File(personDIR, "IMG_" + path + IDCARD + ".jpg");
-                photo_tmp = photo;
-
-                // declare imageUri as the Uri of photo
-                imageUri = Uri.fromFile(photo);
-                //saves the uri path temporary
-                saveToMemory(imageUri);
-
-
-                detailsFile = new File(personDIR.getPath(), path + "_DETAILS.txt");
-                detailspath = detailsFile.getAbsolutePath();
-
-                takePicture(v);
-            }
-
-        }
-
     }
+
 
 
     private void initDialog(Cursor cursor) {
@@ -392,16 +450,16 @@ public class EntryActivity extends Activity {
         tvLast.setText(cursor.getString(cursor.getColumnIndex(Database.COL_LASTNAME)));
 
         //calculate the age out of the database
-        int[] date = datecalc.getDateInSplittedFormatAsInteger(cursor.getString(cursor.getColumnIndex(Database.COL_BIRTHDATE)));
-        int age = datecalc.getAgeInYears(date[0], date[1], date[2]);
+        int[] date = dh.getDateInSplittedFormatAsInteger(cursor.getString(cursor.getColumnIndex(Database.COL_BIRTHDATE)));
+        int age = dh.getAgeInYears(date[0], date[1], date[2]);
 
         tvAge.setText(age + " Jahre");
 
         final int id = cursor.getInt(0);
 
-        AndroidHandler ah = new AndroidHandler(getApplicationContext());
+        BitmapHandler bh = new BitmapHandler(getApplicationContext());
 
-        final Bitmap bm = ah.getBitmap(cursor.getString(cursor.getColumnIndex(Database.COL_PROFILEPICTURE)));
+        final Bitmap bm = bh.getBitmap(cursor.getString(cursor.getColumnIndex(Database.COL_PROFILEPICTURE)));
         picture.setImageBitmap(bm);
 
         overwrite = (Button) dialog.findViewById(R.id.dialogTakeThisButton);
@@ -435,7 +493,7 @@ public class EntryActivity extends Activity {
 
     }
 
-    private Cursor personDuplicateCursor;
+
     private synchronized void takePicture(View v) {
         isNewStart = false;
 
@@ -445,20 +503,20 @@ public class EntryActivity extends Activity {
         boolean isDuplicate = checkPersonForOverwrite(v);
         if (takePictureIntent != null) {
 
-            if(isDuplicate){
-                if(isUpdatable) {
+            if (isDuplicate) {
+                if (isUpdatable) {
                     if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                         System.out.println("in true if");
                         startActivityForResult(takePictureIntent, REQUEST_TAKE_PICTURE);
+
                         onTrimMemory(TRIM_MEMORY_UI_HIDDEN);
                     }
-                }else{
-                    if(personDuplicateCursor != null)
+                } else {
+                    if (personDuplicateCursor != null)
                         initDialog(personDuplicateCursor);
                 }
-            }else
-            if(!isDuplicate){
-                if(takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            } else if (!isDuplicate) {
+                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                     System.out.println("in false if");
                     startActivityForResult(takePictureIntent, REQUEST_TAKE_PICTURE);
                     onTrimMemory(TRIM_MEMORY_UI_HIDDEN);
@@ -467,12 +525,25 @@ public class EntryActivity extends Activity {
 
 
         }
-            //deletes all temporary data
-            editor.clear();
+        //deletes all temporary data
+        editor.clear();
 
     }
 
 
+    /*
+    * For Listeners and other objects where the dialog element
+    * would have to be final to access it inside an inner class
+    * */
+    Dialog mDialog;
+
+    private void setDialogAsset(Dialog d) {
+        mDialog = d;
+    }
+
+    private Dialog getmDialog() {
+        return mDialog;
+    }
 
     private boolean checkPersonForOverwrite(View v) {
 
@@ -489,7 +560,7 @@ public class EntryActivity extends Activity {
                         c.moveToFirst();
                         personDuplicateCursor = c;
                         return true;
-                    }else{
+                    } else {
                         System.out.println("is Updatable, return true");
 
                     }
@@ -499,10 +570,8 @@ public class EntryActivity extends Activity {
         System.out.println("return false");
         return false;
     }
-    public void onResume() {
-        recreateData();
-        super.onResume();
-    }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -576,10 +645,61 @@ public class EntryActivity extends Activity {
         }
     }
 
+    private void createThumbnails() {
+
+        //temporary file array
+        File[] origFiles = personFullSizedImages.listFiles();
+
+        //The amount of files
+        int fileAmount = origFiles.length;
+
+        System.out.println("Anzahl der Dateien im img Ordner: "+fileAmount);
+        //temporary bitmap object
+        Bitmap bitmap;
+
+        /*
+        * Run through the file array and check wether it's a image or textfile.
+        *
+        * Then if its an image, resize it
+        * */
+        for(int i = 0;i < fileAmount;i++){
+            //the path of the current file
+            String path = origFiles[i].getPath();
+            String fileEnd = fh.checkFileType(origFiles[i]);
+
+            System.out.println("Dateiname: "+ path);
+
+            //check if the file is a jpeg
+            if(FilesHandler.JPEG.equals(fileEnd)){
+                bitmap = bh.getBitmap(path);
+
+                System.out.println("Width: "+ bitmap.getWidth()+" Height: "+bitmap.getHeight());
+
+                bitmap = bh.resizeBitmap(bitmap,THUMBNAIL_SCALE_FACTOR);
+
+                File thumbnail = new File(personThumbnails,ah.splitIntoFILEPATHAndFILENAME(path,IMAGE_SPLIT_POINT,false)[1]);
+                System.out.println("Vorschau Dateipfad: "+thumbnail.getAbsolutePath());
+                bh.saveBitmapToFile(thumbnail,bitmap);
+
+                System.out.println("Bilddatei wurde bearbeitet: "+path);
+                System.out.println("Und verkleinert nach "+thumbnail.getAbsolutePath()+" verschoben.");
+
+            }else{
+                System.out.println("Datei ist keine Bilddatei: "+path);
+            }
+        }
+    }
+
+
     protected void save(View v) {
 
         db.getWritableDatabase();
 
+        try{
+            createThumbnails();
+        }catch(Exception tmbEx){
+            System.out.println("Error while creating thumbnails "+tmbEx);
+        }
         if (db != null) {
 
             // add details to textfile
@@ -587,7 +707,7 @@ public class EntryActivity extends Activity {
             isNewStart = true;
 
             for (int i = 0; i < imagePaths.length; i++) {
-                //c.println(pathNamesInOrder[i]+": "+imagePaths[i]);
+                c.println(pathNamesInOrder[i]+": "+imagePaths[i]);
             }
             if (!isUpdatable) {
                 //if no person with these data exists create one
@@ -710,15 +830,17 @@ public class EntryActivity extends Activity {
         });
     }
 
-    private void fillActivityWithTestData(String name, String date) {
+    private void fillActivityWithTestData(String name, String date, String details) {
 
         newNameText.setText(name);
         // date
 
         dateText.setText(date);
 
+        EditText detailsView = (EditText)findViewById(R.id.personDetails);
+        detailsView.setText(details);
 
-        //profilePictureButton.callOnClick();
+        profilePictureButton.callOnClick();
 
     }
 
@@ -726,6 +848,55 @@ public class EntryActivity extends Activity {
         onTrimMemory(TRIM_MEMORY_COMPLETE);
 
         super.onStop();
+    }
+
+    public void onPause(){
+        if(!isNewStart)
+            isCameraActivated = true;
+
+
+        super.onPause();
+    }
+    public void onResume() {
+        recreateData();
+        super.onResume();
+    }
+
+    public void onBackPressed() {
+        Dialog d = new Dialog(this);
+        d.setContentView(R.layout.dialog_cancel);
+        EntryActivity.this.setDialogAsset(d);
+        final Button ok, cancel;
+        String text = "Möchten Sie wirklich beenden?";
+        ok = (Button) d.findViewById(R.id.okButton);
+        cancel = (Button) d.findViewById(R.id.cancelButton);
+
+        ok.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                ok.setOnClickListener(null);
+                cancel.setOnClickListener(null);
+                EntryActivity.this.setDialogAsset(null);
+                EntryActivity.this.finish();
+
+
+            }
+        });
+        cancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                EntryActivity.this.getmDialog().dismiss();
+                ok.setOnClickListener(null);
+                cancel.setOnClickListener(null);
+                EntryActivity.this.setDialogAsset(null);
+
+            }
+        });
+
+        d.setTitle(text);
+        d.show();
     }
 
     private void setKindOfImage(String string) {
@@ -766,13 +937,13 @@ public class EntryActivity extends Activity {
             return text;
         }
         if (view == findViewById(R.id.miniPersonalIDfront)) {
-            text = "_PERSONALAUSWEIS_VS";
+            text = "_PERSONALAUSWEIS-VS";
             // c.println("+_PERSONALAUSWEIS_VS");
             setKindOfImage(text);
             return text;
         }
         if (view == findViewById(R.id.miniPersonalIDback)) {
-            text = "_PERSONALAUSWEIS_RS";
+            text = "_PERSONALAUSWEIS-RS";
             // c.println("+_PERSONALAUSWEIS_RS");
             setKindOfImage(text);
             return text;
@@ -905,6 +1076,7 @@ public class EntryActivity extends Activity {
                     File picture = new File(loadUriFromMemory());
                     Log.v("Passed", "Image created");
                     isNewStart = false;
+                    isCameraActivated = false;
                     k++;
                     c.println("recreateData() Durchlauf(" + k + ")");
                 }
@@ -912,10 +1084,6 @@ public class EntryActivity extends Activity {
             }
             c.println("getCurrentViewForImage() = null");
         }
-    }
-
-    private boolean checkIfExistsInDatabase() {
-        return false;
     }
 
     private void calculateAge() {
@@ -991,5 +1159,13 @@ public class EntryActivity extends Activity {
         } catch (NullPointerException npe) {
 
         }
+    }
+
+    /*
+    * Developers mode
+    *
+    * */
+    private void addTestEntriesToDatabase(int amount) {
+
     }
 }

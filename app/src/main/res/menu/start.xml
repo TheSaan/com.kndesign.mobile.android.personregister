@@ -24,7 +24,7 @@
     
 
     <item
-        android:id="@+id/action_entry_count"
+        android:id="@+id/action_settings"
         android:icon="@drawable/ic_action_settings"
         android:orderInCategory="4"
         android:title="@string/action_settings"

@@ -12,7 +12,7 @@
         android:id="@+id/personListIndex"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="60sp"
+        android:textSize="12sp"
         android:textIsSelectable="false"
         android:clickable="false"
         android:focusable="false" />
@@ -21,31 +21,19 @@
         android:id="@+id/thumbnail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:paddingLeft="15dp"
         android:contentDescription="@string/thumbnailCD"
         android:clickable="false"
         android:focusable="false" />
 
-    <TextView
-        android:id="@+id/personAge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="38sp"
-        android:textIsSelectable="false"
-        android:clickable="false"
-        android:focusable="false"/>
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="0.1"
-        android:clickable="false"
-        android:focusable="false" />
 
     <TextView
         android:id="@+id/personFirstname"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="38sp"
+        android:textAlignment="textStart"
+        android:layout_marginLeft="15dp"
+        android:textSize="40sp"
         android:textIsSelectable="false"
         android:clickable="false"
         android:focusable="false" />
@@ -53,7 +41,7 @@
     <Space
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="0.1"
+        android:layout_weight="0.05"
         android:clickable="false"
         android:focusable="false" />
 
@@ -62,16 +50,31 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textIsSelectable="false"
-        android:textSize="38sp"
+        android:textSize="40sp"
+        android:clickable="false"
+        android:focusable="false" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1"
         android:clickable="false"
         android:focusable="false" />
 
+    <TextView
+        android:id="@+id/personAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="50sp"
+        android:layout_gravity="end"
+        android:textIsSelectable="false"
+        android:clickable="false"
+        android:focusable="false"/>
+
+
     <ImageView
-        android:id="@+id/detailsImage"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:contentDescription="@string/detailsImageCD"
-        android:focusable="false"
-        android:clickable="false"/>
+        android:id="@+id/infoImage"
+        android:layout_gravity="end|center|center_vertical"/>
 
 </LinearLayout>

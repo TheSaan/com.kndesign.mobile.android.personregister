@@ -6,7 +6,6 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.IBinder;
@@ -21,18 +20,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
 
+import com.knoeflerdesign.keywest.Handler.AndroidHandler;
+import com.knoeflerdesign.keywest.Handler.BitmapHandler;
 import com.knoeflerdesign.keywest.Handler.DateHandler;
+import com.knoeflerdesign.keywest.Handler.FilesHandler;
+import com.knoeflerdesign.keywest.Service.TestEntryCreationService;
 
 import java.io.File;
 
 
-public class StartActivity extends Activity {
+public class StartActivity extends Activity implements KeyWestInterface{
 
-
-    CursorFactory cf;
-    Database db;
-
-    ViewSwitcher viewSwitcher;
+    private ViewSwitcher viewSwitcher;
 
     private SearchResultService srs;
     private ServiceConnection SearchServiceConnection = new ServiceConnection() {
@@ -63,15 +62,10 @@ public class StartActivity extends Activity {
         setContentView(R.layout.activity_start);
         setMinAgeDate();
 
+       init(this);
 
         File sd = new File(Environment.getExternalStorageDirectory()+"/KWIMG/", "BACKUP");
         sd.mkdir();
-
-
-
-        db = new Database(this);
-
-        System.out.println(db.getDatabaseName());
 
         db.exportDatabase(Database.DATABASE_NAME);
 
@@ -84,10 +78,13 @@ public class StartActivity extends Activity {
 
         Intent SearchServiceIntent = new Intent(this, SearchResultService.class);
         Intent AgeServiceIntent = new Intent(this, AgeControlService.class);
+        Intent TestEntriyIntent = new Intent(this, TestEntryCreationService.class);
+
         //start
         try {
             getApplicationContext().startService(SearchServiceIntent);
             getApplicationContext().startService(AgeServiceIntent);
+            getApplicationContext().startService(TestEntriyIntent);
         } catch (NullPointerException npe) {
             Log.e("Service Intent", "Service intent throws " + npe);
         }
@@ -95,11 +92,25 @@ public class StartActivity extends Activity {
         createAgbSwitches();
 
     }
+    /*
+        * initalize the Handlers for this activity
+        * */
+    Database db;
+    DateHandler dh;
+    FilesHandler fh;
+    BitmapHandler bh;
+    AndroidHandler ah;
 
+    private final void init(Context c){
+        db = new Database(c);
+        dh = new DateHandler();
+        fh = new FilesHandler();
+        bh = new BitmapHandler(c);
+        ah = new AndroidHandler(c);
+    }
     private void createAgbSwitches() {
         final Switch agbSwitch = (Switch)findViewById(R.id.agbSwitch);
         final Switch agbSwitch2 = (Switch)findViewById(R.id.agbSwitch2);
-
 
         agbSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override

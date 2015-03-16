@@ -30,26 +30,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.knoeflerdesign.keywest.Handler.AndroidHandler;
+import com.knoeflerdesign.keywest.Handler.BitmapHandler;
+import com.knoeflerdesign.keywest.Handler.DateHandler;
+import com.knoeflerdesign.keywest.Handler.FilesHandler;
 
-public class SearchActivity extends Activity implements PatternCollection {
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
-    public final static int PERSON_INFO_REQUEST = 1;
-    //ImageView Ids for the person info activity
-    final static int[] idCardImageIds = {R.id.personsCheckItCard, R.id.personsDriversLicence, R.id.personsPassport, R.id.personsPassFront, R.id.personsPassBack, R.id.personsOebbb};
-    protected final static String PLUS_SIXTEEN = "unter 18";
-    protected final static String PLUS_EIGHTEEN = "über 18";
-    protected final static String BANNED = "Verbot";
-    protected final static String ALL = "Alle";
-    private static SearchActivity myClass;
-    private static boolean isThumbnailShown = false;
+public class SearchActivity extends Activity implements PatternCollection,KeyWestInterface {
+
+
+    private boolean isThumbnailShown = false;
 
     // search selection criteria
-    protected Database db;
     ListView personList;
-    CursorFactory cf;
     View[] list_items;
     //include self written functions for path splitting, etc
-    AndroidHandler ff;
     Bundle extras;
     //the last search query before pausing activity
     String lastQuery;
@@ -81,14 +77,11 @@ public class SearchActivity extends Activity implements PatternCollection {
         }
     };
 
-
-    private SharedPreferences memory;
-    private SharedPreferences.Editor editor;
-
     public void onResume() {
         super.onResume();
         srsintent = new Intent(this, SearchResultService.class);
         bindService(srsintent, SearchServiceConnection, Context.BIND_AUTO_CREATE);
+
 
     }
 
@@ -134,8 +127,7 @@ public class SearchActivity extends Activity implements PatternCollection {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results);
 
-        // get the existing database
-        db = new Database(this);
+        init(this);
         // The list of the results
         personList = (ListView) findViewById(R.id.resultList);
 
@@ -151,7 +143,22 @@ public class SearchActivity extends Activity implements PatternCollection {
 
 
     }
+    /*
+        * initalize the Handlers for this activity
+        * */
+    Database db;
+    DateHandler dh;
+    FilesHandler fh;
+    BitmapHandler bh;
+    AndroidHandler ah;
 
+    private final void init(Context c){
+        db = new Database(c);
+        dh = new DateHandler();
+        fh = new FilesHandler();
+        bh = new BitmapHandler(c);
+        ah = new AndroidHandler(c);
+    }
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
@@ -160,7 +167,7 @@ public class SearchActivity extends Activity implements PatternCollection {
     }
 
     protected void search(String query) {
-        ff = new AndroidHandler(getApplicationContext());
+        bh = new BitmapHandler(getApplicationContext());
         final String QUERY = query;
         lastQuery = query;
 
@@ -195,7 +202,7 @@ public class SearchActivity extends Activity implements PatternCollection {
 
             Log.v("Test", "Setting listener");
 
-            personList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            /*personList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
 
                 @Override
@@ -211,14 +218,14 @@ public class SearchActivity extends Activity implements PatternCollection {
                         if (c.getCount() > 0) {
                             c.moveToFirst();
 
-                            Bitmap bm = ff.getBitmap(c.getString(c.getColumnIndex(Database.COL_PROFILEPICTURE)));
+                            Bitmap bm = bh.getBitmap(c.getString(c.getColumnIndex(Database.COL_PROFILEPICTURE)));
 
                             //set dimension of the bitmap
                             int height = 128;
                             double scaledWidth = height * 0.5625;
                             int width = (int) scaledWidth;
-                            bm = ff.rotateBitmap(bm, 90);
-                            bm = ff.scaleBitmap(bm, width, height);
+                            bm = bh.rotateBitmap(bm, 90);
+                            bm = bh.scaleBitmap(bm, width, height);
                             thumbnail.setImageBitmap(bm);
                             isThumbnailShown = true;
                         } else {
@@ -231,7 +238,7 @@ public class SearchActivity extends Activity implements PatternCollection {
                     }
 
                 }
-            });
+            });*/
             personList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
                 @Override
@@ -270,11 +277,9 @@ public class SearchActivity extends Activity implements PatternCollection {
             int first_name_length
                     ,
                     last_name_length;
-            int getIndex;
-            String firstName
-                    ,
-                    lastName;
-            int bannedState;
+            int getIndex,bannedState;
+            String firstName,lastName,fileText;
+
 
 
             @Override
@@ -287,40 +292,74 @@ public class SearchActivity extends Activity implements PatternCollection {
                 * */
 
                 getIndex = cursor.getColumnIndex(Database.COL_BANNED);
-                bannedState = (int) cursor.getInt(getIndex);
+                bannedState =  cursor.getInt(getIndex);
 
+                if(view instanceof ImageView) {
+                    if (view.getId() == R.id.thumbnail) {
+                        try{
+                            ImageView image = (ImageView) view;
+                            String path = cursor.getString(columnIndex);
 
-                    /*if (view instanceof ImageView) {
-                        if (view.getId() == R.id.thumbnail) {
-                            try {
-                                ImageView image = (ImageView) view;
-                                String path = cursor.getString(columnIndex);
+                            /*
+                            * To get the thumbnail, cut the path part /img/
+                            * out and replace it with /tmb/.
+                            * The rest of the path keeps the same
+                            * */
+                            String[] pathCut = path.split(EntryActivity.IMAGES_LARGE);
 
-                                Bitmap bitmap = ff.getBitmap(path);
+                            //now glue the path together again with the tmb value
+                            path = pathCut[0]+EntryActivity.THUMBNAILS+pathCut[1];
+                            if(bh == null)
+                                bh = new BitmapHandler(getApplicationContext());
 
-                                if (bitmap != null) {
-                                    int height = 128;
-                                    double scaledWidth = height * 0.5625;
-                                    int width = (int) scaledWidth;
+                            Bitmap bitmap = bh.getBitmap(path);
 
-                                    bitmap = ff.scaleBitmap(bitmap, height, width);
-                                    bitmap = ff.rotateBitmap(bitmap, 90);
+                            if (bitmap != null) {
+                                int height = 128;
+                                double scaledWidth = height * 0.5625;
+                                int width = (int) scaledWidth;
 
-                                    image.setImageBitmap(bitmap);
-                                    return true;
-                                }
-                            } catch (Resources.NotFoundException nfe) {
-                                //System.out.println("ImageView Resource couldn't be found in ViewBinder");
+                                bitmap = bh.scaleBitmap(bitmap, height, width);
+                                bitmap = bh.rotateBitmap(bitmap, 90);
 
+                                image.setImageBitmap(bitmap);
+                                return true;
                             }
-                        } else {
-                            //System.out.println("Bitmap was empty or null");
+                        }catch(Resources.NotFoundException nfe){
+                            System.out.println("ImageView Resource couldn't be found in ViewBinder");
+
+                        }
+                    }else {
+                        System.out.println("Bitmap was empty or null");
+                    }
+
+                    if (view instanceof ImageView) {
+                        if (view.getId() == R.id.infoImage) {
+
+
+                        try {
+                            fileText = fh.readTextFile(cursor.getString(cursor.getColumnIndex(Database.COL_DETAILS)));
+                        } catch (FileNotFoundException fnf) {
+                            System.out.println("Details file not found");
+                            return false;
                         }
 
-                    } else*/
+                        System.out.println("Details: " + fileText);
+
+                        try {
+                            if (!fileText.toString().isEmpty() && fileText != null) {
+                                System.out.println("set background resource");
+
+                                ((ImageView) view).setBackgroundResource(R.drawable.ic_info_grey);
+                                return true;
+                            }
+                        } catch (NullPointerException npe) {
+                            return false;
+                        }
+                    }
+                }
+                    }
                 if (view instanceof TextView) {
-
-
                     if (view.getId() == R.id.personAge) {
                         ((TextView) view).setTextColor(Color.GREEN);
                         return false;
@@ -351,7 +390,7 @@ public class SearchActivity extends Activity implements PatternCollection {
                         if (first_name_length + last_name_length + 1 > 17) {
 
                             //prepare full name
-                            String[] cuts = ff.cutStringIfTooLongAndAddDots(firstName + " " + lastName, 20).split(" ");
+                            String[] cuts = ah.cutStringIfTooLongAndAddDots(firstName + " " + lastName, 20).split(" ");
 
                             // select last name
                             String cutted_last_name = cuts[1];
@@ -381,6 +420,12 @@ public class SearchActivity extends Activity implements PatternCollection {
                     }
                 }
                 //bitmap.recycle();
+
+                //close
+                ah = null;
+                fh = null;
+                bh = null;
+
                 return false;
             }
 
@@ -401,6 +446,7 @@ public class SearchActivity extends Activity implements PatternCollection {
             @Override
             public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
 
+                bh = new BitmapHandler(getApplicationContext());
                 ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
                 if (!isThumbnailShown) {
                     //select cursor from list items data
@@ -408,14 +454,14 @@ public class SearchActivity extends Activity implements PatternCollection {
                     if (c.getCount() > 0) {
                         c.moveToFirst();
 
-                        Bitmap bm = ff.getBitmap(c.getString(c.getColumnIndex(Database.COL_PROFILEPICTURE)));
+                        Bitmap bm = bh.getBitmap(c.getString(c.getColumnIndex(Database.COL_PROFILEPICTURE)));
 
                         //set dimension of the bitmap
                         int height = 128;
                         double scaledWidth = height * 0.5625;
                         int width = (int) scaledWidth;
-                        bm = ff.rotateBitmap(bm, 90);
-                        bm = ff.scaleBitmap(bm, width, height);
+                        bm = bh.rotateBitmap(bm, 90);
+                        bm = bh.scaleBitmap(bm, width, height);
                         thumbnail.setImageBitmap(bm);
                         isThumbnailShown = true;
                     } else {
@@ -433,18 +479,15 @@ public class SearchActivity extends Activity implements PatternCollection {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-
                 showPersonInfo(view);
                 return false;
             }
         });
-        createPersonItemArray(personList);
     }
 
     protected Cursor getCursorFromSearchQuery(String QUERY) {
 
-
+        AndroidHandler ah = new AndroidHandler(getApplicationContext());
 
 
 
@@ -495,22 +538,22 @@ public class SearchActivity extends Activity implements PatternCollection {
         //if ask for name
         //this order is important
         // search for name with single word (first or last name
-        if (ff.checkMultiplePatterns(SINGLE_NAME_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(SINGLE_NAME_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 4);
             return cursor;
         }
         //search for multiple name formats
-        if (ff.checkMultiplePatterns(NAME_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(NAME_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 1);
             return cursor;
         }else
         //search for age
-        if (ff.checkMultiplePatterns(AGE_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(AGE_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 2);
             return cursor;
         }else
         //search for date
-        if (ff.checkMultiplePatterns(DATE_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(DATE_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 3);
             return cursor;
         } else {
@@ -525,14 +568,6 @@ public class SearchActivity extends Activity implements PatternCollection {
             //call search again to show the data from service
             onDestroy();
             return null;
-        }
-    }
-
-    private void createPersonItemArray(ListView lv) {
-        list_items = new View[lv.getChildCount()];
-
-        for (int i = 0; i < lv.getChildCount(); i++) {
-            list_items[i] = lv.getChildAt(i);
         }
     }
 

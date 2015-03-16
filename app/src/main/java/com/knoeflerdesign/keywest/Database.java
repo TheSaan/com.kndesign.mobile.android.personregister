@@ -1,139 +1,55 @@
 package com.knoeflerdesign.keywest;
 
 import android.app.Service;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.IntentSender;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
 import android.database.Cursor;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.UserHandle;
 import android.util.Log;
-import android.view.Display;
-import android.widget.Toast;
 
 import com.knoeflerdesign.keywest.Handler.AndroidHandler;
+import com.knoeflerdesign.keywest.Handler.BitmapHandler;
 import com.knoeflerdesign.keywest.Handler.DateHandler;
+import com.knoeflerdesign.keywest.Handler.FilesHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.FileChannel;
 
-public class Database extends SQLiteOpenHelper implements PatternCollection{
+public class Database extends SQLiteOpenHelper implements PatternCollection, KeyWestInterface{
 
-    AndroidHandler ff;
+    private final SQLiteDatabase db;
     Context context;
-    // database specific
-    public static final String QM = "=?";
-    public static final String AND = " AND ";
-    public static final String ALL = "all";
-
-    //Application Package
-    public static final String PACKAGE = "com.knoeflerdesign.keywest";
-
-    //Database Backup Name
-    public static final String DATABASE_BACKUP_NAME = "key_west_pers_reg_backup";
-
-    //Database Tables
-    public static final String DATABASE_TABEL_PERSONS = "personen";
-    public static final String DATABASE_TABEL_SUGGESTIONS = "vorschläge";
-    private static final String DATABASE_TABEL_PASSWORDS = "passwörter";
-
-    // table values
-    public static final String PATH_MAX_VARCHAR_LENGTH = "500";
-    public static final String SELECT_ALL = "*";
-    public static final String COL_ID = "_id";
-    public static final String COL_AGE = "_alter";
-    public static final String COL_LASTNAME = "name";
-    public static final String COL_FIRSTNAME = "vorname";
-    public static final String COL_BIRTHDATE = "geburtsdatum";
-    public static final String COL_PROFILEPICTURE = "profilbild";
-    public static final String COL_DRIVERSLICENCE = "führerschein";
-    public static final String COL_CHECKITCARD = "checkitcard";
-    public static final String COL_PASSPORT = "reisepass";
-    public static final String COL_OEBBCARD = "öbbcard";
-    public static final String COL_PERSO_FRONT = "personalausweis_vs";
-    public static final String COL_PERSO_BACK = "personalausweis_rs";
-    public static final String COL_DETAILS = "details";
-    public static final String COL_BANNED = "hausverbot";
-    // COL_BANNED always has to be last index, otherwise change the loop in
-    // addPerson()
-    protected static final String[] COLUMNS = {COL_ID, COL_AGE, COL_FIRSTNAME,
-            COL_LASTNAME, COL_BIRTHDATE, COL_PROFILEPICTURE,
-            COL_DRIVERSLICENCE, COL_CHECKITCARD, COL_PASSPORT, COL_OEBBCARD,
-            COL_PERSO_FRONT, COL_PERSO_BACK, COL_DETAILS, COL_BANNED};
-
-    protected static final String DATABASE_NAME = "KeyWestDatabase.db";
-    private static final String TAG = "KeyWestDatabase";
-    private static final int DATABASE_VERSION = 1;
-
-    private final String sql1 = "CREATE TABLE " + DATABASE_TABEL_PERSONS + "( "
-            + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COL_AGE
-            + " INTEGER," + COL_FIRSTNAME + " VARCHAR(20) NOT NULL,"
-            + COL_LASTNAME + " VARCHAR(20) NOT NULL," + COL_BIRTHDATE
-            + " DATE NOT NULL," + COL_PROFILEPICTURE + " VARCHAR("
-            + PATH_MAX_VARCHAR_LENGTH + ") NOT NULL,"
-            + COL_DRIVERSLICENCE + " VARCHAR("
-            + PATH_MAX_VARCHAR_LENGTH + ") NOT NULL," + COL_CHECKITCARD
-            + " VARCHAR(" + PATH_MAX_VARCHAR_LENGTH + ") NOT NULL,"
-            + COL_PASSPORT + " VARCHAR(" + PATH_MAX_VARCHAR_LENGTH
-            + ") NOT NULL," + COL_OEBBCARD + " VARCHAR("
-            + PATH_MAX_VARCHAR_LENGTH + ") NOT NULL," + COL_PERSO_FRONT
-            + " VARCHAR(" + PATH_MAX_VARCHAR_LENGTH + ") NOT NULL,"
-            + COL_PERSO_BACK + " VARCHAR(" + PATH_MAX_VARCHAR_LENGTH
-            + ") NOT NULL," + COL_DETAILS + " VARCHAR("
-            + PATH_MAX_VARCHAR_LENGTH + ") NOT NULL," + COL_BANNED
-            + " INTEGER  ) ";
-
-    /*private final String sql3 = "CREATE TABLE " + DATABASE_TABEL_SUGGESTIONS
-            + "( _id INTEGER PRIMARY KEY AUTOINCREMENT,"
-            + " VARCHAR(20) NOT NULL,"
-            + "password VARCHAR(20) NOT NULL,"
-            + "kontotype VARCHAR(25) NOT NULL)";*/
-    /*
-    * Update
-    *
-    *
-    * */
-
-
-    private SQLiteDatabase db;
-    CursorFactory cf;
 
     public Database(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
+        init(context);
         db = this.getWritableDatabase();
+    }
+
+    /*
+        * initalize the Handlers for this activity
+        * */
+    DateHandler dh;
+    FilesHandler fh;
+    BitmapHandler bh;
+    AndroidHandler ah;
+
+    private final void init(Context c){
+        dh = new DateHandler();
+        fh = new FilesHandler();
+        bh = new BitmapHandler(c);
+        ah = new AndroidHandler(c);
     }
 
     public void onCreate(SQLiteDatabase db) {
         try {
             // create table 'personen'
-            db.execSQL(sql1);
+            db.execSQL(CREATE_PERSON_TABEL_STRING);
             //db.execSQL(sql3);
 
             System.out.println("Database Path:\t" + db.getPath());
@@ -174,9 +90,9 @@ public class Database extends SQLiteOpenHelper implements PatternCollection{
         int k = 0;
         // add to database
         if (data != null) {
-            for (int i = 0; i < columnsSize; i++) {
+           /* for (int i = 0; i < columnsSize; i++) {
                 System.out.println(i + ". Column:\t" + COLUMNS[i]);
-            }
+            }*/
             for (int i = 0; i < columnsSize; i++) {
                 if (i == 0) {
                     data.put(COLUMNS[i], (this.countPersons() + 1));
@@ -272,7 +188,6 @@ public class Database extends SQLiteOpenHelper implements PatternCollection{
     }
     protected Cursor getCursorFromSearchQuery(String QUERY) {
 
-        ff = new AndroidHandler(context);
         //set also date and age as possible searchresults
         final String[] DATE_CONVENTIONS = {STANDARD_DATE_PATTERN};
         final String[] AGE_CONVENTIONS = {STANDARD_AGE_PATTERN};
@@ -325,19 +240,19 @@ public class Database extends SQLiteOpenHelper implements PatternCollection{
         //if ask for name
         //this order is important
         // search for name with single word (first or last name
-        if (ff.checkMultiplePatterns(SINGLE_NAME_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(SINGLE_NAME_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 4);
         }
         //search for multiple name formats
-        if (ff.checkMultiplePatterns(NAME_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(NAME_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 1);
         }
         //search for age
-        if (ff.checkMultiplePatterns(AGE_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(AGE_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 2);
         }
         //search for date
-        if (ff.checkMultiplePatterns(DATE_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(DATE_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 3);
         } else {
             /*Toast.makeText(SearchActivity,

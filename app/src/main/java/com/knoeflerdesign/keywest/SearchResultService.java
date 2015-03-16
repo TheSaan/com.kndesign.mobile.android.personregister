@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
@@ -18,13 +19,21 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.knoeflerdesign.keywest.Handler.AndroidHandler;
+import com.knoeflerdesign.keywest.Handler.BitmapHandler;
+import com.knoeflerdesign.keywest.Handler.FilesHandler;
+
+import org.w3c.dom.Text;
+
+import java.io.FileNotFoundException;
+import java.io.IOError;
+import java.io.IOException;
 
 
 public class SearchResultService extends Service {
 
     private final IBinder mBinder = new MyBinder();
     protected Database db;
-    protected AndroidHandler ff;
+    protected AndroidHandler ah;
     SQLiteDatabase.CursorFactory cf;
     Cursor cursor;
     boolean binded;
@@ -58,44 +67,15 @@ public class SearchResultService extends Service {
         new AdapterLoadTask().execute(loadCostumerEntries());
 
 
-
         //Does not depend on the intent
         //because this service runs anyway
         return Service.START_STICKY;
     }
 
-    private class AdapterLoadTask extends AsyncTask<SimpleCursorAdapter,Integer,Boolean>{
-
-
-        @Override
-        protected Boolean doInBackground(SimpleCursorAdapter... adapter) {
-
-            int count = adapter[0].getCount();
-
-            for (int i = 0; i < count; i++) {
-                publishProgress((int) ((i / (float) count) * 100));
-                if (isCancelled()) break;
-            }
-            mAdapter = adapter[0];
-            System.out.println("New adapter set");
-            return true;
-        }
-
-       /* protected void onProgressUpdate(Integer... progress){
-            setProgressPercent(progress[0]);
-        }*/
-
-       /*protected void onPostExecute(Long result) {
-           showDialog("Downloaded " + result + " bytes");
-       }*/
-
-    }
     protected SimpleCursorAdapter loadCostumerEntries() {
 
-       /* Toast.makeText(SearchResultService.this,
-                "Lade Datenbank...",
-                Toast.LENGTH_LONG).show();*/
-        ff = new AndroidHandler(getApplicationContext());
+        ah = new AndroidHandler(getApplicationContext());
+
 
         cursor = db.readData();
 
@@ -117,12 +97,19 @@ public class SearchResultService extends Service {
             //calculates the length of the full name and
             //if its bigger than 18 print "Max Musterm..."
 
-            int first_name_length,last_name_length;
+            int first_name_length
+                    ,
+                    last_name_length;
             int getIndex;
-            String firstName,lastName;
+            String firstName
+                    ,
+                    lastName
+                    ,
+                    fileText;
             int bannedState;
             //Bitmap bitmap;
-
+            FilesHandler fh = new FilesHandler();
+            BitmapHandler bh = new BitmapHandler(getApplicationContext());
 
             @Override
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
@@ -131,38 +118,70 @@ public class SearchResultService extends Service {
                 getIndex = cursor.getColumnIndex(Database.COL_BANNED);
                 bannedState = cursor.getInt(getIndex);
 
-
-               /* if (view instanceof ImageView) {
+                if(view instanceof ImageView){
                     if (view.getId() == R.id.thumbnail) {
                         try{
                             ImageView image = (ImageView) view;
                             String path = cursor.getString(columnIndex);
 
-                             bitmap = ff.getBitmap(path);
+                            /*
+                            * To get the thumbnail, cut the path part /img/
+                            * out and replace it with /tmb/.
+                            * The rest of the path keeps the same
+                            * */
+                            String[] pathCut = path.split(EntryActivity.IMAGES_LARGE);
+
+                            //now glue the path together again with the tmb value
+                            path = pathCut[0]+EntryActivity.THUMBNAILS+pathCut[1];
+
+                            Bitmap bitmap = bh.getBitmap(path);
 
                             if (bitmap != null) {
                                 int height = 128;
                                 double scaledWidth = height * 0.5625;
                                 int width = (int) scaledWidth;
 
-                                bitmap = ff.scaleBitmap(bitmap, height, width);
-                                bitmap = ff.rotateBitmap(bitmap, 90);
+                                bitmap = bh.scaleBitmap(bitmap, height, width);
+                                bitmap = bh.rotateBitmap(bitmap, 90);
 
                                 image.setImageBitmap(bitmap);
-
                                 return true;
                             }
                         }catch(Resources.NotFoundException nfe){
-                            //System.out.println("ImageView Resource couldn't be found in ViewBinder");
+                            System.out.println("ImageView Resource couldn't be found in ViewBinder");
 
                         }
-                    }else {
-                        //System.out.println("Bitmap was empty or null");
                     }
+                    if (view.getId() == R.id.infoImage) {
+                        ImageView image = (ImageView)view;
+                        try {
+                            fileText = fh.readTextFile(cursor.getString(cursor.getColumnIndex(Database.COL_DETAILS)));
+                        } catch (FileNotFoundException fnf) {
+                            System.out.println("Details file not found");
+                            return false;
+                        }
 
-                } else*/ if (view instanceof TextView) {
+                        System.out.println("Details: " + fileText);
 
-                    if (view.getId() == R.id.personListIndex){
+                        try {
+                            if (!fileText.toString().isEmpty() && fileText != null) {
+                                System.out.println("set background resource");
+
+                                image.setBackgroundResource(R.drawable.ic_info_grey);
+                                return true;
+                            }else{
+                                System.out.println("FileText is null or empty:"+fileText);
+                                return false;
+                            }
+                        } catch (NullPointerException npe) {
+                            return false;
+                        }
+                    }
+                    return false;
+                }
+                if (view instanceof TextView) {
+
+                    if (view.getId() == R.id.personListIndex) {
 
                         ((TextView) view).setTextColor(Color.BLACK);
                         return false;
@@ -194,17 +213,16 @@ public class SearchResultService extends Service {
                         //System.out.println(text.getText().toString()+"("+thisLength+")");
 
 
-
                         if (first_name_length + last_name_length + 1 > 17) {
 
                             //prepare full name
-                            String[] cuts = ff.cutStringIfTooLongAndAddDots(firstName+" "+lastName,20).split(" ");
+                            String[] cuts = ah.cutStringIfTooLongAndAddDots(firstName + " " + lastName, 20).split(" ");
 
                             // select last name
                             String cutted_last_name = cuts[1];
 
                             //set new lastname to view
-                            ((TextView) view).setText(" "+cutted_last_name);
+                            ((TextView) view).setText(" " + cutted_last_name);
 
 
                             //colorize text to red if the person is banned
@@ -242,34 +260,67 @@ public class SearchResultService extends Service {
         return ca;
     }
 
-    protected void updateEntriesIndexesAfterRemovingOne(int startIndex){
+    protected void updateEntriesIndexesAfterRemovingOne(int startIndex) {
         int entriesNumber;
-        if(cursor != null){
+        if (cursor != null) {
             entriesNumber = cursor.getCount();
-        }else{
+        } else {
             cursor = db.readData();
             entriesNumber = cursor.getCount();
         }
-        for(int i = 0; i < entriesNumber;i++){
-            db.updateIndex(startIndex+1);
+        for (int i = 0; i < entriesNumber; i++) {
+            db.updateIndex(startIndex + 1);
         }
     }
+
+    protected void restart() {
+        stopSelf();
+        startService(new Intent(this, SearchResultService.class));
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        binded = false;
+        super.onUnbind(intent);
+
+        return true;
+    }
+
+    private class AdapterLoadTask extends AsyncTask<SimpleCursorAdapter, Integer, Boolean> {
+
+
+        @Override
+        protected Boolean doInBackground(SimpleCursorAdapter... adapter) {
+
+            int count = adapter[0].getCount();
+
+            for (int i = 0; i < count; i++) {
+                publishProgress((int) ((i / (float) count) * 100));
+                if (isCancelled()) break;
+            }
+            mAdapter = adapter[0];
+            System.out.println("New adapter set");
+            return true;
+        }
+
+       /* protected void onProgressUpdate(Integer... progress){
+            setProgressPercent(progress[0]);
+        }*/
+
+       /*protected void onPostExecute(Long result) {
+           showDialog("Downloaded " + result + " bytes");
+       }*/
+
+    }
+
     class MyBinder extends Binder {
         SearchResultService getService() {
             return SearchResultService.this;
         }
     }
 
-    protected void restart(){
-        stopSelf();
-        startService(new Intent(this,SearchResultService.class));
-    }
-    @Override
-    public boolean onUnbind(Intent intent){
-        binded = false;
-        super.onUnbind(intent);
-
-        return true;
+    public void reloadAdapter(){
+        mAdapter = loadCostumerEntries();
     }
 }
 

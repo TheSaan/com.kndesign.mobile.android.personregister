@@ -101,4 +101,8 @@ Zur Behebung von Software bedingten Mängeln stehen dem Entwickler die von Ihm v
     <string name="search">Suche</string>
     <string name="app_title">Key West Register</string>
 
+    <string name="title_activity_person_image_detailed">PersonImageDetailedActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+
 </resources>
