@@ -74,6 +74,7 @@ public class PersonImageDetailedActivity extends Activity implements KeyWestInte
     public void onBackPressed(){
 
         mIntent = null;
+        System.gc();
         super.onDestroy();
         super.onBackPressed();
     }

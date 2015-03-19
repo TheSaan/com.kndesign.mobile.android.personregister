@@ -36,6 +36,7 @@ import com.knoeflerdesign.keywest.Handler.FilesHandler;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Locale;
 
 public class SearchActivity extends Activity implements PatternCollection,KeyWestInterface {
 
@@ -136,12 +137,89 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String query = intent.getStringExtra(SearchManager.QUERY);
-            System.out.println("go search "+query);
+            c.println("go search "+query);
+
+            //check if the query is just a number
+            if(!ah.isNumeric(query)) {
+                //set search value in the correct form
+                query = correctLowerAndUppercase(query);
+                query = removeSpacesFromLineEnd(query);
+            }
 
             search(query);
         }
 
 
+    }
+
+    private String correctLowerAndUppercase(String editString){
+        String[] words = editString.split(" ");
+
+        //set editstring at first to null
+        //otherwise the first added word is a twin of it
+        editString = null;
+
+        //words
+        if(words.length >1) {
+            for (int i = 0; i < words.length; i++) {
+
+                //split the word into first letter and rest
+                //
+                //the second letter
+                char cutLetter = words[i].charAt(1);
+
+                //split the word at the second letter
+                String firstLetter = words[i].substring(0,1);
+                String rest = words[i].substring(1);
+                //make first letter uppercase
+                firstLetter = firstLetter.toUpperCase(Locale.GERMANY);
+
+                //make the rest lowercase
+                rest = rest.toLowerCase(Locale.GERMANY);
+
+                //now glue the word togheter
+                words[i] =firstLetter + rest;
+            }
+
+            editString = words[0];
+
+            for(int k = 1;k<words.length;k++){
+                editString += " "+words[k];
+            }
+        }else{
+            //split the word into first letter and rest
+            //
+            //the second letter
+            //split the word at the second letter
+            String firstLetter = words[0].substring(0,1);
+            String rest = words[0].substring(1);
+
+            //make first letter uppercase
+            firstLetter = firstLetter.toUpperCase(Locale.GERMAN);
+
+            //make the rest lowercase
+            rest = rest.toLowerCase(Locale.GERMAN);
+
+            editString = firstLetter + rest;
+        }
+
+        return editString;
+    }
+    private String removeSpacesFromLineEnd(String editString){
+
+        String[] words;
+
+        if(editString.split(" ").length>1) {
+            words = editString.split(" ");
+
+            for (int i = 1; i < words.length; i++) {
+                editString = words[0] + " " +words[i];
+            }
+            c.println(editString + "was edited");
+        }else{
+            editString = editString.split(" ")[0];
+        }
+        return editString;
     }
     /*
         * initalize the Handlers for this activity
@@ -163,10 +241,15 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         String value = intent.getStringExtra(SearchManager.QUERY);
+
+        //set search value in the correct form
+        value = correctLowerAndUppercase(value);
+        value = removeSpacesFromLineEnd(value);
+
         search(value);
     }
 
-    protected void search(String query) {
+    protected void search(final String query) {
         bh = new BitmapHandler(getApplicationContext());
         final String QUERY = query;
         lastQuery = query;
@@ -202,56 +285,20 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
 
             Log.v("Test", "Setting listener");
 
-            /*personList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-
-                @Override
-                public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-                    //selection test
-                    //view.setBackgroundColor(Color.YELLOW);
-
-
-                    ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-                    if (!isThumbnailShown) {
-                        //select cursor from list items data
-                        Cursor c = getPersonCursor(view);
-                        if (c.getCount() > 0) {
-                            c.moveToFirst();
-
-                            Bitmap bm = bh.getBitmap(c.getString(c.getColumnIndex(Database.COL_PROFILEPICTURE)));
-
-                            //set dimension of the bitmap
-                            int height = 128;
-                            double scaledWidth = height * 0.5625;
-                            int width = (int) scaledWidth;
-                            bm = bh.rotateBitmap(bm, 90);
-                            bm = bh.scaleBitmap(bm, width, height);
-                            thumbnail.setImageBitmap(bm);
-                            isThumbnailShown = true;
-                        } else {
-                            System.out.println("Cursor is null in ClickListener");
-                        }
-
-                    } else {
-                        isThumbnailShown = false;
-                        thumbnail.setImageBitmap(null);
-                    }
-
-                }
-            });*/
             personList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
                 @Override
                 public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                     ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-
+                    srs.setLastSearch(QUERY);
                     showPersonInfo(view);
                     return false;
                 }
             });
             return;
         } else {
-            System.out.println("Connection: " + SearchServiceConnection + "\nService: " + srs);
+            c.println("Connection: " + SearchServiceConnection + "\nService: " + srs);
         }
         /*
         * run below code if no adapter providing service is available
@@ -266,223 +313,169 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
                 R.id.personFirstname,
                 R.id.personLastname
         };
-        //the adapter which adds the data to the views
-        SimpleCursorAdapter ca2 = new SimpleCursorAdapter(SearchActivity.this, R.layout.search_list_item, getCursorFromSearchQuery(QUERY), select_from, add_to);
 
-        ca2.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            //calculates the length of the full name and
-            //if its bigger than 18 print "Max Musterm..."
+        //the cursor for the current list
+        Cursor resultCursor = getCursorFromSearchQuery(QUERY);
+        if(resultCursor != null) {
+            //the adapter which adds the data to the views
+            SimpleCursorAdapter ca2 = new SimpleCursorAdapter(SearchActivity.this, R.layout.search_list_item, resultCursor, select_from, add_to);
 
-            boolean isNameTooLong = false;
-            int first_name_length
-                    ,
-                    last_name_length;
-            int getIndex,bannedState;
-            String firstName,lastName,fileText;
+            ca2.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+                //calculates the length of the full name and
+                //if its bigger than 18 print "Max Musterm..."
+
+                boolean isNameTooLong = false;
+                int first_name_length
+                        ,
+                        last_name_length;
+                int getIndex
+                        ,
+                        bannedState;
+                String firstName
+                        ,
+                        lastName
+                        ,
+                        fileText;
 
 
+                @Override
+                public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
 
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                /*DE INFO:
-                * Wenn ich am Ende einer if Anweisung true übergebe, dann lässt der ViewBinder
-                * mich die Arbeit übernehmen.
-                *
-                * Übergebe ich false nimmt er die Daten vom Cursor
-                * */
 
-                getIndex = cursor.getColumnIndex(Database.COL_BANNED);
-                bannedState =  cursor.getInt(getIndex);
+                    getIndex = cursor.getColumnIndex(Database.COL_BANNED);
+                    bannedState = cursor.getInt(getIndex);
 
-                if(view instanceof ImageView) {
-                    if (view.getId() == R.id.thumbnail) {
-                        try{
-                            ImageView image = (ImageView) view;
-                            String path = cursor.getString(columnIndex);
+                    if (view instanceof ImageView) {
+                        if (view.getId() == R.id.thumbnail) {
+                            try {
+                                ImageView image = (ImageView) view;
+                                String path = cursor.getString(columnIndex);
 
                             /*
                             * To get the thumbnail, cut the path part /img/
                             * out and replace it with /tmb/.
                             * The rest of the path keeps the same
                             * */
-                            String[] pathCut = path.split(EntryActivity.IMAGES_LARGE);
+                                String[] pathCut = path.split(EntryActivity.IMAGES_LARGE);
 
-                            //now glue the path together again with the tmb value
-                            path = pathCut[0]+EntryActivity.THUMBNAILS+pathCut[1];
-                            if(bh == null)
-                                bh = new BitmapHandler(getApplicationContext());
+                                //now glue the path together again with the tmb value
+                                path = pathCut[0] + EntryActivity.THUMBNAILS + pathCut[1];
 
-                            Bitmap bitmap = bh.getBitmap(path);
+                                Bitmap bitmap = bh.getBitmap(path);
 
-                            if (bitmap != null) {
-                                int height = 128;
-                                double scaledWidth = height * 0.5625;
-                                int width = (int) scaledWidth;
+                                if (bitmap != null) {
+                                    int height = 128;
+                                    double scaledWidth = height * 0.5625;
+                                    int width = (int) scaledWidth;
 
-                                bitmap = bh.scaleBitmap(bitmap, height, width);
-                                bitmap = bh.rotateBitmap(bitmap, 90);
+                                    bitmap = bh.scaleBitmap(bitmap, height, width);
+                                    bitmap = bh.rotateBitmap(bitmap, 90);
 
-                                image.setImageBitmap(bitmap);
-                                return true;
+                                    image.setImageBitmap(bitmap);
+                                    return true;
+                                }
+                            } catch (Resources.NotFoundException nfe) {
+                                c.println("ImageView Resource couldn't be found in ViewBinder");
+
                             }
-                        }catch(Resources.NotFoundException nfe){
-                            System.out.println("ImageView Resource couldn't be found in ViewBinder");
-
                         }
-                    }else {
-                        System.out.println("Bitmap was empty or null");
-                    }
-
-                    if (view instanceof ImageView) {
-                        if (view.getId() == R.id.infoImage) {
-
-
-                        try {
-                            fileText = fh.readTextFile(cursor.getString(cursor.getColumnIndex(Database.COL_DETAILS)));
-                        } catch (FileNotFoundException fnf) {
-                            System.out.println("Details file not found");
-                            return false;
-                        }
-
-                        System.out.println("Details: " + fileText);
-
-                        try {
-                            if (!fileText.toString().isEmpty() && fileText != null) {
-                                System.out.println("set background resource");
-
-                                ((ImageView) view).setBackgroundResource(R.drawable.ic_info_grey);
-                                return true;
-                            }
-                        } catch (NullPointerException npe) {
-                            return false;
-                        }
-                    }
-                }
-                    }
-                if (view instanceof TextView) {
-                    if (view.getId() == R.id.personAge) {
-                        ((TextView) view).setTextColor(Color.GREEN);
                         return false;
                     }
+                    if (view instanceof TextView) {
 
-                    if (view.getId() == R.id.personFirstname) {
+                        if (view.getId() == R.id.personListIndex) {
 
-
-                        firstName = cursor.getString(cursor.getColumnIndex(Database.COL_FIRSTNAME));
-                        first_name_length = firstName.toCharArray().length;
-
-                        if (bannedState == 1) {
-                            ((TextView) view).setTextColor(Color.RED);
-                        } else {
                             ((TextView) view).setTextColor(Color.BLACK);
+                            return false;
                         }
-                        return false;
-                    }
+                        if (view.getId() == R.id.personAge) {
+                            ((TextView) view).setTextColor(getResources().getColor(R.color.yellow));
+                            return false;
+                        }
 
-                    if (view.getId() == R.id.personLastname) {
-
-
-                        lastName = cursor.getString(cursor.getColumnIndex(Database.COL_LASTNAME));
-                        last_name_length = lastName.toCharArray().length;
-                        //System.out.println(text.getText().toString()+"("+thisLength+")");
+                        if (view.getId() == R.id.personFirstname) {
 
 
-                        if (first_name_length + last_name_length + 1 > 17) {
+                            firstName = cursor.getString(cursor.getColumnIndex(Database.COL_FIRSTNAME));
+                            first_name_length = firstName.toCharArray().length;
 
-                            //prepare full name
-                            String[] cuts = ah.cutStringIfTooLongAndAddDots(firstName + " " + lastName, 20).split(" ");
-
-                            // select last name
-                            String cutted_last_name = cuts[1];
-
-                            //set new lastname to view
-                            ((TextView) view).setText(cutted_last_name);
-
-
-                            //colorize text to red if the person is banned
                             if (bannedState == 1) {
                                 ((TextView) view).setTextColor(Color.RED);
                             } else {
-                                ((TextView) view).setTextColor(Color.BLACK);
-                            }
-                            return true;
-
-                        } else {
-                            //colorize text to red if the person is banned
-                            if (bannedState == 1) {
-                                ((TextView) view).setTextColor(Color.RED);
-                            } else {
-                                ((TextView) view).setTextColor(Color.BLACK);
+                                ((TextView) view).setTextColor(Color.WHITE);
                             }
                             return false;
+                        }
 
+                        if (view.getId() == R.id.personLastname) {
+
+
+                            lastName = cursor.getString(cursor.getColumnIndex(Database.COL_LASTNAME));
+                            last_name_length = lastName.toCharArray().length;
+                            //c.println(text.getText().toString()+"("+thisLength+")");
+
+                            if (first_name_length + last_name_length + 1 > 17) {
+
+                                //prepare full name
+                                String[] cuts = ah.cutStringIfTooLongAndAddDots(firstName + " " + lastName, 20).split(" ");
+
+                                // select last name
+                                String cutted_last_name = cuts[1];
+
+                                //set new lastname to view
+                                ((TextView) view).setText(" " + cutted_last_name);
+
+
+                                //colorize text to red if the person is banned
+                                if (bannedState == 1) {
+                                    ((TextView) view).setTextColor(Color.RED);
+                                } else {
+                                    ((TextView) view).setTextColor(Color.WHITE);
+                                }
+                                return true;
+
+                            } else {
+
+                                //colorize text to red if the person is banned
+                                if (bannedState == 1) {
+                                    ((TextView) view).setTextColor(Color.RED);
+                                } else {
+                                    ((TextView) view).setTextColor(Color.WHITE);
+                                }
+                                return false;
+
+                            }
                         }
                     }
-                }
-                //bitmap.recycle();
-
-                //close
-                ah = null;
-                fh = null;
-                bh = null;
-
-                return false;
-            }
-
-        });
-
-        ca2.notifyDataSetChanged();
-
-        personList.setAdapter(ca2);
-
-        //set items selectable
-        personList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
-        personList.setClickable(true);
-
-        // Log.v("Test", "Setting listener");
-        personList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
-
-                bh = new BitmapHandler(getApplicationContext());
-                ImageView thumbnail = (ImageView) view.findViewById(R.id.thumbnail);
-                if (!isThumbnailShown) {
-                    //select cursor from list items data
-                    Cursor c = getPersonCursor(view);
-                    if (c.getCount() > 0) {
-                        c.moveToFirst();
-
-                        Bitmap bm = bh.getBitmap(c.getString(c.getColumnIndex(Database.COL_PROFILEPICTURE)));
-
-                        //set dimension of the bitmap
-                        int height = 128;
-                        double scaledWidth = height * 0.5625;
-                        int width = (int) scaledWidth;
-                        bm = bh.rotateBitmap(bm, 90);
-                        bm = bh.scaleBitmap(bm, width, height);
-                        thumbnail.setImageBitmap(bm);
-                        isThumbnailShown = true;
-                    } else {
-                        System.out.println("Cursor is null in ClickListener");
-                    }
-
-                } else {
-                    isThumbnailShown = false;
-                    thumbnail.setImageBitmap(null);
+//                bitmap.recycle();
+                    return false;
                 }
 
-            }
-        });
-        personList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            });
 
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                showPersonInfo(view);
-                return false;
-            }
-        });
+            ca2.notifyDataSetChanged();
+
+            personList.setAdapter(ca2);
+
+            //set items selectable
+            personList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
+            personList.setClickable(true);
+
+            // Log.v("Test", "Setting listener");
+
+            personList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+                @Override
+                public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                    showPersonInfo(view);
+                    return false;
+                }
+            });
+        }else{
+            Toast.makeText(SearchActivity.this, "Kein Eintrag gefunden. Überprüfen Sie die Eingabe!",
+                    Toast.LENGTH_SHORT).show();
+            onBackPressed();
+        }
     }
 
     protected Cursor getCursorFromSearchQuery(String QUERY) {
@@ -516,36 +509,56 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
             Log.v("getSearchCursor", "PLUS_SIXTEEN, [" + QUERY + "]\n" + "\n");
             cursor = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                     columns, selection[0], null, null, null,
-                    Database.COL_LASTNAME);
-            return cursor;
+                    Database.COL_AGE);
+            if(cursor.getCount()>0)
+                return cursor;
+            else
+                return null;
         }else
         // show 18+
         if (PLUS_EIGHTEEN.equals(QUERY)) {
             Log.v("getSearchCursor", "PLUS_EIGHTEEN, [" + QUERY + "]\n" + "\n");
             cursor = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                     columns, selection[1], null, null, null,
-                    Database.COL_LASTNAME);
-            return cursor;
+                    Database.COL_AGE);
+            if(cursor.getCount()>0)
+                return cursor;
+            else
+                return null;
         }else
         // show banned persons
         if (BANNED.equals(QUERY)) {
             Log.v("getSearchCursor", "BANNED, [" + QUERY + "]\n" + "\n");
             cursor = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
                     columns, selection[2], null, null, null,
-                    Database.COL_LASTNAME);
+                    Database.COL_AGE);
             return cursor;
         }else
-        //if ask for name
-        //this order is important
-        // search for name with single word (first or last name
         if (ah.checkMultiplePatterns(SINGLE_NAME_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 4);
-            return cursor;
+            if(cursor.getCount()>0)
+                return cursor;
+            else
+                return null;
         }
         //search for multiple name formats
         if (ah.checkMultiplePatterns(NAME_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 1);
-            return cursor;
+
+            //if cursor has no matches change the switch the first and lastname
+            //and check again otherwise return null
+            if(cursor.getCount() == 0){
+                c.println(QUERY +" not found. Retry with "+ changeFirstAndLastName(QUERY)+"...");
+                cursor = getSearchCursor(changeFirstAndLastName(QUERY),1);
+                if(cursor.getCount() > 0){
+                    return cursor;
+                }else{
+                    return null;
+                }
+
+            }else {
+                return cursor;
+            }
         }else
         //search for age
         if (ah.checkMultiplePatterns(AGE_CONVENTIONS, QUERY)) {
@@ -554,8 +567,14 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
         }else
         //search for date
         if (ah.checkMultiplePatterns(DATE_CONVENTIONS, QUERY)) {
+            if(QUERY.toCharArray().length == 8)
+                QUERY = formatDateInput(QUERY);
+
             cursor = getSearchCursor(QUERY, 3);
-            return cursor;
+            if(cursor.getCount()>0)
+                return cursor;
+            else
+                return null;
         } else {
             Toast.makeText(SearchActivity.this,
                     "'" + QUERY + "' nicht erkannt!",
@@ -570,9 +589,34 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
             return null;
         }
     }
+    private String formatDateInput(String input){
+            String sDay,sMonth,sYear;
 
+
+                sDay = input.substring(0, 2);
+                sMonth = input.substring(2, 4);
+                sYear = input.substring(4, 8);
+
+                return sDay+"."+sMonth+"."+sYear;
+    }
+    private String changeFirstAndLastName(String name){
+        String[] names = name.split(" ");
+
+        name = "";
+        //put all the firstnames together
+        for(int i = 0;i<names.length-1;i++){
+            c.println("firstnames["+i+"]: "+names[i]);
+            if(names.length>2)
+            names[0] += " "+names[i];
+            c.println("firstnames complete : "+name);
+        }
+
+        //now write the name with lastname at first place and return
+
+        return names[names.length-1]+" "+names[0];
+    }
     private Cursor getSearchCursor(String command, int identifier) {
-        //System.out.println("getSearchCursor startet mit: " + command);
+        //c.println("getSearchCursor startet mit: " + command);
         //the coumns to select
         String[] columns = {Database.COL_ID, Database.COL_PROFILEPICTURE, Database.COL_BIRTHDATE, Database.COL_DETAILS,
                 Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME, Database.COL_BANNED};
@@ -741,7 +785,7 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
             startActivityForResult(i, PERSON_INFO_REQUEST);
             onStop();
             query = null;
-            System.out.println();
+            c.println();
         }
     }
 
@@ -760,12 +804,22 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
                         boolean b = ((Boolean) extras.get("backFromPersonInfoActivity")).booleanValue();
 
                         if (b) {
-                            if (srs != null)
-                                srs.restart();
-                            //after restarting the service call search to show
-                            //the last search again
+
                             try {
-                                search(extras.get("lastSearchQuery").toString());
+                                if(srs != null){
+                                    c.println("restart srs...");
+
+                                    srs.restart();
+
+                                    c.println("...restarted");
+
+                                    c.println("Search again for "+ srs.getLastSearchQuery()+"...");
+
+                                    search(srs.getLastSearchQuery());
+                                    c.println("searched.");
+                                }else{
+                                    c.println("SRS is null in onActivityResult()");
+                                }
                             } catch (Exception e) {
                                 System.err.println("Search could not get started after resuming\nfrom PersonInfoActivity!");
                             }
@@ -773,7 +827,7 @@ public class SearchActivity extends Activity implements PatternCollection,KeyWes
                     }
 
                 } else {
-                    System.out.println("Bundle 'extras' is null");
+                    c.println("Bundle 'extras' is null");
                 }
             }
         }

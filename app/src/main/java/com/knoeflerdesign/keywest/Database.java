@@ -137,7 +137,8 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     public Cursor readData() {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, null, null, null, null, null);
+        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, null, null, null, null, COL_AGE);
+
         if (c != null)
             c.moveToFirst();
         return c;

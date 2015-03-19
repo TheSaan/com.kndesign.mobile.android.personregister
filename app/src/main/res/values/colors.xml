@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <color name="darkPurple">#4b336f</color>
-  <color name="brightPurple">#79336f</color>
+  <color name="dark_purple">#4b336f</color>
+  <color name="bright_purple">#79336f</color>
   <color name="yellow">#ffdd17</color>
-  <color name="bannedRed">#FF0000</color>
-  <color name="black_overlay">#66000000</color>
+  <color name="banned_red">#FF0000</color>
+  <color name="black_overlay">#5FB404</color>
+  <color name="confirmed_green">#5FB404</color>
 </resources>

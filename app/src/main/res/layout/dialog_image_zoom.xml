@@ -9,5 +9,5 @@
         android:id="@+id/zoomImage"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:background="@color/brightPurple"/>
+        android:background="@color/bright_purple"/>
 </RelativeLayout>

@@ -1,5 +1,6 @@
 package com.knoeflerdesign.keywest;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -7,14 +8,21 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
+import android.hardware.display.DisplayManager;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
+import android.view.Display;
 import android.view.View;
+import android.view.ViewParent;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
+import android.widget.Space;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,7 +37,9 @@ import java.io.IOError;
 import java.io.IOException;
 
 
-public class SearchResultService extends Service {
+public class SearchResultService extends Service{
+
+    private String lastSearchQuery;
 
     private final IBinder mBinder = new MyBinder();
     protected Database db;
@@ -75,8 +85,6 @@ public class SearchResultService extends Service {
     protected SimpleCursorAdapter loadCostumerEntries() {
 
         ah = new AndroidHandler(getApplicationContext());
-
-
         cursor = db.readData();
 
         String[] select_from = {Database.COL_ID, Database.COL_PROFILEPICTURE, Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME, Database.COL_BANNED};
@@ -97,18 +105,21 @@ public class SearchResultService extends Service {
             //calculates the length of the full name and
             //if its bigger than 18 print "Max Musterm..."
 
+
             int first_name_length
                     ,
                     last_name_length;
             int getIndex;
+
+
             String firstName
                     ,
                     lastName
-                    ,
-                    fileText;
+                    ;
             int bannedState;
+
+
             //Bitmap bitmap;
-            FilesHandler fh = new FilesHandler();
             BitmapHandler bh = new BitmapHandler(getApplicationContext());
 
             @Override
@@ -152,31 +163,6 @@ public class SearchResultService extends Service {
 
                         }
                     }
-                    if (view.getId() == R.id.infoImage) {
-                        ImageView image = (ImageView)view;
-                        try {
-                            fileText = fh.readTextFile(cursor.getString(cursor.getColumnIndex(Database.COL_DETAILS)));
-                        } catch (FileNotFoundException fnf) {
-                            System.out.println("Details file not found");
-                            return false;
-                        }
-
-                        System.out.println("Details: " + fileText);
-
-                        try {
-                            if (!fileText.toString().isEmpty() && fileText != null) {
-                                System.out.println("set background resource");
-
-                                image.setBackgroundResource(R.drawable.ic_info_grey);
-                                return true;
-                            }else{
-                                System.out.println("FileText is null or empty:"+fileText);
-                                return false;
-                            }
-                        } catch (NullPointerException npe) {
-                            return false;
-                        }
-                    }
                     return false;
                 }
                 if (view instanceof TextView) {
@@ -187,7 +173,7 @@ public class SearchResultService extends Service {
                         return false;
                     }
                     if (view.getId() == R.id.personAge) {
-                        ((TextView) view).setTextColor(Color.GREEN);
+                        ((TextView) view).setTextColor(getResources().getColor(R.color.yellow));
                         return false;
                     }
 
@@ -200,7 +186,7 @@ public class SearchResultService extends Service {
                         if (bannedState == 1) {
                             ((TextView) view).setTextColor(Color.RED);
                         } else {
-                            ((TextView) view).setTextColor(Color.BLACK);
+                            ((TextView) view).setTextColor(Color.WHITE);
                         }
                         return false;
                     }
@@ -211,7 +197,6 @@ public class SearchResultService extends Service {
                         lastName = cursor.getString(cursor.getColumnIndex(Database.COL_LASTNAME));
                         last_name_length = lastName.toCharArray().length;
                         //System.out.println(text.getText().toString()+"("+thisLength+")");
-
 
                         if (first_name_length + last_name_length + 1 > 17) {
 
@@ -229,16 +214,17 @@ public class SearchResultService extends Service {
                             if (bannedState == 1) {
                                 ((TextView) view).setTextColor(Color.RED);
                             } else {
-                                ((TextView) view).setTextColor(Color.BLACK);
+                                ((TextView) view).setTextColor(Color.WHITE);
                             }
                             return true;
 
                         } else {
+
                             //colorize text to red if the person is banned
                             if (bannedState == 1) {
                                 ((TextView) view).setTextColor(Color.RED);
                             } else {
-                                ((TextView) view).setTextColor(Color.BLACK);
+                                ((TextView) view).setTextColor(Color.WHITE);
                             }
                             return false;
 
@@ -321,6 +307,13 @@ public class SearchResultService extends Service {
 
     public void reloadAdapter(){
         mAdapter = loadCostumerEntries();
+    }
+
+    protected void setLastSearch(String query){
+        this.lastSearchQuery = query;
+    }
+    protected String getLastSearchQuery(){
+        return lastSearchQuery;
     }
 }
 

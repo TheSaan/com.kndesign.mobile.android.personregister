@@ -35,15 +35,27 @@
 
     <!-- Backward-compatible version of ?android:attr/buttonBarButtonStyle -->
     <style name="ButtonBarButton" />
+
     <style name="defaultButton">
         <item name="android:textSize">25sp</item>
-        <item name="android:textColor">@color/darkPurple</item>
-        <item name="android:background">@drawable/kw_button_yellow</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:background">@drawable/button_yellow</item>
     </style>
+
+    <style name="confirmButton">
+        <item name="android:textSize">40sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:background">@drawable/save_not_enabled</item>
+    </style>
+
     <style name="deleteButton">
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">#ffffff</item>
-        <item name="android:background">@drawable/kw_button_red</item>
+        <item name="android:background">@drawable/button_red</item>
+    </style>
+    <style name="detailsTextField">
+        <item name="android:background">@drawable/details_text_style</item>
     </style>
 
 </resources>

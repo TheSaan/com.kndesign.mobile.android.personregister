@@ -3,26 +3,23 @@ package com.knoeflerdesign.keywest;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.hardware.Camera;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,10 +29,8 @@ import com.knoeflerdesign.keywest.Handler.DateHandler;
 import com.knoeflerdesign.keywest.Handler.FilesHandler;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -57,7 +52,8 @@ public class EntryActivity extends Activity implements KeyWestInterface{
 
     //Views
     private ImageView CurrentViewForImage;
-    private ImageButton bannedImageButton;
+    private Button currentPhotoButton;
+    private Switch bannedSwitch;
     private Button profilePictureButton, driversLicenceButton, checkitcardButton,
             oebbCardButton, passportButton, idFrontButton, idBackButton,
             saveButton;
@@ -144,6 +140,9 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         init(this);
         findAllViewsByID();
 
+        // confirmation to save
+        saveButton = (Button) findViewById(R.id.saveButton);
+
         addListeners();
 
         memory = getApplicationContext().getSharedPreferences("temp", 0);
@@ -194,22 +193,36 @@ public class EntryActivity extends Activity implements KeyWestInterface{
 
                 ImageView imageView = (ImageView) findViewById(LayoutContainer
                         .getChildAt(0).getId());
+                Button button = (Button) findViewById(LayoutContainer.getChildAt(1).getId());
 
                 setCurrentViewForImage(imageView);
+                setCurrentPhotoButton(button);
             } else {
                 if (v.getId() == R.id.idFrontsideButton) {
                     ImageView imageView = (ImageView) findViewById(LayoutContainer
                             .getChildAt(0).getId());
+                    Button button = (Button) findViewById(LayoutContainer.getChildAt(1).getId());
+
                     setCurrentViewForImage(imageView);
+                    setCurrentPhotoButton(button);
                 }
                 if (v.getId() == R.id.idBacksideButton) {
                     ImageView imageView = (ImageView) findViewById(LayoutContainer
                             .getChildAt(2).getId());
+                    Button button = (Button) findViewById(LayoutContainer.getChildAt(3).getId());
+
                     setCurrentViewForImage(imageView);
+                    setCurrentPhotoButton(button);
                 }
 
             }
-            saveButtonIdToMemory(getCurrentViewForImage().getId());
+
+            //saves the image view besides the selected photo button
+            saveButtonIdToMemory(getCurrentViewForImage().getId(),DONE_BUTTON);
+
+            //saves the actual photo button
+            saveButtonIdToMemory(getCurrentPhotoButton().getId(),PHOTO_BUTTON);
+
         } catch (Exception e) {
             c.println("Exception:\t" + e);
         }
@@ -621,7 +634,12 @@ public class EntryActivity extends Activity implements KeyWestInterface{
     private synchronized void notifyAsSynchronized() {
         notifyAll();
     }
-
+    private void setCurrentPhotoButton(Button button){
+        currentPhotoButton = button;
+    }
+    private Button getCurrentPhotoButton(){
+        return currentPhotoButton;
+    }
     private ImageView getCurrentViewForImage() {
 
         return CurrentViewForImage;
@@ -691,8 +709,9 @@ public class EntryActivity extends Activity implements KeyWestInterface{
     }
 
 
-    protected void save(View v) {
-
+    protected void save() {
+        Toast.makeText(
+                EntryActivity.this, "Speichere...", Toast.LENGTH_SHORT).show();
         db.getWritableDatabase();
 
         try{
@@ -706,9 +725,6 @@ public class EntryActivity extends Activity implements KeyWestInterface{
             addDetailsToFile(detailsFile, R.id.personDetails);
             isNewStart = true;
 
-            for (int i = 0; i < imagePaths.length; i++) {
-                c.println(pathNamesInOrder[i]+": "+imagePaths[i]);
-            }
             if (!isUpdatable) {
                 //if no person with these data exists create one
                 db.addPerson(age, firstname, lastname, formattedDate,
@@ -756,11 +772,12 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         passportButton = (Button) findViewById(R.id.passportButton);
         idFrontButton = (Button) findViewById(R.id.idFrontsideButton);
         idBackButton = (Button) findViewById(R.id.idBacksideButton);
-        // confirmation to save
-        saveButton = (Button) findViewById(R.id.saveButton);
+        /*// confirmation to save
+        saveButton = (Button) findViewById(R.id.saveButton);*/
+
         text = (TextView) findViewById(R.id.currAgeTextView);
 
-        bannedImageButton = (ImageButton) findViewById(R.id.isBannedButton);
+        bannedSwitch = (Switch) findViewById(R.id.isBannedSwitch);
         newNameText = (EditText) findViewById(R.id.newName);
         dateText = (EditText) findViewById(R.id.dateText);
 
@@ -808,26 +825,48 @@ public class EntryActivity extends Activity implements KeyWestInterface{
 
             @Override
             public void onClick(View v) {
-                save(v);
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>SAVE TEST<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+                save();
             }
         });
 
 
-        bannedImageButton.setOnClickListener(new View.OnClickListener() {
-
+        bannedSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                if (isBanned == 0) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
                     isBanned = 1;
-                    bannedImageButton
-                            .setImageResource(R.drawable.ic_house_banned_red);
+                    Toast.makeText(
+                            EntryActivity.this, "HV "+isBanned, Toast.LENGTH_SHORT).show();
+                    buttonView.setBackgroundResource(R.drawable.banned_state_on_background);
                 } else {
                     isBanned = 0;
-                    bannedImageButton
-                            .setImageResource(R.drawable.ic_house_banned_grey);
+                    Toast.makeText(
+                            EntryActivity.this, "HV "+isBanned, Toast.LENGTH_SHORT).show();
+                    buttonView.setBackgroundResource(R.drawable.banned_state_off_background);
                 }
             }
         });
+    }
+
+    private boolean checkIfEnoughDataIsAvailable(){
+        int counter = 0;
+        /*check that at least on path is available, means
+        * at least one id card.
+        *
+        * Starting from index 1 because 0 is the Profile picture which
+        * isn't required primary
+        * */
+        for(int i = 1;i<imagePaths.length;i++) {
+            if (imagePaths[i] != null && !(imagePaths[i].toString().equals(NO_ENTRY))) {
+                counter++;
+            }
+            if(counter >= 1)
+                return true;
+
+        }
+
+        return false;
     }
 
     private void fillActivityWithTestData(String name, String date, String details) {
@@ -840,7 +879,7 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         EditText detailsView = (EditText)findViewById(R.id.personDetails);
         detailsView.setText(details);
 
-        profilePictureButton.callOnClick();
+        //profilePictureButton.callOnClick();
 
     }
 
@@ -857,6 +896,7 @@ public class EntryActivity extends Activity implements KeyWestInterface{
 
         super.onPause();
     }
+
     public void onResume() {
         recreateData();
         super.onResume();
@@ -956,32 +996,39 @@ public class EntryActivity extends Activity implements KeyWestInterface{
 
     }
 
-    private int loadButtonIdFromMemory() {
-        int id = memory.getInt("ButtonID", -1);
-        //c.println("ID out: " + id);
-        if (id != 0) {
-            //Toast.makeText(EntryActivity.this, "ButtonID(" + id + ") wird geladen...", Toast.LENGTH_SHORT).show();
-            return memory.getInt("ButtonID", -1);
-        } else {
-            return -1;
+    private int loadButtonIdFromMemory(int identifier) {
+        switch (identifier){
+            case DONE_BUTTON:{
+                return memory.getInt(DONE_BUTTON_NAME, -1);
+            }
+            case PHOTO_BUTTON:{
+                return memory.getInt(PHOTO_BUTTON_NAME, -1);
+            }
+            default:
+                return -1;
         }
+
     }
 
-    private void saveButtonIdToMemory(int id) {
-        if (id != 0) {
-            editor.putInt("ButtonID", id);
-            //c.println("ID in: " + id);
-            //Toast.makeText(EntryActivity.this, "ButtonID(" + id + ") wurde gespeichert", Toast.LENGTH_SHORT).show();
-            editor.commit();
+    private void saveButtonIdToMemory(int id,int identifier) {
 
+        if (id != 0) {
+            switch (identifier){
+                case DONE_BUTTON:{
+                    editor.putInt(DONE_BUTTON_NAME, id);
+                    editor.commit();
+                }
+                case PHOTO_BUTTON:{
+                    editor.putInt(PHOTO_BUTTON_NAME, id);
+                    editor.commit();
+                }
+            }
         }
     }
 
     private String loadUriFromMemory() {
         String p = memory.getString("Path", null);
-        //c.println("Uri Path out: " + p);
         if (p != null) {
-            //Toast.makeText(EntryActivity.this, "Path (" + p + ") wird geladen...", Toast.LENGTH_SHORT).show();
             return memory.getString("Path", p);
         } else {
             return null;
@@ -1062,7 +1109,9 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         int k = 0;
         if (!isNewStart) {
 
-            ImageView i = (ImageView) findViewById(loadButtonIdFromMemory());
+            ImageView i = (ImageView) findViewById(loadButtonIdFromMemory(DONE_BUTTON));
+            Button b = (Button) findViewById(loadButtonIdFromMemory(PHOTO_BUTTON));
+
             if (getCurrentViewForImage() == null) {
                 setCurrentViewForImage(i);
             } else {
@@ -1072,20 +1121,28 @@ public class EntryActivity extends Activity implements KeyWestInterface{
 
 
                     i.setBackgroundResource(R.drawable.ic_action_done);
-                    Log.v("Passed", "Häckchen set");
+                    b.setBackgroundResource(R.drawable.button_yellow_confirmed);
+
+                    //make saveButton green if the user can save
+                    //because he has put in enough data
+                    checkIfSavingIsPossible(checkIfEnoughDataIsAvailable());
+
                     File picture = new File(loadUriFromMemory());
-                    Log.v("Passed", "Image created");
+
                     isNewStart = false;
                     isCameraActivated = false;
                     k++;
-                    c.println("recreateData() Durchlauf(" + k + ")");
                 }
                 while (currAge.getText().toString().isEmpty() && i.getBackground() == getCurrentViewForImage().getResources().getDrawable(R.drawable.ic_action_photo));
             }
-            c.println("getCurrentViewForImage() = null");
         }
     }
-
+    private void checkIfSavingIsPossible(boolean checkPaths){
+        if(checkPaths)
+            saveButton.setBackgroundResource(R.drawable.save);
+        else
+            saveButton.setBackgroundResource(R.drawable.save_not_enabled);
+    }
     private void calculateAge() {
         DateHandler date = new DateHandler();
         isNewStart = false;

@@ -10,6 +10,7 @@ import java.io.PrintStream;
  */
 public interface KeyWestInterface {
 
+    //common
 
     //References
 
@@ -38,6 +39,12 @@ public interface KeyWestInterface {
     //test details texts
     final static String LOREM_IPSUM = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.";
     final static String TEST_DETAILS = "Ich programmiere diese Applikation";
+
+    //selected Button identifier
+    final static int DONE_BUTTON = 9983;
+    final static String DONE_BUTTON_NAME = "DoneButtonID";
+    final static int PHOTO_BUTTON = 9984;
+    final static String PHOTO_BUTTON_NAME = "PhotoButtonID";
 
     final static String[] imagePathsKeys = {Database.COL_PROFILEPICTURE, Database.COL_DRIVERSLICENCE, Database.COL_CHECKITCARD, Database.COL_PASSPORT, Database.COL_OEBBCARD, Database.COL_PERSO_FRONT/*, Database.COL_PERSO_BACK*/};
 

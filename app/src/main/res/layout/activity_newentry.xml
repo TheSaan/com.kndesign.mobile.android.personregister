@@ -3,8 +3,9 @@
     android:id="@+id/entryLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/darkPurple"
-    android:orientation="vertical">
+    android:background="@color/dark_purple"
+    android:orientation="vertical"
+    android:weightSum="1">
 
     <LinearLayout
         android:id="@+id/newNameLL"
@@ -49,14 +50,17 @@
         android:id="@+id/dateLL"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:textAlignment="center">
 
         <TextView
             android:id="@+id/currAgeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="#FFFFFF"
-            android:textSize="70sp" />
+            android:hint="Alter wird berechnet"
+            android:textColorHint="@color/bright_purple"
+            android:textSize="50sp" />
     </LinearLayout>
 
 
@@ -75,7 +79,8 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="2.5dp"
             android:background="@drawable/ic_action_photo"
-            android:contentDescription="@string/profilepictureCD" />
+            android:contentDescription="@string/profilepictureCD"
+            android:paddingTop="0dp" />
 
         <Button
             style="@style/defaultButton"
@@ -223,22 +228,22 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="5dp"
             android:background="@drawable/ic_action_photo"
-            android:contentDescription="@string/personalidpictureCD" />
+            android:contentDescription="@string/personalidpictureCD"
+            android:visibility="invisible" />
 
         <Button 
             android:id="@+id/idBacksideButton"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_margin="9dp"
-            android:background="@color/darkPurple"
             android:text="@string/back"
-             />
+            android:visibility="invisible" />
     </LinearLayout>
 
     <EditText
         android:id="@+id/personDetails"
         android:layout_width="582dp"
-        android:layout_height="158dp"
+        android:layout_height="115dp"
         android:layout_marginLeft="7dp"
         android:ems="10"
         android:hint="@string/personDetailsHint"
@@ -246,26 +251,27 @@
         android:textColor="#FFFFFF"
         android:textColorHint="#F5F6CE" />
 
-    <LinearLayout
-        android:id="@+id/confirmationLL"
+    <Switch
+        android:id="@+id/isBannedSwitch"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal" >
+        android:layout_height="60dp"
+        android:layout_marginLeft="0dp"
+        android:src="@drawable/ic_house_banned_grey"
+        android:background="@drawable/banned_state_off_background"
+        android:textColor="#ffffff"
+        android:textOff="Kein Hausverbot"
+        android:text="Hausverbot Status"
+        android:textOn="Hat Hausverbot"
+        android:visibility="visible"
+        android:paddingTop="0dp"
+        android:paddingEnd="50dp" />
 
-        <ImageButton
-            android:id="@+id/isBannedButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="7dp"
-            android:src="@drawable/ic_house_banned_grey" />
-
-        <Button
-            android:id="@+id/saveButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.00"
-            android:background="#FFFFFF"
-            android:text="@string/save" />
-    </LinearLayout>
+    <Button
+        style="@style/confirmButton"
+        android:id="@+id/saveButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/save"
+        android:minHeight="60dp" />
 
 </LinearLayout>

@@ -6,26 +6,50 @@
     android:descendantFocusability="blocksDescendants"
     android:minHeight="48dp"
     android:orientation="horizontal"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:background="@drawable/search_list_item_style">
 
     <TextView
         android:id="@+id/personListIndex"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:textSize="12sp"
         android:textIsSelectable="false"
         android:clickable="false"
-        android:focusable="false" />
+        android:focusable="false"
+        android:minWidth="30dp"
+        android:paddingTop="45dp"
+        android:paddingLeft="7dp" />
 
     <ImageView
         android:id="@+id/thumbnail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="15dp"
         android:contentDescription="@string/thumbnailCD"
         android:clickable="false"
-        android:focusable="false" />
+        android:focusable="false"
+        android:padding="7dp" />
 
+
+    <TextView
+        android:id="@+id/personAge"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textSize="50sp"
+        android:textIsSelectable="false"
+        android:clickable="false"
+        android:focusable="false"
+        android:paddingEnd="7dp"
+        android:paddingTop="15dp" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_weight="0.1"
+        android:clickable="false"
+        android:focusable="false"
+        android:focusableInTouchMode="false"
+        android:id="@+id/nameAgeSplitter" />
 
     <TextView
         android:id="@+id/personFirstname"
@@ -33,17 +57,19 @@
         android:layout_height="wrap_content"
         android:textAlignment="textStart"
         android:layout_marginLeft="15dp"
-        android:textSize="40sp"
+        android:textSize="40dp"
         android:textIsSelectable="false"
         android:clickable="false"
-        android:focusable="false" />
+        android:focusable="false"
+        android:paddingTop="25dp" />
 
     <Space
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_weight="0.05"
         android:clickable="false"
-        android:focusable="false" />
+        android:focusable="false"
+        android:minWidth="7dp" />
 
     <TextView
         android:id="@+id/personLastname"
@@ -53,28 +79,6 @@
         android:textSize="40sp"
         android:clickable="false"
         android:focusable="false" />
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_weight="0.1"
-        android:clickable="false"
-        android:focusable="false" />
 
-    <TextView
-        android:id="@+id/personAge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textSize="50sp"
-        android:layout_gravity="end"
-        android:textIsSelectable="false"
-        android:clickable="false"
-        android:focusable="false"/>
-
-
-    <ImageView
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:id="@+id/infoImage"
-        android:layout_gravity="end|center|center_vertical"/>
 
 </LinearLayout>
