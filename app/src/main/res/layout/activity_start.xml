@@ -18,53 +18,84 @@
 
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
             android:contentDescription="@string/logoCD"
-            android:src="@drawable/intro"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:src="@drawable/intro_small"
+            android:layout_alignTop="@+id/analogClock1"
+            android:layout_toRightOf="@+id/agbSwitch"
+            android:layout_toEndOf="@+id/agbSwitch"
+            android:layout_marginTop="30dp" />
 
         <TextView
             android:id="@+id/minAgeDescription"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/imageView1"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="27dp"
-            android:layout_marginTop="48dp"
             android:text="@string/min16_decr"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:layout_above="@+id/textfield_MIN_AGE"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="center_horizontal"
+            android:layout_alignRight="@+id/textfield_MIN_AGE"
+            android:layout_alignEnd="@+id/textfield_MIN_AGE" />
 
         <TextView
             android:id="@+id/textfield_MIN_AGE"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/minAgeDescription"
-            android:layout_below="@+id/minAgeDescription"
             android:text="@string/default_minDate"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#FFFFFF"
-            android:textSize="70sp" />
+            android:textColor="@color/yellow"
+            android:textSize="70sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="center_horizontal" />
 
         <AnalogClock
             android:id="@+id/analogClock1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignRight="@+id/imageView1"
-            android:layout_alignTop="@+id/minAgeDescription" />
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/agbSwitch"
+            android:layout_toEndOf="@+id/agbSwitch"
+            android:layout_marginTop="32dp" />
 
         <Switch
             android:id="@+id/agbSwitch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@+id/minAgeDescription"
-            android:layout_alignParentTop="true"
-            android:layout_alignStart="@+id/minAgeDescription"
             android:checked="false"
-            android:text="AGB Ansicht" />
+            android:text="AGB Ansicht"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/infoTextview"
+            android:layout_above="@+id/agbSwitch"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="30dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/bdayInfo"
+            android:layout_above="@+id/infoTextview"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignRight="@+id/infoTextview"
+            android:layout_alignEnd="@+id/infoTextview"
+            android:layout_below="@+id/textfield_MIN_AGE"
+            android:gravity="center_vertical"
+            android:hint="Heute sind keine Geburtstage." />
 
     </RelativeLayout>
 

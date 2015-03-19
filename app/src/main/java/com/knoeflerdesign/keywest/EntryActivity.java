@@ -155,7 +155,7 @@ public class EntryActivity extends Activity implements KeyWestInterface{
          * the values are only settet to test ordinary input values without
 		 * having to type them in all the time
 		 */
-        fillActivityWithTestData("Michael Knöfler","08111990",TEST_DETAILS);
+        //fillActivityWithTestData("Michael Knöfler","08111990",TEST_DETAILS);
 
         // DEVELOPERS MODE END
         isNewStart = true;

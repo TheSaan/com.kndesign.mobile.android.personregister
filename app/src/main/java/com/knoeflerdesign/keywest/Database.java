@@ -1,5 +1,6 @@
 package com.knoeflerdesign.keywest;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.ContentValues;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
+import android.widget.TextView;
 
 import com.knoeflerdesign.keywest.Handler.AndroidHandler;
 import com.knoeflerdesign.keywest.Handler.BitmapHandler;
@@ -23,6 +25,8 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
 
     private final SQLiteDatabase db;
     Context context;
+
+    TextView bdayEvent;
 
     public Database(Context context) {
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -143,7 +147,49 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             c.moveToFirst();
         return c;
     }
+    /*
+        * Get the amount of all Entries
+        *
+        *
+        *
+        * */
+    public Cursor readUnder18() {
 
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, COL_AGE+"<=?",new String[]{"17"}, null, null, COL_AGE);
+
+        if (c != null)
+            c.moveToFirst();
+        return c;
+    }/*
+    * Get the amount of all Entries
+    *
+    *
+    *
+    * */
+    public Cursor readOver18() {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, COL_AGE+">=?",new String[]{"18"}, null, null, COL_AGE);
+
+        if (c != null)
+            c.moveToFirst();
+        return c;
+    }/*
+    * Get the amount of all Entries
+    *
+    *
+    *
+    * */
+    public Cursor readBanned() {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, COL_BANNED+"=?",new String[]{"1"}, null, null, COL_AGE);
+
+        if (c != null)
+            c.moveToFirst();
+        return c;
+    }
     /*
     * Delete Database Entries
     * TODO Benutze die Pfad angaben gleich, um die Daten im Ordner zu löschen
@@ -395,21 +441,25 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         if (index != 0)
             db.update(DATABASE_TABEL_PERSONS, cv, COL_ID + "=" + index, null);
     }
-    /*
-    * Make the database entries(persons) older if the have their birthday
-    *
-    *
-    * */
-    protected void checkPersonsAgeInDatabase(Service service) {
-        String countQuery = "SELECT  * FROM " + DATABASE_TABEL_PERSONS;
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery(countQuery, null);
+
+    /**
+     * Make the database entries(persons) older if the have their birthday.
+     * If a contact has its birthday. Print it on the homescreen.
+     *
+     * @param activity
+     */
+    protected void checkPersonsAgeInDatabase(Activity activity) {
+
+        boolean hasBDay = false;
+
+        Cursor cursor = readData();
 
         cursor.moveToFirst();
         /*check every entry of its age. If the person got older
         * set the new age to it
         * */
-        for (int i = 0; i < cursor.getCount(); i++) {
+
+         for (int i = 0; i < cursor.getCount(); i++) {
 
             int currentAgeInDatabase = cursor.getInt(cursor.getColumnIndex(COL_AGE));
             String dateOfBirth = cursor.getString(cursor.getColumnIndex(COL_BIRTHDATE));
@@ -424,8 +474,23 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             * required
             * */
 
-            //if the person has become older, update its age
-            compareAgeStatus(currentAgeInDatabase, dateOfBirth, cursor);
+             //if the person has become older, update its age
+             if (compareAgeStatus(currentAgeInDatabase, dateOfBirth, cursor)) {
+                 hasBDay = true;
+             }
+             //the textview to show the birthday event
+             if(hasBDay) {
+                 if (activity instanceof StartActivity) {
+                     bdayEvent = (TextView) activity.findViewById(R.id.bdayInfo);
+
+                     String notificationText =
+                             firstname + " " + lastname + " ist heute " + currentAgeInDatabase + 1 + " Jahre alt geworden";
+
+                     bdayEvent.setText(bdayEvent.getText() + NEW_LINE + notificationText);
+                 }else{
+                     c.println("StartActivity not detected");
+                 }
+             }
             cursor.moveToNext();
         }
         cursor.close();
@@ -462,7 +527,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     }
 
 
-    private void compareAgeStatus(int databaseAge, String databaseDate,Cursor cursor) {
+    private boolean compareAgeStatus(int databaseAge, String databaseDate,Cursor cursor) {
         String[] columns = {COL_AGE};
         DateHandler dh = new DateHandler();
 
@@ -476,8 +541,9 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
 
         if (age > databaseAge) {
             updateAgeInEntry(columns, age, cursor.getInt(cursor.getColumnIndex(COL_ID)));
-
+            return true;
         }
+        return false;
     }
     /*
     * Backup Database to external Folder to have access from Computer

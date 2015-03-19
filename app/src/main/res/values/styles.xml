@@ -43,10 +43,13 @@
     </style>
 
     <style name="confirmButton">
-        <item name="android:textSize">40sp</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textColor">#ffffff</item>
         <item name="android:background">@drawable/save_not_enabled</item>
+    </style>
+    <style name="idCardHeaders">
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:background">@drawable/headers</item>
+        <item name="android:gravity">center_horizontal</item>
     </style>
 
     <style name="deleteButton">

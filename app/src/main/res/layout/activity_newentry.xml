@@ -269,6 +269,8 @@
     <Button
         style="@style/confirmButton"
         android:id="@+id/saveButton"
+        android:textStyle="bold"
+        android:textSize="40sp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/save"

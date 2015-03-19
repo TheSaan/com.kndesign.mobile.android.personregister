@@ -2,6 +2,7 @@ package com.knoeflerdesign.keywest;
 
 import android.content.Intent;
 import android.provider.MediaStore;
+import android.widget.TextView;
 
 import java.io.PrintStream;
 
@@ -11,7 +12,7 @@ import java.io.PrintStream;
 public interface KeyWestInterface {
 
     //common
-
+    final String NEW_LINE = "\n";
     //References
 
     PrintStream c = System.out;
@@ -143,4 +144,11 @@ public interface KeyWestInterface {
             "PersoFront",
             "PersonBack"
     };
-  }
+
+    /*
+    * StartActivity
+    *
+    * */
+
+
+   }

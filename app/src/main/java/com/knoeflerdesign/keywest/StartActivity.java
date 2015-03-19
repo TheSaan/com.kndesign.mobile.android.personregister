@@ -26,11 +26,13 @@ import com.knoeflerdesign.keywest.Handler.DateHandler;
 import com.knoeflerdesign.keywest.Handler.FilesHandler;
 import com.knoeflerdesign.keywest.Service.TestEntryCreationService;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 
 
 public class StartActivity extends Activity implements KeyWestInterface{
-
+    TextView startInfoText;
     private ViewSwitcher viewSwitcher;
 
     private SearchResultService srs;
@@ -56,17 +58,43 @@ public class StartActivity extends Activity implements KeyWestInterface{
         }
     };
 
+    private AgeControlService acs;
+    private ServiceConnection AgeControlServiceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Toast.makeText(StartActivity.this,
+                    "Verbinde SRS...",
+                    Toast.LENGTH_SHORT).show();
+
+
+            AgeControlService.MyBinder binder = (AgeControlService.MyBinder) service;
+            acs = binder.getService();
+
+            Toast.makeText(StartActivity.this,
+                    "SRS Verbunden",
+                    Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            acs = null;
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         setMinAgeDate();
 
-       init(this);
+        init(this);
 
         File sd = new File(Environment.getExternalStorageDirectory()+"/KWIMG/", "BACKUP");
         sd.mkdir();
 
+        startInfoText = (TextView)findViewById(R.id.infoTextview);
+
+        showAppInfos(startInfoText);
         db.exportDatabase(Database.DATABASE_NAME);
 
         viewSwitcher = (ViewSwitcher) findViewById(R.id.startViewSwitcher);
@@ -84,13 +112,27 @@ public class StartActivity extends Activity implements KeyWestInterface{
         try {
             getApplicationContext().startService(SearchServiceIntent);
             getApplicationContext().startService(AgeServiceIntent);
-            getApplicationContext().startService(TestEntriyIntent);
+            acs.myActivity = this;
+
+            //getApplicationContext().startService(TestEntriyIntent);
         } catch (NullPointerException npe) {
             Log.e("Service Intent", "Service intent throws " + npe);
         }
 
         createAgbSwitches();
 
+    }
+    private void showAppInfos(TextView v){
+        String infoText =
+                        "Einträge gesamt: " + db.readData().getCount() +
+                        NEW_LINE +
+                        "Einträge < 18: " + db.readUnder18().getCount() +
+                        NEW_LINE +
+                        "Einträge > 18: " + db.readOver18().getCount() +
+                        NEW_LINE +
+                        "Personen mit Hausverbot: " + db.readBanned().getCount();
+
+        v.setText(infoText);
     }
     /*
         * initalize the Handlers for this activity
