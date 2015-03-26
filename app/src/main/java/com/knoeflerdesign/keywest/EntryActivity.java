@@ -35,7 +35,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class EntryActivity extends Activity implements KeyWestInterface{
+public class EntryActivity extends Activity implements PatternCollection,KeyWestInterface{
 
     private boolean isCameraActivated = false;
     final private static String[] pathNamesInOrder = {
@@ -148,7 +148,7 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         memory = getApplicationContext().getSharedPreferences("temp", 0);
         editor = memory.edit();
 
-        recreateData();
+        //recreateData();
 
         // DEVELOPERS MODE
         /*
@@ -263,18 +263,11 @@ public class EntryActivity extends Activity implements KeyWestInterface{
             }
         }
 
-
         // merge
         datestring = sDay + sMonth + sYear;
 
         //format date from DDMMYYYY to DD.MM.YYYY
         formattedDate = sDay + "." + sMonth + "." + sYear;
-
-        /*
-        * At the first name max length it can be up to 50 in case
-        * the Person has a second first name
-        * */
-        String NAME_PATTERN = "[öÖäÄüÜßA-Za-z]{3,50}\\s+[öÖäÄüÜßA-Za-z]{2,40}";
 
         inputText = newNameText.getText().toString();
 
@@ -283,6 +276,19 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         try {
 
             firstAndLastName = inputText.split(" ");
+            String[] tmp;
+            //if the name has two first names
+            //create format firstname1-firstname2 Lastname
+            if (firstAndLastName.length == 3) {
+
+                tmp = new String[firstAndLastName.length - 1];
+
+                //glue the two first names in one object
+                tmp[0] = firstAndLastName[0] + "-" + firstAndLastName[1];
+                tmp[1] = firstAndLastName[2];
+
+                firstAndLastName = tmp;
+            }
 
             if (firstAndLastName[0] == "") {
 
@@ -292,9 +298,6 @@ public class EntryActivity extends Activity implements KeyWestInterface{
                             + " to 'Unbekannt'.\n" + "Content of Index " + i
                             + ": " + firstAndLastName[i]);*/
                 }
-            } else {
-                /*c.println(firstAndLastName[0] + ", " + firstAndLastName[1]
-                        + " set as Name.");*/
             }
 
             // root directory of the app data
@@ -330,13 +333,10 @@ public class EntryActivity extends Activity implements KeyWestInterface{
             personFullSizedImages.canWrite();
             personFullSizedImages.mkdir();
 
+            c.println("Print input name >>>>>>>>>>");
+            printForTest(firstAndLastName);
 
-
-            Pattern p = Pattern.compile(NAME_PATTERN);
-            Matcher m = p.matcher(fullName);
-
-
-            if (m.matches()) {
+            if (ah.checkMultiplePatterns(ACCEPTED_NAME_CONVENTIONS, fullName)) {
                 newNameText.setHintTextColor(Color.parseColor("#F5F6CE"));
 
                 String path = firstAndLastName[0].toUpperCase(Locale.GERMANY)
@@ -601,11 +601,16 @@ public class EntryActivity extends Activity implements KeyWestInterface{
                     c.println("Request Code OK\n");
 
                     if (resultCode == Activity.RESULT_OK) {
-                        //add new Image Paths
 
+
+                        recreateData(resultCode);
+
+                        //add new Image Paths
                         notifyAsSynchronized();
 
                     } else {
+
+                        recreateData(resultCode);
                         c.println("Result Code FAILED\n");
                     }
                 } else {
@@ -708,6 +713,11 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         }
     }
 
+    private void printForTest(String[] str){
+        for(int i= 0;i<str.length;i++){
+            c.println("Test Print "+i+":\t"+str[i]);
+        }
+    }
 
     protected void save() {
         Toast.makeText(
@@ -724,6 +734,10 @@ public class EntryActivity extends Activity implements KeyWestInterface{
             // add details to textfile
             addDetailsToFile(detailsFile, R.id.personDetails);
             isNewStart = true;
+
+            printForTest(new String[]{age+SPACE,firstname,lastname,formattedDate,imagePaths[0], imagePaths[1], imagePaths[2], imagePaths[3],
+                    imagePaths[4], imagePaths[5], "KEIN EINTRAG",
+                    detailsFile.getPath(), isBanned+SPACE});
 
             if (!isUpdatable) {
                 //if no person with these data exists create one
@@ -898,7 +912,6 @@ public class EntryActivity extends Activity implements KeyWestInterface{
     }
 
     public void onResume() {
-        recreateData();
         super.onResume();
     }
 
@@ -1094,7 +1107,7 @@ public class EntryActivity extends Activity implements KeyWestInterface{
         }
     }
 
-    private synchronized void recreateData() {
+    private synchronized void recreateData(int resultCode) {
         c.println("recreateData()");
           /*
               * 1. After returning from camera, the app rotates its orientation and loose
@@ -1119,16 +1132,16 @@ public class EntryActivity extends Activity implements KeyWestInterface{
                     newNameText.setText(loadNameTextFromMemory());
                     dateText.setText(loadDateTextFromMemory());
 
+                    if(resultCode == Activity.RESULT_OK) {
+                        i.setBackgroundResource(R.drawable.ic_action_done);
+                        b.setBackgroundResource(R.drawable.button_yellow_confirmed);
 
-                    i.setBackgroundResource(R.drawable.ic_action_done);
-                    b.setBackgroundResource(R.drawable.button_yellow_confirmed);
+                        //make saveButton green if the user can save
+                        //because he has put in enough data
+                        checkIfSavingIsPossible(checkIfEnoughDataIsAvailable());
 
-                    //make saveButton green if the user can save
-                    //because he has put in enough data
-                    checkIfSavingIsPossible(checkIfEnoughDataIsAvailable());
-
-                    File picture = new File(loadUriFromMemory());
-
+                        File picture = new File(loadUriFromMemory());
+                    }
                     isNewStart = false;
                     isCameraActivated = false;
                     k++;

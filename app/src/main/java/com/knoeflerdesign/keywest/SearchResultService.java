@@ -73,7 +73,7 @@ public class SearchResultService extends Service{
         adapterThread.start();*/
 
 
-        System.out.println("SearchService runs");
+        //System.out.println("SearchService runs");
         new AdapterLoadTask().execute(loadCostumerEntries());
 
 

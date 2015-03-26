@@ -67,6 +67,7 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int save_not_enabled=0x7f020021;
         public static final int search_list_item_style=0x7f020022;
         public static final int start_style=0x7f020023;
+        public static final int thumbnail_theme=0x7f020024;
     }
     public static final class id {
         public static final int action_action_show_all_entries=0x7f0a006d;
@@ -302,11 +303,12 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int ButtonBar=0x7f080002;
         public static final int ButtonBarButton=0x7f080003;
         public static final int FullscreenTheme=0x7f080004;
-        public static final int confirmButton=0x7f080005;
-        public static final int defaultButton=0x7f080006;
-        public static final int deleteButton=0x7f080007;
-        public static final int detailsTextField=0x7f080008;
-        public static final int idCardHeaders=0x7f080009;
+        public static final int Thumbnail=0x7f080005;
+        public static final int confirmButton=0x7f080006;
+        public static final int defaultButton=0x7f080007;
+        public static final int deleteButton=0x7f080008;
+        public static final int detailsTextField=0x7f080009;
+        public static final int idCardHeaders=0x7f08000a;
     }
     public static final class xml {
         public static final int searchable=0x7f040000;

@@ -63,7 +63,7 @@ public class StartActivity extends Activity implements KeyWestInterface{
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
             Toast.makeText(StartActivity.this,
-                    "Verbinde SRS...",
+                    "Verbinde ACS...",
                     Toast.LENGTH_SHORT).show();
 
 
@@ -71,7 +71,7 @@ public class StartActivity extends Activity implements KeyWestInterface{
             acs = binder.getService();
 
             Toast.makeText(StartActivity.this,
-                    "SRS Verbunden",
+                    "ACS Verbunden",
                     Toast.LENGTH_SHORT).show();
         }
 
@@ -106,15 +106,17 @@ public class StartActivity extends Activity implements KeyWestInterface{
 
         Intent SearchServiceIntent = new Intent(this, SearchResultService.class);
         Intent AgeServiceIntent = new Intent(this, AgeControlService.class);
-        Intent TestEntriyIntent = new Intent(this, TestEntryCreationService.class);
+        Intent TestEntryIntent = new Intent(this, TestEntryCreationService.class);
 
         //start
         try {
             getApplicationContext().startService(SearchServiceIntent);
             getApplicationContext().startService(AgeServiceIntent);
+
+            //getApplicationContext().startService(TestEntryIntent);
             acs.myActivity = this;
 
-            //getApplicationContext().startService(TestEntriyIntent);
+
         } catch (NullPointerException npe) {
             Log.e("Service Intent", "Service intent throws " + npe);
         }

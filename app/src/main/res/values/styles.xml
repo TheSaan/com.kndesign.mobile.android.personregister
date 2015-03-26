@@ -60,5 +60,8 @@
     <style name="detailsTextField">
         <item name="android:background">@drawable/details_text_style</item>
     </style>
+    <style name="Thumbnail">
+        <item name="android:background">@drawable/thumbnail_theme</item>
+    </style>
 
 </resources>

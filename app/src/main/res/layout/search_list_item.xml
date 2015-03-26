@@ -26,6 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@string/thumbnailCD"
+        style="@style/Thumbnail"
         android:clickable="false"
         android:focusable="false"
         android:padding="7dp" />

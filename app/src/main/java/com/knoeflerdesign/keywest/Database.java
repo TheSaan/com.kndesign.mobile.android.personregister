@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.knoeflerdesign.keywest.Handler.AndroidHandler;
 import com.knoeflerdesign.keywest.Handler.BitmapHandler;
@@ -98,9 +99,9 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                 System.out.println(i + ". Column:\t" + COLUMNS[i]);
             }*/
             for (int i = 0; i < columnsSize; i++) {
-                if (i == 0) {
+                /*if (i == 0) {
                     data.put(COLUMNS[i], (this.countPersons() + 1));
-                }
+                }*/
                 if (i == 1) {
                     // add age at correct position
                     data.put(COLUMNS[i], age);
@@ -480,16 +481,21 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
              }
              //the textview to show the birthday event
              if(hasBDay) {
+                 String notificationText =
+                         firstname + " " + lastname + " ist heute " + (currentAgeInDatabase + 1) + " Jahre alt geworden";
+                    /*
+                 c.println(notificationText);
+
                  if (activity instanceof StartActivity) {
                      bdayEvent = (TextView) activity.findViewById(R.id.bdayInfo);
 
-                     String notificationText =
-                             firstname + " " + lastname + " ist heute " + currentAgeInDatabase + 1 + " Jahre alt geworden";
-
                      bdayEvent.setText(bdayEvent.getText() + NEW_LINE + notificationText);
+                     hasBDay = false;
                  }else{
                      c.println("StartActivity not detected");
-                 }
+                 }*/
+             }else{
+                 //System.out.println("No birth day for "+firstname+" "+lastname);
              }
             cursor.moveToNext();
         }
@@ -538,7 +544,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         int year = Integer.parseInt(date[2]);
 
         int age = dh.getAgeInYears(day, month, year);
-
+        //System.out.println("Database Date: "+databaseDate+"\tCalc. Age: "+age+"\tDatabase Age: "+databaseAge);
         if (age > databaseAge) {
             updateAgeInEntry(columns, age, cursor.getInt(cursor.getColumnIndex(COL_ID)));
             return true;
@@ -575,4 +581,6 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
 
         }
     }
+
+
 }
