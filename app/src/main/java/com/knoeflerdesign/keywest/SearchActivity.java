@@ -539,7 +539,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                         return null;
                 }
         //search for multiple name formats
-        if (ah.checkMultiplePatterns(ACCEPTED_NAME_CONVENTIONS, QUERY)) {
+        if (ah.checkMultiplePatterns(SEARCH_NAME_CONVENTIONS, QUERY)) {
             cursor = getSearchCursor(QUERY, 1);
 
             //if cursor has no matches change the switch the first and lastname

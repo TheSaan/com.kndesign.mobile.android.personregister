@@ -22,10 +22,9 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/logoCD"
             android:src="@drawable/intro_small"
-            android:layout_alignTop="@+id/analogClock1"
-            android:layout_toRightOf="@+id/agbSwitch"
-            android:layout_toEndOf="@+id/agbSwitch"
-            android:layout_marginTop="30dp" />
+            android:layout_above="@+id/agbSwitch"
+            android:layout_alignRight="@+id/infoTextview"
+            android:layout_alignEnd="@+id/infoTextview" />
 
         <TextView
             android:id="@+id/minAgeDescription"
@@ -58,10 +57,9 @@
             android:id="@+id/analogClock1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_toRightOf="@+id/agbSwitch"
-            android:layout_toEndOf="@+id/agbSwitch"
-            android:layout_marginTop="32dp" />
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/imageView1"
+            android:layout_alignStart="@+id/imageView1" />
 
         <Switch
             android:id="@+id/agbSwitch"
@@ -88,14 +86,45 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:id="@+id/bdayInfo"
-            android:layout_above="@+id/infoTextview"
+            android:gravity="center_vertical"
+            android:hint="Heute sind keine Geburtstage."
+            android:layout_above="@+id/analogClock1"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:layout_alignRight="@+id/infoTextview"
-            android:layout_alignEnd="@+id/infoTextview"
-            android:layout_below="@+id/textfield_MIN_AGE"
-            android:gravity="center_vertical"
-            android:hint="Heute sind keine Geburtstage." />
+            android:layout_marginBottom="65dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Neuer Eintrag"
+            android:id="@+id/newEntryButton"
+            style="@style/defaultButton"
+            android:layout_below="@+id/searchButton"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginTop="50dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Einträge anzeigen"
+            android:id="@+id/listButton"
+            style="@style/defaultButton"
+            android:layout_alignTop="@+id/newEntryButton"
+            android:layout_alignLeft="@+id/analogClock1"
+            android:layout_alignStart="@+id/analogClock1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suchen"
+            android:id="@+id/searchButton"
+            android:layout_alignParentTop="true"
+            android:layout_alignRight="@+id/newEntryButton"
+            android:layout_alignEnd="@+id/newEntryButton"
+            style="@style/defaultButton"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
 
     </RelativeLayout>
 

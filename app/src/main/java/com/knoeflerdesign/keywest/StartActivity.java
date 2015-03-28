@@ -12,6 +12,8 @@ import android.os.IBinder;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.SearchView;
@@ -34,6 +36,7 @@ import java.io.File;
 public class StartActivity extends Activity implements KeyWestInterface{
     TextView startInfoText;
     private ViewSwitcher viewSwitcher;
+    Button newEntryButton,listButton, searchButton;
 
     private SearchResultService srs;
     private ServiceConnection SearchServiceConnection = new ServiceConnection() {
@@ -93,6 +96,9 @@ public class StartActivity extends Activity implements KeyWestInterface{
         sd.mkdir();
 
         startInfoText = (TextView)findViewById(R.id.infoTextview);
+        searchButton = (Button)findViewById(R.id.searchButton);
+        newEntryButton = (Button)findViewById(R.id.newEntryButton);
+        listButton = (Button)findViewById(R.id.listButton);
 
         showAppInfos(startInfoText);
         db.exportDatabase(Database.DATABASE_NAME);
@@ -120,7 +126,7 @@ public class StartActivity extends Activity implements KeyWestInterface{
         } catch (NullPointerException npe) {
             Log.e("Service Intent", "Service intent throws " + npe);
         }
-
+        setListeners();
         createAgbSwitches();
 
     }
@@ -184,7 +190,7 @@ public class StartActivity extends Activity implements KeyWestInterface{
         super.onResume();
     }
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.start, menu);
@@ -233,7 +239,30 @@ public class StartActivity extends Activity implements KeyWestInterface{
                 return super.onOptionsItemSelected(item);
         }
     }
+*/
+    private void setListeners(){
+        newEntryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addPerson();
+            }
+        });
+        listButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showAllEntries();
+            }
+        });
+        searchButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        onSearchRequested();
+                    }
+                }
+        );
 
+    }
 
     private void setMinAgeDate() {
         DatePicker d = new DatePicker(getApplicationContext());

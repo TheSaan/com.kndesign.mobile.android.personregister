@@ -429,6 +429,10 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                     takePicture(v);
                 }
 
+            }else{
+                Toast.makeText(EntryActivity.this,
+                        "Name enthält falsches Format. (Doppelnamen mit Bindestrich)",
+                        Toast.LENGTH_SHORT).show();
             }
         } catch (Exception ex) {
             Toast.makeText(EntryActivity.this,
