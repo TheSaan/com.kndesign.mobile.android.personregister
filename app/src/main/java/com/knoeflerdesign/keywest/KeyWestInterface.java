@@ -69,8 +69,8 @@ public interface KeyWestInterface {
     final static String DATABASE_BACKUP_NAME = "key_west_pers_reg_backup";
 
     //Database Tables
-    final static String DATABASE_TABEL_PERSONS = "personen";
-    final static String DATABASE_TABEL_SUGGESTIONS = "vorschläge";
+    final static String DATABASE_TABLE_PERSONS = "personen";
+    final static String DATABASE_TABLE_SUGGESTIONS = "vorschläge";
     final static String DATABASE_TABEL_PASSWORDS = "passwörter";
 
     // table values
@@ -101,7 +101,7 @@ public interface KeyWestInterface {
     final static String TAG = "KeyWestDatabase";
     final static int DATABASE_VERSION = 1;
 
-    final static String CREATE_PERSON_TABEL_STRING = "CREATE TABLE " + DATABASE_TABEL_PERSONS + "( "
+    final static String CREATE_PERSON_TABLE_STRING = "CREATE TABLE " + DATABASE_TABLE_PERSONS + "( "
             + COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + COL_AGE
             + " INTEGER," + COL_FIRSTNAME + " VARCHAR(20) NOT NULL,"
             + COL_LASTNAME + " VARCHAR(20) NOT NULL," + COL_BIRTHDATE

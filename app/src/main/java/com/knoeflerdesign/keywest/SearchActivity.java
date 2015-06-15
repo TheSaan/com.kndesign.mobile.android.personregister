@@ -505,7 +505,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
         // show 16+
         if (PLUS_SIXTEEN.equals(QUERY)) {
             Log.v("getSearchCursor", "PLUS_SIXTEEN, [" + QUERY + "]\n" + "\n");
-            cursor = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+            cursor = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                     columns, selection[0], null, null, null,
                     Database.COL_AGE);
             if (cursor.getCount() > 0)
@@ -516,7 +516,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
             // show 18+
             if (PLUS_EIGHTEEN.equals(QUERY)) {
                 Log.v("getSearchCursor", "PLUS_EIGHTEEN, [" + QUERY + "]\n" + "\n");
-                cursor = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                cursor = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                         columns, selection[1], null, null, null,
                         Database.COL_AGE);
                 if (cursor.getCount() > 0)
@@ -527,7 +527,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                 // show banned persons
                 if (BANNED.equals(QUERY)) {
                     Log.v("getSearchCursor", "BANNED, [" + QUERY + "]\n" + "\n");
-                    cursor = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                    cursor = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                             columns, selection[2], null, null, null,
                             Database.COL_AGE);
                     return cursor;
@@ -665,7 +665,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                     query_parts = null;
 
                     //Log.v("getSearchCursor", "Name recognized , [" + command + "]\n\n");
-                    c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                    c = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                             columns, selection[3], tmp, null, null,
                             Database.COL_LASTNAME);
 
@@ -675,7 +675,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                     if (identifier == 2) {
                         // show result of input text search (ordinary age search)
                         String[] age = {command};
-                        c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                        c = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                 columns, selection[4], age, null, null,
                                 Database.COL_LASTNAME);
 
@@ -685,7 +685,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                         if (identifier == 3) {
                             // show result of input text search (ordinary date  search)
                             String[] date = {command};
-                            c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                            c = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                     columns, selection[5], date, null, null,
                                     Database.COL_LASTNAME);
 
@@ -695,7 +695,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                             if (identifier == 4) {
                                 // show result of input text search (ordinary date  search)
                                 String[] word = {command, command};
-                                c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                                c = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                         columns, selection[6], word, null, null,
                                         Database.COL_LASTNAME);
 
@@ -718,7 +718,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                                 }
                                 query_parts = null;
 
-                                c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                                c = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                         null, selection[7], query_parts, null, null,
                                         Database.COL_LASTNAME);
 
@@ -823,7 +823,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
 
                 System.out.println("Search for " + searchFor[0]);
 
-                tmpC = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                tmpC = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                         null, selection, searchFor, null, null,
                         null);
 

@@ -603,7 +603,7 @@ public class PersonInfoActivity extends Activity implements KeyWestInterface{
         try {
             // show result of input text search (ordinary date  search)
             String[] query_parts = command.split(" ");
-            c = db.getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+            c = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                     null, selection[7], query_parts, null, null,
                     Database.COL_LASTNAME);
 

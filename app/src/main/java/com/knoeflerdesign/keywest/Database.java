@@ -1,16 +1,16 @@
 package com.knoeflerdesign.keywest;
 
 import android.app.Activity;
-import android.app.Service;
+import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.knoeflerdesign.keywest.Handler.AndroidHandler;
 import com.knoeflerdesign.keywest.Handler.BitmapHandler;
@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.channels.FileChannel;
+import java.util.HashMap;
 
 public class Database extends SQLiteOpenHelper implements PatternCollection, KeyWestInterface{
 
@@ -54,10 +55,12 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     public void onCreate(SQLiteDatabase db) {
         try {
             // create table 'personen'
-            db.execSQL(CREATE_PERSON_TABEL_STRING);
+            db.execSQL(CREATE_PERSON_TABLE_STRING);
             //db.execSQL(sql3);
 
             System.out.println("Database Path:\t" + db.getPath());
+
+            setHashMapForSearchSuggestions();
         } catch (Exception e) {
             Log.e("Error message", e.getMessage());
         }
@@ -68,10 +71,88 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.w(TAG, "Upgrading database from version " + oldVersion + " to "
                 + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABEL_PERSONS);
+        db.execSQL("DROP TABLE IF EXISTS " + DATABASE_TABLE_PERSONS);
         onCreate(db);
     }
 
+    private HashMap<String,String> mAliasMap;
+
+    private void setHashMapForSearchSuggestions(){
+
+        // This HashMap is used to map table fields to Custom Suggestion fields
+        mAliasMap = new HashMap<String, String>();
+
+        // Unique id for the each Suggestions ( Mandatory )
+        mAliasMap.put("_ID", COL_ID + " as " + "_id" );
+
+        // Text for Suggestions ( Mandatory )
+        mAliasMap.put(SearchManager.SUGGEST_COLUMN_TEXT_1, /*COL_AGE+ " " + */COL_FIRSTNAME /*+" "+ COL_LASTNAME */+ " as " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+
+        // Icon for Suggestions ( Optional )
+        // mAliasMap.put( SearchManager.SUGGEST_COLUMN_ICON_1, FIELD_FLAG + " as " + SearchManager.SUGGEST_COLUMN_ICON_1);
+
+        // This value will be appended to the Intent data on selecting an item from Search result or Suggestions ( Optional )
+        mAliasMap.put( SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, COL_ID + " as " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID );
+
+    }
+
+    /** Returns Persons */
+    public Cursor getPersons(String[] selectionArgs){
+
+        String selection =
+                COL_FIRSTNAME   + " or " +
+                COL_LASTNAME    + " or " +
+                COL_AGE         + " or " +
+                COL_BIRTHDATE   +
+                " like ? ";
+
+        if(selectionArgs!=null){
+            selectionArgs[0] = "%"+selectionArgs[0] + "%";
+
+
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+        queryBuilder.setProjectionMap(mAliasMap);
+
+        queryBuilder.setTables(Database.DATABASE_TABLE_PERSONS);
+
+        Cursor c = queryBuilder.query(getReadableDatabase(),
+                new String[] { "_ID",
+                        COL_FIRSTNAME  } ,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                COL_AGE + " asc ","5"
+        );
+            return c;
+        }else{
+        System.err.println("Selection Args are null in getPersons()");
+            return null;
+    }
+
+    }
+
+    /** Return Person corresponding to the id */
+    public Cursor getPerson(String id){
+
+        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+
+        queryBuilder.setTables(DATABASE_TABLE_PERSONS);
+
+        Cursor c = queryBuilder.query(getReadableDatabase(),
+                new String[]{COL_ID, COL_FIRSTNAME, COL_LASTNAME, COL_BIRTHDATE},
+                "_id = ?", new String[]{id}, null, null, null, "1"
+        );
+
+        return c;
+    }
+    public Cursor getPersonForSuggestion(String query){
+        return getReadableDatabase().query(
+          DATABASE_TABLE_PERSONS,
+                new String[]{COL_ID,COL_FIRSTNAME,COL_LASTNAME,COL_AGE, COL_BANNED},
+                COL_FIRSTNAME+"=?"+" OR "+COL_LASTNAME+"=?"+" OR "+COL_AGE+"=?",new String[]{query},null,null,COL_AGE
+        );
+    }
     /**
      * @param name      The last name
      * @param firstname The first name
@@ -117,13 +198,13 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                 }
             }
             Log.v("data not NULL", data.toString());
-            db.insert(DATABASE_TABEL_PERSONS, null, data);
+            db.insert(DATABASE_TABLE_PERSONS, null, data);
             db.close();
         }
     }
 
     public int countPersons() {
-        String countQuery = "SELECT  * FROM " + DATABASE_TABEL_PERSONS;
+        String countQuery = "SELECT  * FROM " + DATABASE_TABLE_PERSONS;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int count = cursor.getCount();
@@ -142,7 +223,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     public Cursor readData() {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, null, null, null, null, COL_AGE);
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, null, null, null, null, COL_AGE);
 
         if (c != null)
             c.moveToFirst();
@@ -157,7 +238,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     public Cursor readUnder18() {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, COL_AGE+"<=?",new String[]{"17"}, null, null, COL_AGE);
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, COL_AGE+"<=?",new String[]{"17"}, null, null, COL_AGE);
 
         if (c != null)
             c.moveToFirst();
@@ -171,7 +252,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     public Cursor readOver18() {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, COL_AGE+">=?",new String[]{"18"}, null, null, COL_AGE);
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, COL_AGE+">=?",new String[]{"18"}, null, null, COL_AGE);
 
         if (c != null)
             c.moveToFirst();
@@ -185,7 +266,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     public Cursor readBanned() {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(DATABASE_TABEL_PERSONS, COLUMNS, COL_BANNED+"=?",new String[]{"1"}, null, null, COL_AGE);
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, COL_BANNED+"=?",new String[]{"1"}, null, null, COL_AGE);
 
         if (c != null)
             c.moveToFirst();
@@ -198,7 +279,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     *
     * */
     public void removeData(int member_id) {
-        db.delete(DATABASE_TABEL_PERSONS, COL_ID + " = " + member_id, null);
+        db.delete(DATABASE_TABLE_PERSONS, COL_ID + " = " + member_id, null);
     }
 
     /**
@@ -214,7 +295,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
 
         String WHERE = COL_FIRSTNAME + QM + AND + COL_LASTNAME + QM + AND + COL_AGE + QM;
 
-        Cursor c = db.query(DATABASE_TABEL_PERSONS, null, WHERE, queries,
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, null, WHERE, queries,
                 null, null, null);
         if(c.getCount() > 0) {
             c.moveToFirst();
@@ -225,12 +306,17 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         return id;
     }
 
+    protected Cursor getSuggestionCursor(String[] columns,String selection, String[] selectionArgs){
+
+        Cursor c = getReadableDatabase().query(DATABASE_TABLE_PERSONS,columns,selection,selectionArgs,null,null,null);
+        return c;
+    }
     protected Cursor getCursor(int index) {
 
         String WHERE = COL_ID + QM;
         String[] id = {index + ""};
         String[] columns = {COL_ID,COL_PROFILEPICTURE};
-        Cursor c = db.query(DATABASE_TABEL_PERSONS, null, WHERE, id,
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, null, WHERE, id,
                 null, null, null);
         return c;
     }
@@ -264,7 +350,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         // show 16+
         if (SearchActivity.PLUS_SIXTEEN.equals(QUERY)) {
             Log.v("getSearchCursor", "PLUS_SIXTEEN, [" + QUERY + "]\n" + "\n");
-            cursor = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+            cursor = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                     columns, selection[0], null, null, null,
                     Database.COL_LASTNAME);
             return cursor;
@@ -272,7 +358,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         // show 18+
         if (SearchActivity.PLUS_EIGHTEEN.equals(QUERY)) {
             Log.v("getSearchCursor", "PLUS_EIGHTEEN, [" + QUERY + "]\n" + "\n");
-            cursor = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+            cursor = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                     columns, selection[1], null, null, null,
                     Database.COL_LASTNAME);
             return cursor;
@@ -280,7 +366,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         // show banned persons
         if (SearchActivity.BANNED.equals(QUERY)) {
             Log.v("getSearchCursor", "BANNED, [" + QUERY + "]\n" + "\n");
-            cursor = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+            cursor = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                     columns, selection[2], null, null, null,
                     Database.COL_LASTNAME);
             return cursor;
@@ -349,7 +435,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
 
                     String[] query_parts = command.split(" ");
                     //Log.v("getSearchCursor", "Name recognized , [" + command + "]\n\n");
-                    c = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                    c = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                             columns, selection[3], query_parts, null, null,
                             Database.COL_LASTNAME);
 
@@ -359,7 +445,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                     if (identifier == 2) {
                         // show result of input text search (ordinary age search)
                         String[] age = {command};
-                        c = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                        c = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                 columns, selection[4], age, null, null,
                                 Database.COL_LASTNAME);
 
@@ -369,7 +455,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                         if (identifier == 3) {
                             // show result of input text search (ordinary date  search)
                             String[] date = {command};
-                            c = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                            c = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                     columns, selection[5], date, null, null,
                                     Database.COL_LASTNAME);
 
@@ -379,7 +465,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                             if (identifier == 4) {
                                 // show result of input text search (ordinary date  search)
                                 String[] word = {command, command};
-                                c = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                                c = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                         columns, selection[6], word, null, null,
                                         Database.COL_LASTNAME);
 
@@ -387,7 +473,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                             } else if (identifier == 5) {
                                 // show result of input text search (ordinary date  search)
                                 String[] query_parts = command.split(" ");
-                                c = getReadableDatabase().query(Database.DATABASE_TABEL_PERSONS,
+                                c = getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
                                         null, selection[7], query_parts, null, null,
                                         Database.COL_LASTNAME);
 
@@ -421,7 +507,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         SQLiteDatabase database = getWritableDatabase();
 
         if (id != 0)
-            database.update(DATABASE_TABEL_PERSONS, cv, COL_ID + "=" + id, null);
+            database.update(DATABASE_TABLE_PERSONS, cv, COL_ID + "=" + id, null);
 
     }
     protected void updateBannedStatus(int index,int status){
@@ -430,7 +516,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         cv.put(COL_BANNED, status);
 
         if (index != 0)
-            db.update(DATABASE_TABEL_PERSONS, cv, COL_ID + "=" + index, null);
+            db.update(DATABASE_TABLE_PERSONS, cv, COL_ID + "=" + index, null);
 
     }
 
@@ -440,7 +526,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         cv.put(COL_ID, index-1);
 
         if (index != 0)
-            db.update(DATABASE_TABEL_PERSONS, cv, COL_ID + "=" + index, null);
+            db.update(DATABASE_TABLE_PERSONS, cv, COL_ID + "=" + index, null);
     }
 
     /**
@@ -515,7 +601,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             cv.put(columns[i], age);
         }
 
-        db.update(DATABASE_TABEL_PERSONS, cv, COL_ID + "=" + id, null);
+        db.update(DATABASE_TABLE_PERSONS, cv, COL_ID + "=" + id, null);
 
     }
 

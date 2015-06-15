@@ -94,6 +94,18 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.knoeflerdesign.keywest.PersonInfoActivity" />
         </activity>
+
+        <provider
+            android:name="PersonSuggestion"
+            android:authorities="com.knoeflerdesign.keywest.PersonSuggestion"
+            android:enabled="true"
+            android:exported="true"
+            android:readPermission="">
+
+        <path-permission android:pathPrefix="/search_suggest_query"
+            android:readPermission="android.permission.GLOBAL_SEARCH" />
+
+        </provider>
     </application>
 
 </manifest>
