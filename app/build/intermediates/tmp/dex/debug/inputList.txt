@@ -1,4 +1,4 @@
-D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\classes\debug
-D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\pre-dexed\debug\support-annotations-22.0.0-88bb30ca51ae8796afe32fdd83b9d325f4664ff7.jar
-D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\pre-dexed\debug\internal_impl-22.0.0-2876661362c27832b2bf84464e68bfb992d3c5ef.jar
-D:\Java Complete\AndroidStudioProjects\KeyWest\app\build\intermediates\pre-dexed\debug\classes-0314d6ed35cda90881940b17d78517cf4ff4576b.jar
+G:\Geschaeftliche_Dateien\KW_Straden\KeyWest\app\build\intermediates\classes\debug
+G:\Geschaeftliche_Dateien\KW_Straden\KeyWest\app\build\intermediates\pre-dexed\debug\support-annotations-22.0.0-9148514c685de3275285b7c498f32e526f5353e2.jar
+G:\Geschaeftliche_Dateien\KW_Straden\KeyWest\app\build\intermediates\pre-dexed\debug\internal_impl-22.0.0-6bdf0787086a28920fc7445789caf7fcb02950db.jar
+G:\Geschaeftliche_Dateien\KW_Straden\KeyWest\app\build\intermediates\pre-dexed\debug\classes-52ab165b77fb29b1a154487d9507936f8bca1ece.jar

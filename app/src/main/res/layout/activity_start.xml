@@ -33,15 +33,15 @@
             android:text="@string/min16_decr"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textColor="#FFFFFF"
-            android:layout_above="@+id/textfield_MIN_AGE"
+            android:layout_above="@+id/textfield_MIN_AGE_16"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:gravity="center_horizontal"
-            android:layout_alignRight="@+id/textfield_MIN_AGE"
-            android:layout_alignEnd="@+id/textfield_MIN_AGE" />
+            android:layout_alignRight="@+id/textfield_MIN_AGE_16"
+            android:layout_alignEnd="@+id/textfield_MIN_AGE_16" />
 
         <TextView
-            android:id="@+id/textfield_MIN_AGE"
+            android:id="@+id/textfield_MIN_AGE_16"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/default_minDate"
@@ -53,6 +53,29 @@
             android:layout_alignParentStart="true"
             android:gravity="center_horizontal" />
 
+        <TextView
+            android:id="@+id/minAge18Description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/min18_decr"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#FFFFFF"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/textfield_MIN_AGE_16"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/textfield_MIN_AGE_18"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/default_minDate"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/yellow"
+            android:textSize="70sp"
+            android:gravity="center_horizontal"
+            android:layout_below="@id/minAge18Description"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
         <AnalogClock
             android:id="@+id/analogClock1"
             android:layout_width="wrap_content"
@@ -128,30 +151,29 @@
 
     </RelativeLayout>
 
+
     <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/agbContentView"
         android:orientation="vertical">
+
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical">
-
             <Switch
-                android:id="@+id/agbSwitch2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
-                android:checked="true"
-                android:text="AGB Ansicht" />
-
+            android:id="@+id/agbSwitch2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:checked="true"
+            android:text="AGB Ansicht" />
             <TextView
                 android:id="@+id/agbTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbHeader"
                 android:text="@string/agbTitle"
-                android:textAlignment="center"
                 android:textSize="25sp" />
 
             <Space
@@ -160,16 +182,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderAufnahme_von_Daten"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderAufnahme_von_Daten"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderAufnahme_von_Daten"/>
 
             <TextView
                 android:id="@+id/agb1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb1" />
 
             <Space
@@ -178,16 +196,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderAushändigung_der_Daten"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderAushändigung_der_Daten"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderAushändigung_der_Daten" />
 
             <TextView
                 android:id="@+id/agb2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb2" />
 
             <Space
@@ -196,16 +210,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderSichern_der_Daten_auf_weiterem_Medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderSichern_der_Daten_auf_weiterem_Medium"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderSichern_der_Daten_auf_weiterem_Medium" />
 
             <TextView
                 android:id="@+id/agb3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb3" />
 
             <Space
@@ -214,16 +224,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderHaftung"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderHaftung"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderHaftung" />
 
             <TextView
                 android:id="@+id/agb4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb4" />
 
             <Space
@@ -232,16 +238,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderHinweisungspflicht"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderHinweisungspflicht"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderHinweisungspflicht"/>
 
             <TextView
                 android:id="@+id/agb5"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb5" />
 
             <Space
@@ -250,16 +252,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderEntfernen_des_Kunden_aus_dem_System"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderEntfernen_des_Kunden_aus_dem_System"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderEntfernen_des_Kunden_aus_dem_System" />
 
             <TextView
                 android:id="@+id/agb6"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb6" />
 
             <Space
@@ -268,16 +266,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderSoftwarebedingte_Fehler"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderSoftwarebedingte_Fehler"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderSoftwarebedingte_Fehler" />
 
             <TextView
                 android:id="@+id/agb7"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb7" />
 
             <Space
@@ -286,16 +280,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderNur_Offline_Nutzung_der_Daten"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderNur_Offline_Nutzung_der_Daten"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderNur_Offline_Nutzung_der_Daten"/>
 
             <TextView
                 android:id="@+id/agb8"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb8" />
 
             <Space
@@ -304,16 +294,12 @@
 
             <TextView
                 android:id="@+id/agbHeaderBildinformationen_und_Inhalte"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/agbHeaderBildinformationen_und_Inhalte"
-                android:textSize="18sp"
-                android:textStyle="bold" />
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderBildinformationen_und_Inhalte"/>
 
             <TextView
                 android:id="@+id/agb9"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                style="@style/agbText"
                 android:text="@string/agb9" />
         </LinearLayout>
     </ScrollView>

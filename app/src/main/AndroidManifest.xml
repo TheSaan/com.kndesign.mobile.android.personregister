@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.knoeflerdesign.keywest"
+    package="com.thesaan.android.business.austria.keywest"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -37,6 +37,7 @@
             android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.SEARCH" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -44,7 +45,12 @@
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".SearchActivity" />
+
         </activity>
+
+
+
+
         <activity
             android:name=".EntryActivity"
             android:configChanges="orientation|screenSize"
@@ -54,6 +60,8 @@
             android:screenOrientation="portrait" >
             >
         </activity>
+
+
         <activity
             android:name=".SearchActivity"
             android:label="Suchergebnisse"
@@ -82,7 +90,8 @@
         <activity
             android:name=".PersonInfoActivity"
             android:label="@string/title_activity_person_info"
-            android:launchMode="singleTask" >
+            android:launchMode="singleTask"
+            android:parentActivityName=".SearchActivity">
         </activity>
         <activity
             android:name=".PersonImageDetailedActivity"
@@ -92,15 +101,14 @@
             android:theme="@style/FullscreenTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.knoeflerdesign.keywest.PersonInfoActivity" />
+                android:value="com.thesaan.android.business.austria.keywest.PersonInfoActivity" />
         </activity>
 
         <provider
             android:name="PersonSuggestion"
-            android:authorities="com.knoeflerdesign.keywest.PersonSuggestion"
+            android:authorities="com.thesaan.android.business.austria.keywest.PersonSuggestion"
             android:enabled="true"
-            android:exported="true"
-            android:readPermission="">
+            android:exported="true">
 
         <path-permission android:pathPrefix="/search_suggest_query"
             android:readPermission="android.permission.GLOBAL_SEARCH" />

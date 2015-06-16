@@ -2,7 +2,8 @@
 <resources>
 
     <string name="action_settings">Settings</string>
-    <string name="min16_decr">Minimum Datum</string>
+    <string name="min16_decr">Minimum Datum 16 Jahre</string>
+    <string name="min18_decr">Minimum Datum 18 Jahre</string>
     <string name="logoCD">Key West Logo</string>
     <string name="default_minDate">Kein Datum verfügbar</string>
     <string name="app_name">Key West Personen Register</string>
@@ -16,11 +17,7 @@
     <string name="takePictureInfo">Foto(s) aufnehmen</string>
 
     <!-- Personal identification cards which are allowed -->
-    <string name="driverslicence">Führerschein</string>
-    <string name="checkitcard">Check it Card</string>
-    <string name="oebbcard">ÖBB Schein</string>
-    <string name="passport">Reisepass</string>
-    <string name="personalidcard">Personalausweis</string>
+    <string name="passport">Ausweis</string>
 
     <!-- Photo status texts -->
     <string name="photosshot">0</string>
@@ -30,14 +27,8 @@
     <string name="profilepictureCD">Profilbild</string>
 
     <!-- Content Descriptions -->
-    <string name="oebbpictureCD">ÖBB Card</string>
-    <string name="passportpictureCD">Reisepass</string>
-    <string name="checkitcardpictureCD">Check-It-Card</string>
-    <string name="personalidpictureCD">Personalausweis</string>
-    <string name="driverslicencepictureCD">Führerschein</string>
+    <string name="passportpictureCD">Ausweis</string>
     <string name="profilePicture">Profilbild</string>
-    <string name="back">Rückseite</string>
-    <string name="front">Personalausweis</string>
 
 
     <string name="titleSearch">Einträge durchsuchen nach</string>
@@ -45,7 +36,7 @@
     <string name="currentAge"></string>
     <string name="calculateAge">Alter berechnen</string>
     <string name="calcProgressAge">Alter wird berechnet</string>
-    <string name="newNameHint">Vorname Nachname</string>
+    <string name="newNameHint">Vorname Nachname (Doppelnamen mit Bindstrichen schreiben)</string>
     <string name="dateHint">TTMMYYYY</string>
     <string name="showUnder18">16+</string>
     <string name="showOver18">18+</string>
