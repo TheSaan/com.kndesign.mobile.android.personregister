@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/entryLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/dark_purple"
+    android:orientation="vertical"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:id="@+id/newNameLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/newName"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/newNameHint"
+            android:inputType="textPersonName"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#F5F6CE" >
+
+            <requestFocus />
+        </EditText>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dateInputLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/dateText"
+            android:layout_width="wrap_content"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/dateHint"
+            android:inputType="date"
+            android:textColor="#FFFFFF"
+            android:textColorHint="#F5F6CE" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/dateLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:textAlignment="center">
+
+        <TextView
+            android:id="@+id/currAgeTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:hint="Alter wird berechnet"
+            android:textColorHint="@color/bright_purple"
+            android:textSize="50sp" />
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:id="@+id/miniProfilePictureLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniProfilePicture"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="2.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2.5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/profilepictureCD"
+            android:paddingTop="0dp" />
+
+        <Button
+            style="@style/defaultButton"
+            android:id="@+id/profilePictureButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:text="@string/profilePicture"
+             />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/miniPassportLL"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <ImageView
+            android:id="@+id/miniDriversLicence"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="2.5dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="2.5dp"
+            android:background="@drawable/ic_action_photo"
+            android:contentDescription="@string/passportpictureCD" />
+
+        <Button
+            style="@style/defaultButton"
+            android:id="@+id/passportButton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="9dp"
+            android:text="@string/passport"/>
+
+    </LinearLayout>
+
+
+
+
+
+    <EditText
+        android:id="@+id/personDetails"
+        android:layout_width="582dp"
+        android:layout_height="115dp"
+        android:layout_marginLeft="7dp"
+        android:ems="10"
+        android:hint="@string/personDetailsHint"
+        android:inputType="textMultiLine"
+        android:textColor="#FFFFFF"
+        android:textColorHint="#F5F6CE" />
+
+    <Switch
+        android:id="@+id/isBannedSwitch"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="0dp"
+        android:src="@drawable/ic_house_banned_grey"
+        android:background="@drawable/banned_state_off_background"
+        android:textColor="#ffffff"
+        android:textOff="Kein Hausverbot"
+        android:text="Hausverbot Status"
+        android:textOn="Hat Hausverbot"
+        android:visibility="visible"
+        android:paddingTop="0dp"
+        android:paddingEnd="50dp" />
+
+    <Button
+        style="@style/confirmButton"
+        android:id="@+id/saveButton"
+        android:textStyle="bold"
+        android:textSize="40sp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/save"
+        android:minHeight="60dp" />
+
+</LinearLayout><!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/layout/activity_newentry.xml -->

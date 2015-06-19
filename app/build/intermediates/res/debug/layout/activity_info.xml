@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="@string/designedForDescription"
+        android:id="@+id/textviewDesignedForDescription" />
+
+
+    <!--////////////////////////Information Element with space line///////////////////////////////////////-->
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content" />
+
+
+        <TableLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content">
+
+            <TableRow>
+                <TextView
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/buildNumberTitle"
+                    android:id="@+id/textviewBuildNumberTitle" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Version 0.6.2"
+                    android:id="@+id/textviewBuildNumber" />
+            </TableRow>
+
+            <TableRow>
+                <TextView
+                    android:layout_width="300dp"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/AmountOfEntriesDesciption"
+                    android:id="@+id/textviewAmountOfEntriesTitle" />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="0"
+                    android:id="@+id/textviewAmountOfEntriesNumber" />
+            </TableRow>
+
+
+        </TableLayout>
+
+</LinearLayout><!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/layout/activity_info.xml -->

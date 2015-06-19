@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+<corners
+    android:radius="5dp"
+    />
+</shape><!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/drawable-mdpi/thumbnail_theme.xml -->

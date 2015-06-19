@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/personInfoLayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="@color/bright_purple"
+    tools:context="com.knoeflerdesign.keywest.PersonInfoActivity">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/bright_purple">
+
+        <ImageView
+            android:id="@+id/personPPImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="7dp"
+            android:layout_marginTop="15dp"
+            android:minHeight="256dp"
+            android:minWidth="144dp" />
+
+        <TableLayout
+            android:id="@+id/personInfo"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/personPPImage"
+            android:layout_marginLeft="20dp"
+            android:layout_toEndOf="@+id/personPPImage">
+
+            <TableRow>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Name:"
+                    android:textSize="25sp"
+                    android:textColor="@color/yellow" />
+
+                <TextView
+                    android:id="@+id/personsName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:textSize="25sp"
+                    android:paddingLeft="30dp" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Alter:"
+                    android:textSize="25sp"
+                    android:textColor="@color/yellow" />
+
+                <TextView
+                    android:id="@+id/personsAge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:textSize="25sp"
+                    android:paddingLeft="30dp" />
+            </TableRow>
+
+            <TableRow>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Geburtstag:"
+                    android:textSize="25sp"
+                    android:textColor="@color/yellow" />
+
+                <TextView
+                    android:id="@+id/personsBirthdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#ffffff"
+                    android:textSize="25sp"
+                    android:paddingLeft="30dp" />
+            </TableRow>
+        </TableLayout>
+
+
+        <Button
+            android:id="@+id/deletePersonButton"
+            style="@style/deleteButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/deleteButtonText"
+            android:layout_alignBottom="@+id/personPPImage"
+            android:layout_alignRight="@+id/personsPassportDescription"
+            android:layout_alignEnd="@+id/personsPassportDescription"
+            android:layout_alignLeft="@+id/bannedSwitch"
+            android:layout_alignStart="@+id/bannedSwitch" />
+
+        <Switch
+            android:id="@+id/bannedSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/personInfo"
+            android:layout_alignStart="@+id/personInfo"
+            android:layout_below="@+id/personInfo"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/yellow"
+            android:layout_alignRight="@+id/detailsText"
+            android:layout_alignEnd="@+id/detailsText"
+            android:checked="false"
+            android:textOff="Kein Hausverbot"
+            android:textOn="Hat Hausverbot" />
+
+        <TextView
+            android:id="@+id/personsBannedState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/deletePersonButton"
+            android:layout_alignStart="@+id/deletePersonButton"
+            android:layout_below="@+id/bannedSwitch"
+            android:text="Hausverbot"
+            android:textAlignment="center"
+            android:textColor="@color/banned_red"
+            android:textSize="30sp"
+            android:layout_alignRight="@+id/deletePersonButton"
+            android:layout_alignEnd="@+id/deletePersonButton" />
+
+    <Space
+        android:layout_width="fill_parent"
+        android:layout_height="30dp"
+        android:layout_below="@id/deletePersonButton"
+        android:id="@+id/Space1"/>
+
+        <TextView
+            android:text="@string/passportpictureCD"
+            android:id="@+id/personsPassportDescription"
+            android:textColor="#ffffff"
+            style="@style/idCardHeaders"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/Space1"
+            android:layout_alignLeft="@+id/personPPImage"
+            android:layout_alignStart="@+id/personPPImage" />
+
+        <ImageView
+            android:id="@+id/personsPassport"
+            android:layout_below="@id/personsPassportDescription"
+            android:layout_width="320dp"
+            android:layout_height="200dp"
+            android:layout_marginLeft="150dp"
+            android:minHeight="72dp"
+            android:minWidth="128dp"/>
+
+        <EditText
+        android:id="@+id/detailsText"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:hint="Eintrag erstellen..."
+        android:textColor="#ffffff"
+        android:textColorHint="@color/yellow"
+        android:textSize="25dp"
+        android:textStyle="italic"
+        android:minLines="1"
+        android:layout_below="@id/personsPassport"
+        android:padding="7dp"
+        style="@style/detailsTextField"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/personPPImage"
+        android:layout_alignLeft="@+id/personPPImage" />
+    </RelativeLayout>
+
+
+</ScrollView>
+
+<!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/layout/activity_person_info.xml -->

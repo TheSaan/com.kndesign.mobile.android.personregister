@@ -1,0 +1,306 @@
+<ViewSwitcher xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/startViewSwitcher"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    >
+
+    <RelativeLayout
+        android:id="@+id/startContentView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/start_style"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        tools:context="com.knoeflerdesign.keywest.StartActivity">
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/logoCD"
+            android:src="@drawable/intro_small"
+            android:layout_above="@+id/agbSwitch"
+            android:layout_alignRight="@+id/infoTextview"
+            android:layout_alignEnd="@+id/infoTextview" />
+
+        <TextView
+            android:id="@+id/minAgeDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/min16_decr"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#FFFFFF"
+            android:layout_above="@+id/textfield_MIN_AGE_16"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="center_horizontal"
+            android:layout_alignRight="@+id/textfield_MIN_AGE_16"
+            android:layout_alignEnd="@+id/textfield_MIN_AGE_16" />
+
+        <TextView
+            android:id="@+id/textfield_MIN_AGE_16"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/default_minDate"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/yellow"
+            android:textSize="70sp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/minAge18Description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/min18_decr"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="#FFFFFF"
+            android:gravity="center_horizontal"
+            android:layout_below="@+id/textfield_MIN_AGE_16"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:id="@+id/textfield_MIN_AGE_18"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/default_minDate"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:textColor="@color/yellow"
+            android:textSize="70sp"
+            android:gravity="center_horizontal"
+            android:layout_below="@id/minAge18Description"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+        <AnalogClock
+            android:id="@+id/analogClock1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignLeft="@+id/imageView1"
+            android:layout_alignStart="@+id/imageView1" />
+
+        <Switch
+            android:id="@+id/agbSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="AGB Ansicht"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:id="@+id/infoTextview"
+            android:layout_above="@+id/agbSwitch"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="30dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/bdayInfo"
+            android:gravity="center_vertical"
+            android:hint="Heute sind keine Geburtstage."
+            android:layout_above="@+id/analogClock1"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_marginBottom="65dp" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Neu"
+            android:id="@+id/newEntryButton"
+            style="@style/defaultButtonRound"
+            android:layout_marginRight="51dp"
+            android:layout_marginEnd="51dp"
+            android:layout_alignTop="@+id/searchButton"
+            android:layout_alignRight="@+id/minAge18Description"
+            android:layout_alignEnd="@+id/minAge18Description" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Einträge"
+            android:id="@+id/listButton"
+            style="@style/defaultButtonRound"
+            android:layout_alignTop="@+id/newEntryButton"
+            android:layout_alignLeft="@+id/analogClock1"
+            android:layout_alignStart="@+id/analogClock1" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suchen"
+            android:id="@+id/searchButton"
+            style="@style/defaultButtonRound"
+            android:layout_marginTop="99dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/agbContentView"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <Switch
+            android:id="@+id/agbSwitch2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:checked="true"
+            android:text="AGB Ansicht" />
+            <TextView
+                android:id="@+id/agbTitle"
+                style="@style/agbHeader"
+                android:text="@string/agbTitle"
+                android:textSize="25sp" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="30dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderAufnahme_von_Daten"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderAufnahme_von_Daten"/>
+
+            <TextView
+                android:id="@+id/agb1"
+                style="@style/agbText"
+                android:text="@string/agb1" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderAushändigung_der_Daten"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderAushändigung_der_Daten" />
+
+            <TextView
+                android:id="@+id/agb2"
+                style="@style/agbText"
+                android:text="@string/agb2" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderSichern_der_Daten_auf_weiterem_Medium"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderSichern_der_Daten_auf_weiterem_Medium" />
+
+            <TextView
+                android:id="@+id/agb3"
+                style="@style/agbText"
+                android:text="@string/agb3" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderHaftung"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderHaftung" />
+
+            <TextView
+                android:id="@+id/agb4"
+                style="@style/agbText"
+                android:text="@string/agb4" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderHinweisungspflicht"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderHinweisungspflicht"/>
+
+            <TextView
+                android:id="@+id/agb5"
+                style="@style/agbText"
+                android:text="@string/agb5" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderEntfernen_des_Kunden_aus_dem_System"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderEntfernen_des_Kunden_aus_dem_System" />
+
+            <TextView
+                android:id="@+id/agb6"
+                style="@style/agbText"
+                android:text="@string/agb6" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderSoftwarebedingte_Fehler"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderSoftwarebedingte_Fehler" />
+
+            <TextView
+                android:id="@+id/agb7"
+                style="@style/agbText"
+                android:text="@string/agb7" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderNur_Offline_Nutzung_der_Daten"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderNur_Offline_Nutzung_der_Daten"/>
+
+            <TextView
+                android:id="@+id/agb8"
+                style="@style/agbText"
+                android:text="@string/agb8" />
+
+            <Space
+                android:layout_width="fill_parent"
+                android:layout_height="15dp" />
+
+            <TextView
+                android:id="@+id/agbHeaderBildinformationen_und_Inhalte"
+                style="@style/agbHeader"
+                android:text="@string/agbHeaderBildinformationen_und_Inhalte"/>
+
+            <TextView
+                android:id="@+id/agb9"
+                style="@style/agbText"
+                android:text="@string/agb9" />
+        </LinearLayout>
+    </ScrollView>
+</ViewSwitcher><!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/layout/activity_start.xml -->

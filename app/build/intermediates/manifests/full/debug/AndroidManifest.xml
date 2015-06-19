@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.thesaan.android.business.austria.keywest"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="16"
+        android:targetSdkVersion="19" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_INTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_INTERNAL_STORAGE" />
+
+    <uses-feature android:name="android.hardware.camera" />
+    <uses-feature android:name="android.hardware.camera.autofocus" />
+
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_title"
+        android:theme="@style/AppTheme" >
+        <service
+            android:name="com.thesaan.android.business.austria.keywest.SearchResultService"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/searchService" >
+        </service>
+
+        <activity
+            android:name="com.thesaan.android.business.austria.keywest.StartActivity"
+            android:label="@string/app_name"
+            android:launchMode="singleTask" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <!-- <action android:name="android.intent.action.SEARCH" /> -->
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.default_searchable"
+                android:value=".SearchActivity" />
+        </activity>
+        <activity
+            android:name="com.thesaan.android.business.austria.keywest.EntryActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="@string/title_activity_entry"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.thesaan.android.business.austria.keywest.StartActivity"
+            android:screenOrientation="portrait" >
+            >
+        </activity>
+        <activity
+            android:name="com.thesaan.android.business.austria.keywest.SearchActivity"
+            android:label="Suchergebnisse"
+            android:launchMode="singleTop"
+            android:parentActivityName="com.thesaan.android.business.austria.keywest.StartActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity>
+
+        <service
+            android:name="com.thesaan.android.business.austria.keywest.AgeControlService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+        <service
+            android:name="com.thesaan.android.business.austria.keywest.Service.TestEntryCreationService"
+            android:enabled="true"
+            android:exported="true" >
+        </service>
+
+        <activity
+            android:name="com.thesaan.android.business.austria.keywest.PersonInfoActivity"
+            android:label="@string/title_activity_person_info"
+            android:launchMode="singleTask"
+            android:parentActivityName="com.thesaan.android.business.austria.keywest.SearchActivity" >
+        </activity>
+        <activity
+            android:name="com.thesaan.android.business.austria.keywest.PersonImageDetailedActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_person_image_detailed"
+            android:parentActivityName="com.thesaan.android.business.austria.keywest.PersonInfoActivity"
+            android:theme="@style/FullscreenTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thesaan.android.business.austria.keywest.PersonInfoActivity" />
+        </activity>
+
+        <provider
+            android:name="com.thesaan.android.business.austria.keywest.PersonSuggestion"
+            android:authorities="com.thesaan.android.business.austria.keywest.PersonSuggestion"
+            android:enabled="true"
+            android:exported="true" >
+            <path-permission android:pathPrefix="/search_suggest_query" />
+        </provider>
+    </application>
+
+</manifest>

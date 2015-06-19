@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="oval">
+
+    <solid
+        android:color="@color/yellow"
+        />
+
+    <size
+        android:height="120dp"
+        android:width="120dp"
+        />
+    <gradient
+        android:startColor="@color/yellow"
+        android:endColor="@color/dark_purple"
+        android:type="linear"
+        />
+
+</shape><!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/drawable-mdpi/button_yellow_round.xml -->

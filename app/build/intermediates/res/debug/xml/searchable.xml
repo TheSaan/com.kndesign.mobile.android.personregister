@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<searchable xmlns:android="http://schemas.android.com/apk/res/android"
+    android:label="@string/search"
+    android:hint="Vorname, Nachname, Geburtsdatum (TT.MM.JJJJ), Alter"
+    android:searchSuggestAuthority="com.thesaan.android.business.austria.keywest.PersonSuggestion"
+    android:searchSuggestIntentData="content://com.thesaan.android.business.austria.keywest.PersonSuggestion/personen"
+    android:searchSuggestIntentAction="android.intent.action.VIEW"
+    android:includeInGlobalSearch="true"
+    >
+    <!--android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"-->
+</searchable><!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/xml/searchable.xml -->
