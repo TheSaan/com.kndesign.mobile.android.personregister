@@ -38,7 +38,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
     protected static boolean isPersonCreatedOrUpdated = false;
 
     //the factor how small the thumbnail is compares to the original
-    private static final double THUMBNAIL_SCALE_FACTOR = 0.16;
+    static final double THUMBNAIL_SCALE_FACTOR = 0.16;
 
     // banned from company is guest (Hausverbot 0 = no, 1 = yes)
     protected int isBanned = 0;
@@ -61,7 +61,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
     private File personFullSizedImages;
 
     //the root folder of all entries
-    private File KWIMG;
+    private File externalRootFolder;
 
     //the folder identifier as first name, last name and date
     private String PERSON_FOLDER;
@@ -263,10 +263,10 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                 }
 
                 // root directory of the app data
-                KWIMG = new File(Environment.getExternalStorageDirectory(), "KWIMG");
-                //c.println("KWIMG path: " + KWIMG.getPath());
-                KWIMG.mkdir();
-                KWIMG.setWritable(true);
+                externalRootFolder = new File(Environment.getExternalStorageDirectory(), "externalRootFolder");
+                //c.println("externalRootFolder path: " + externalRootFolder.getPath());
+                externalRootFolder.mkdir();
+                externalRootFolder.setWritable(true);
 
 			/*
              * create individualized folder with named by the persons full name
@@ -280,7 +280,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                 // assumption of all firstname and lastname
                 String fullName = firstAndLastName[0] + " " + firstAndLastName[1];
 
-                personDIR = new File(KWIMG.getPath() + "/" + PERSON_FOLDER);
+                personDIR = new File(externalRootFolder.getPath() + "/" + PERSON_FOLDER);
 
                 personDIR.canWrite();
                 personDIR.mkdirs();
@@ -618,7 +618,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
         //The amount of files
         int fileAmount = origFiles.length;
 
-        System.out.println("Anzahl der Dateien im img Ordner: "+fileAmount);
+//        System.out.println("Anzahl der Dateien im img Ordner: "+fileAmount);
         //temporary bitmap object
         Bitmap bitmap;
 
@@ -642,7 +642,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
 
                 bitmap = bh.resizeBitmap(bitmap,THUMBNAIL_SCALE_FACTOR);
 
-                File thumbnail = new File(personThumbnails,ah.splitIntoFILEPATHAndFILENAME(path,IMAGE_SPLIT_POINT,false)[1]);
+                File thumbnail = new File(personThumbnails,ah.splitFileNameAndPath(path, IMAGE_SPLIT_POINT, false)[1]);
                 System.out.println("Vorschau Dateipfad: "+thumbnail.getAbsolutePath());
                 bh.saveBitmapToFile(thumbnail,bitmap);
 

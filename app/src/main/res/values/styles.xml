@@ -41,6 +41,11 @@
         <item name="android:textColor">#ffffff</item>
         <item name="android:background">@drawable/button_yellow</item>
     </style>
+    <style name="defaultButtonRound">
+        <item name="android:textSize">25sp</item>
+        <item name="android:textColor">#ffffff</item>
+        <item name="android:background">@drawable/button_yellow_round</item>
+    </style>
 
     <style name="confirmButton">
         <item name="android:textColor">#ffffff</item>

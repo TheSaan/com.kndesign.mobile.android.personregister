@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <searchable xmlns:android="http://schemas.android.com/apk/res/android"
     android:label="@string/search"
+    android:hint="Vorname, Nachname, Geburtsdatum (TT.MM.JJJJ), Alter"
     android:searchSuggestAuthority="com.thesaan.android.business.austria.keywest.PersonSuggestion"
-    android:searchSuggestIntentData="com.thesaan.android.business.austria.keywest.PersonSuggestion/personen"
-    android:searchSuggestIntentAction="android.Intent.action.VIEW"
-    android:includeInGlobalSearch="true">
-
+    android:searchSuggestIntentData="content://com.thesaan.android.business.austria.keywest.PersonSuggestion/personen"
+    android:searchSuggestIntentAction="android.intent.action.VIEW"
+    android:includeInGlobalSearch="true"
+    >
+    <!--android:voiceSearchMode="showVoiceSearchButton|launchRecognizer"-->
 </searchable>

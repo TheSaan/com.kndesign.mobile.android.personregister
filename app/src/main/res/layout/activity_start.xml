@@ -119,20 +119,21 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Neuer Eintrag"
+            android:text="Neu"
             android:id="@+id/newEntryButton"
-            style="@style/defaultButton"
-            android:layout_below="@+id/searchButton"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="50dp" />
+            style="@style/defaultButtonRound"
+            android:layout_marginRight="51dp"
+            android:layout_marginEnd="51dp"
+            android:layout_alignTop="@+id/searchButton"
+            android:layout_alignRight="@+id/minAge18Description"
+            android:layout_alignEnd="@+id/minAge18Description" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Einträge anzeigen"
+            android:text="Einträge"
             android:id="@+id/listButton"
-            style="@style/defaultButton"
+            style="@style/defaultButtonRound"
             android:layout_alignTop="@+id/newEntryButton"
             android:layout_alignLeft="@+id/analogClock1"
             android:layout_alignStart="@+id/analogClock1" />
@@ -142,10 +143,9 @@
             android:layout_height="wrap_content"
             android:text="Suchen"
             android:id="@+id/searchButton"
+            style="@style/defaultButtonRound"
+            android:layout_marginTop="99dp"
             android:layout_alignParentTop="true"
-            android:layout_alignRight="@+id/newEntryButton"
-            android:layout_alignEnd="@+id/newEntryButton"
-            style="@style/defaultButton"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />
 

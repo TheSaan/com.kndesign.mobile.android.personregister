@@ -88,8 +88,8 @@ public class BitmapHandler {
 
 
         try {
-            String filepath = ah.splitIntoFILEPATHAndFILENAME(path, "IMG_", false)[0];
-            String filename = ah.splitIntoFILEPATHAndFILENAME(path, "IMG_", false)[1];
+            String filepath = ah.splitFileNameAndPath(path, "IMG_", false)[0];
+            String filename = ah.splitFileNameAndPath(path, "IMG_", false)[1];
 
             File file = new File(filepath, filename);
 

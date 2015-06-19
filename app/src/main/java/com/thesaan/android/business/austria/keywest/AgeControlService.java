@@ -9,8 +9,8 @@ import android.os.IBinder;
 public class AgeControlService extends Service {
 
     private final IBinder mBinder = new MyBinder();
-    protected Activity myActivity;
-    protected Database db;
+    public Activity myActivity;
+    Database db;
 
 
     public AgeControlService() {

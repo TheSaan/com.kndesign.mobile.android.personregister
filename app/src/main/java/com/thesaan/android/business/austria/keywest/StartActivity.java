@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -92,6 +93,7 @@ public class StartActivity extends Activity implements KeyWestInterface {
 
         File sd = new File(Environment.getExternalStorageDirectory() + "/KWIMG/files", "backup");
         sd.mkdir();
+
 
         startInfoText = (TextView) findViewById(R.id.infoTextview);
         searchButton = (Button) findViewById(R.id.searchButton);

@@ -2,11 +2,11 @@
 <resources>
 
     <string name="action_settings">Settings</string>
-    <string name="min16_decr">Minimum Datum 16 Jahre</string>
-    <string name="min18_decr">Minimum Datum 18 Jahre</string>
+    <string name="min16_decr">16 Jahre ab</string>
+    <string name="min18_decr">18 Jahre ab</string>
     <string name="logoCD">Key West Logo</string>
-    <string name="default_minDate">Kein Datum verfügbar</string>
-    <string name="app_name">Key West Personen Register</string>
+    <string name="default_minDate">Kein Datum</string>
+    <string name="app_name">Personen Register</string>
     <string name="weiter">Weiter</string>
     <string name="title_activity_search">Key West Jugend Registrierung</string>
     <string name="cameraDescr">Camera Button</string>

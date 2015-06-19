@@ -1,5 +1,6 @@
 package com.thesaan.android.business.austria.keywest;
 
+import android.app.Notification;
 import android.app.SearchManager;
 import android.content.ContentProvider;
 import android.content.ContentValues;
@@ -7,6 +8,8 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+
+import java.io.File;
 
 public class PersonSuggestion extends ContentProvider {
 
@@ -88,39 +91,28 @@ public class PersonSuggestion extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection,
                         String[] selectionArgs, String sortOrder) {
-        ;
-        MatrixCursor mc;
-        String banned;
-        selection = "LIKE ?";
-        String select =
-                Database.COL_LASTNAME + selection + " OR "+
-                        Database.COL_FIRSTNAME + selection +  " OR "+
-                        Database.COL_AGE + selection +  " OR "+
-                        Database.COL_BIRTHDATE + selection;
 
-        String query = uri.getLastPathSegment();
-        System.out.println("Query:\t"+query);
+        MatrixCursor mc;
+        String banned, reason;
+
+        String query = uri.getLastPathSegment().toLowerCase();
+
         Cursor c = null;
 
         if(query != null) {
             switch (mUriMatcher.match(uri)) {
 
                 case SUGGESTIONS_OF_PERSONS: {
-                    System.out.println("SUGGESTIONS_OF_PERSONS");
+//                    System.out.println("SUGGESTIONS_OF_PERSONS");
 
-                    mc = new MatrixCursor(new String[]{"_id", SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
-                    c = db.getPersons(query.split(" "));
-
-                    c.moveToFirst();
+                    //TODO Add image preview
+                    mc = new MatrixCursor(new String[]{"_id",SearchManager.SUGGEST_COLUMN_ICON_1, SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2, SearchManager.SUGGEST_COLUMN_INTENT_DATA});
+                    c = db.getPersons(query);
 
                     int count = c.getCount();
 
-                    System.out.println(count+" possible matches");
-                    System.out.println(mc.getColumnCount()+" mc columns");
-                    System.out.println(c.getColumnCount()+" c columns");
+                    c.moveToFirst();
 
-
-                    //mc.moveToFirst();
                     if(c instanceof MatrixCursor){
                         mc.newRow()
                                 .add(0)
@@ -129,21 +121,49 @@ public class PersonSuggestion extends ContentProvider {
                                 .add(0);
                         return mc;
                     }else
-                    if(c.getCount() > 0 && c != null) {
+                    if(count > 0 && c != null) {
+
                         for (int i = 0; i < count; i++) {
-                            if(c.getInt(c.getColumnIndex(Database.COL_BANNED))==1)
-                                banned = "Hat Hausverbot";
+
+                            reason = c.getString(c.getColumnIndex(Database.COL_DETAILS));
+                            banned = "Hat Lokal verbot!";
+                            if(c.getInt(c.getColumnIndex(Database.COL_BANNED))==1) {
+
+                                if(reason == null) reason = "Keine Angabe";
+                                else
+                                if(reason == "") reason = "Keine Angabe";
+
+                                banned = "Hat Lokalverbot (" + reason + ")";
+                            }else
+                                banned = reason;
+
+                            String bdate = c.getString(c.getColumnIndex(Database.COL_BIRTHDATE));
+
+                            String age;
+
+                            if(KeyWestInterface.UNKNOWN_BIRTHDATE.equals(bdate))
+                                age = "Keine Angabe";
                             else
-                                banned = "";
-                            mc.newRow()
-                                    .add(c.getInt(c.getColumnIndex(Database.COL_ID)))
-                                    .add(c.getString(c.getColumnIndex(Database.COL_FIRSTNAME)) + " " + c.getString(c.getColumnIndex(Database.COL_LASTNAME)))
-                                    .add(c.getInt(c.getColumnIndex(Database.COL_AGE)) + " Jahre / " + banned)
-                                    .add(c.getInt(c.getColumnIndex(Database.COL_ID)));
+                                age = Integer.toString(c.getInt(c.getColumnIndex(Database.COL_AGE)))+" Jahre";
+
+                            int id = c.getInt(c.getColumnIndex(Database.COL_ID));
+
+                            String name_age =
+                                            c.getString(c.getColumnIndex(Database.COL_LASTNAME)) +
+                                            " " + c.getString(c.getColumnIndex(Database.COL_FIRSTNAME)) +
+                                            " ("+ age+")";
+
+
+
+                                    mc.newRow()
+                                    .add(id)//id
+                                    .add(R.drawable.ic_person)
+                                    .add(name_age)
+                                    .add(banned)
+                                    .add(id);
 
                             c.moveToNext();
                         }
-
                         return mc;
                     }else{
                         System.err.println("No data matched for cursor");
@@ -154,7 +174,7 @@ public class PersonSuggestion extends ContentProvider {
                 }
                 case LISTED_PERSONS: {
                     System.out.println("LISTED_PERSONS");
-                    c = db.getPersons(query.split(" "));
+                    c = db.getPersons(query);
                     break;
                 }
                 case GET_PERSON: {
@@ -164,8 +184,10 @@ public class PersonSuggestion extends ContentProvider {
 
                     break;
                 }
-                default:
+                default: {
                     System.out.println("no suggestion data found for uri[" + uri + "]");
+                    break;
+                }
             }
         }else{
             System.out.println("SelectionArgs queried with null value");

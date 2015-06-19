@@ -37,7 +37,7 @@
             android:launchMode="singleTask" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <action android:name="android.intent.action.SEARCH" />
+                <!--<action android:name="android.intent.action.SEARCH" />-->
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -105,13 +105,12 @@
         </activity>
 
         <provider
-            android:name="PersonSuggestion"
+            android:name=".PersonSuggestion"
             android:authorities="com.thesaan.android.business.austria.keywest.PersonSuggestion"
             android:enabled="true"
             android:exported="true">
 
-        <path-permission android:pathPrefix="/search_suggest_query"
-            android:readPermission="android.permission.GLOBAL_SEARCH" />
+        <path-permission android:pathPrefix="/search_suggest_query"/>
 
         </provider>
     </application>

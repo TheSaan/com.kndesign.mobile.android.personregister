@@ -5,9 +5,12 @@ import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.TextView;
@@ -15,27 +18,49 @@ import android.widget.Toast;
 
 import com.thesaan.android.business.austria.keywest.Handler.*;
 
+import org.xmlpull.v1.XmlPullParser;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 
-public class Database extends SQLiteOpenHelper implements PatternCollection, KeyWestInterface{
+public class Database extends SQLiteOpenHelper implements PatternCollection, KeyWestInterface {
 
     private final SQLiteDatabase db;
     Context context;
 
+    public static Drawable[] profile_icon_drawables;
+    /*
+    this value contains the highest id value of the entries in database
+     to create the max value of possible profile_icon_drawables
+     to make them available by index
+    */
+    public static int drawable_id_max;
+
+    private HashMap<String, String> mAliasMap;
+
     TextView bdayEvent;
 
     public Database(Context context) {
-            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
         this.context = context;
         init(context);
         db = this.getWritableDatabase();
+
+/*
+        setupDrawableMaxId();
+
+        //create all profile picture icon drawables
+        setupDrawables();*/
     }
-    public Database(Context context,String args) {
-            super(context, DATABASE_BACKUP_NAME, null, DATABASE_VERSION);
+
+    public Database(Context context, String args) {
+        super(context, DATABASE_BACKUP_NAME, null, DATABASE_VERSION);
         this.context = context;
         init(context);
         db = this.getWritableDatabase();
@@ -49,7 +74,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     BitmapHandler bh;
     AndroidHandler ah;
 
-    private final void init(Context c){
+    private final void init(Context c) {
         dh = new DateHandler();
         fh = new FilesHandler();
         bh = new BitmapHandler(c);
@@ -60,26 +85,27 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         try {
             createTables(db, TABLES_TO_CREATE);
 
+
             setHashMapForSearchSuggestions();
         } catch (Exception e) {
             Log.e("Error message", e.getMessage());
         }
     }
+
     /**
-     *
      * @param db
-     * @param creationStrings
-     * An array of the strings to create all tables.
+     * @param creationStrings An array of the strings to create all tables.
      */
-    private void createTables(SQLiteDatabase db, String[] creationStrings){
-        for(int i = 0; i < creationStrings.length;i++){
+    private void createTables(SQLiteDatabase db, String[] creationStrings) {
+        for (int i = 0; i < creationStrings.length; i++) {
             try {
                 db.execSQL(creationStrings[i]);
-            }catch (Exception e) {
+            } catch (Exception e) {
                 Log.e("Error message", e + "");
             }
         }
     }
+
     // TODO Its only upgrade the persons side, but not the password table
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
@@ -89,95 +115,230 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         onCreate(db);
     }
 
-    private HashMap<String,String> mAliasMap;
 
-    private void setHashMapForSearchSuggestions(){
+    private void setHashMapForSearchSuggestions() {
 
         // This HashMap is used to map table fields to Custom Suggestion fields
         mAliasMap = new HashMap<String, String>();
 
         // Unique id for the each Suggestions ( Mandatory )
-        mAliasMap.put("_ID", COL_ID + " as " + "_id" );
+        mAliasMap.put("_ID", COL_ID + " as " + "_id");
 
         // Text for Suggestions ( Mandatory )
-        mAliasMap.put(SearchManager.SUGGEST_COLUMN_TEXT_1, /*COL_AGE+ " " + */COL_FIRSTNAME /*+" "+ COL_LASTNAME */+ " as " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+        mAliasMap.put(SearchManager.SUGGEST_COLUMN_TEXT_1, /*COL_AGE+ " " + */COL_FIRSTNAME /*+" "+ COL_LASTNAME */ + " as " + SearchManager.SUGGEST_COLUMN_TEXT_1);
+        //mAliasMap.put(SearchManager.SUGGEST_COLUMN_TEXT_2, /*COL_AGE+ " " + */COL_DETAILS /*+" "+ COL_LASTNAME */ + " as " + SearchManager.SUGGEST_COLUMN_TEXT_2);
 
         // Icon for Suggestions ( Optional )
-        // mAliasMap.put( SearchManager.SUGGEST_COLUMN_ICON_1, FIELD_FLAG + " as " + SearchManager.SUGGEST_COLUMN_ICON_1);
+//        mAliasMap.put( SearchManager.SUGGEST_COLUMN_ICON_1, context.getResources().getDrawable(R.drawable.ic_person) + " as " + SearchManager.SUGGEST_COLUMN_ICON_1);
 
         // This value will be appended to the Intent data on selecting an item from Search result or Suggestions ( Optional )
-        mAliasMap.put( SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, COL_ID + " as " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID );
+        mAliasMap.put(SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID, COL_ID + " as " + SearchManager.SUGGEST_COLUMN_INTENT_DATA_ID);
 
     }
 
-    /** Returns Persons */
-    public Cursor getPersons(String[] selectionArgs){
+/*    protected Drawable getIconDrawable(int id){
+        return profile_icon_drawables[id];
+    }
+    *//**
+     * Prepares the profile pictures of all entries as drawables to
+     * make them usable for the icon function in the search suggestion
+     *//*
+    protected void setupDrawables(){
+        //get the
+        profile_icon_drawables = createProfilePictureThumbnailsFromDatabase();
+        System.err.println("");
+    }
+
+    private void setupDrawableMaxId() {
+        Cursor c = readData();
+        int num = c.getCount();
+        int max = 0;
+        c.moveToFirst();
+        for(int i = 0; i < num; i++) {
+            int id = c.getInt(c.getColumnIndex(COL_ID));
+
+            if(id > max)
+                max = id;
+
+            c.moveToNext();
+        }
+
+        drawable_id_max = max;
+    }
+    private Drawable[] createProfilePictureThumbnailsFromDatabase() {
+        //get all entries
+        Cursor c = readData();
+
+        //final bitmaps
+        BitmapDrawable[] drawables = new BitmapDrawable[drawable_id_max+1];
+
+        FileInputStream fis;
+        File file;
+
+        int entryId = 0;
+
+        //the paths of each entry
+        String[] paths = getProfilePictureFilePathFromDatabase(c);
+        try {
+            c.moveToFirst();
+
+            for (int i = 0; i < drawable_id_max;i++) {
+                //the first is always null, but in this way the idexes are always equal
+                //even if some entry gets deleted
+                int index = c.getInt(c.getColumnIndex(COL_ID));
+
+                String filename = paths[i].split(THUMBNAILS)[1];
+                String filepath = paths[i].split(THUMBNAILS)[0]+THUMBNAILS;
+
+                file = new File(filepath, filename);
+
+
+
+                if(file.exists()) {
+                    fis = new FileInputStream(file);
+                    drawables[index] = (BitmapDrawable) Drawable.createFromStream(fis,paths[i]);
+                }else {
+                    drawables[index] = (BitmapDrawable) context.getResources().getDrawable(R.drawable.ic_person);
+                    System.err.println("File does not exist!(" + paths[i] + ")");
+                }
+                c.moveToNext();
+            }
+
+            return drawables;
+        }catch (Exception e){
+            System.err.println("Drawable could not be loaded correctly\n"+e);
+            e.printStackTrace();
+            return null;
+        }
+    }
+    protected String getPersonDirectoryPath(String s) {
+        *//*
+        Up to index 4 is the root path of each entry
+
+        /storage/emulated/0/MAX_MUSTERMANN_01011950
+         *//*
+        String[] parts = s.split("/");
+        String dir = "/"+parts[1]+"/"+parts[2]+"/"+parts[3]+"/"+parts[4]+"/"+parts[5];
+        return dir;
+    }
+    protected String[] getProfilePictureFilePathFromDatabase(Cursor c){
+        int num = c.getCount();
+
+        String[] paths = new String[num];
+
+        c.moveToFirst();
+
+        //choose the thumbnail path of the image
+        for(int i = 0; i < num; i++){
+            paths[i] = c.getString(c.getColumnIndex(COL_PROFILEPICTURE));
+
+            //split the path to get the file name which is equal in both folders
+            String filename = ah.splitFileNameAndPath(paths[i], IMAGE_SPLIT_POINT, false)[1];
+
+            //go back to root of entry
+            paths[i] = getPersonDirectoryPath(paths[i]);
+
+            //now go into the thumbnail folder and choose the profile picture
+            paths[i] += "/"+THUMBNAILS+filename;
+
+            c.moveToNext();
+        }
+        return paths;
+    }*/
+
+    /**
+     * Returns Persons
+     */
+    public Cursor getPersons(String query) {
 
         String selection =
-                COL_FIRSTNAME   + " or " +
-                COL_LASTNAME    + " or " +
-                COL_AGE         + " or " +
-                COL_BIRTHDATE   +
-                " like ? ";
-
-        if(selectionArgs!=null){
-            selectionArgs[0] = "%"+selectionArgs[0] + "%";
+                COL_FIRSTNAME + " LIKE ? OR " +
+                COL_LASTNAME + " LIKE ? OR " +
+                COL_AGE + " LIKE ? OR " +
+                COL_DETAILS + " LIKE ? OR " +
+                COL_BIRTHDATE + " LIKE ?";
 
 
-        SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-        queryBuilder.setProjectionMap(mAliasMap);
+        if (query != null) {
+            query = "%" + query + "%";
 
-        queryBuilder.setTables(Database.DATABASE_TABLE_PERSONS);
 
-        Cursor c = queryBuilder.query(getReadableDatabase(),
-                new String[] { "_ID",
-                        COL_FIRSTNAME  } ,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                COL_AGE + " asc ","5"
-        );
-            return c;
-        }else{
-        System.err.println("Selection Args are null in getPersons()");
+            String[] selValues = new String[]{
+                    query,
+                    query,
+                    query,
+                    query,
+                    query,
+            };
+
+            SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+            queryBuilder.setProjectionMap(mAliasMap);
+
+            queryBuilder.setTables(Database.DATABASE_TABLE_PERSONS);
+
+            int amountOfEntriesDisplayed = 9;//todo Einstellung
+
+            Cursor c = queryBuilder.query(getReadableDatabase(),
+                    new String[]{
+                            COL_ID,
+                            COL_AGE,
+                            COL_FIRSTNAME,
+                            COL_LASTNAME,
+                            COL_BIRTHDATE,
+                            COL_BANNED,
+                            COL_DETAILS
+                    },
+                    selection,
+                    selValues,
+                    null,
+                    null,
+                    COL_LASTNAME + " asc ",/*TODO Einstellung*/
+                    amountOfEntriesDisplayed + ""
+            );
+            if (c.getCount() > 0)
+                return c;
+            else {
+                MatrixCursor mc = new MatrixCursor(new String[]{"_id", SearchManager.SUGGEST_COLUMN_TEXT_1, SearchManager.SUGGEST_COLUMN_TEXT_2});
+
+                mc.moveToFirst();
+                return mc;
+            }
+        } else {
+            System.err.println("Selection Args are null in getPersons()");
             return null;
-    }
+        }
 
     }
 
-    /** Return Person corresponding to the id */
-    public Cursor getPerson(String id){
+    /**
+     * Return Person corresponding to the id
+     */
+    public Cursor getPerson(String id) {
 
         SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 
         queryBuilder.setTables(DATABASE_TABLE_PERSONS);
 
-        Cursor c = queryBuilder.query(getReadableDatabase(),
-                new String[]{COL_ID, COL_FIRSTNAME, COL_LASTNAME, COL_BIRTHDATE},
-                "_id = ?", new String[]{id}, null, null, null, "1"
+        Cursor c = queryBuilder.query(
+                getReadableDatabase(),
+                null,
+                COL_ID + " = ?", new String[]{id}, null, null, null, "1"
         );
 
         return c;
     }
-    public Cursor getPersonForSuggestion(String query){
-        return getReadableDatabase().query(
-          DATABASE_TABLE_PERSONS,
-                new String[]{COL_ID,COL_FIRSTNAME,COL_LASTNAME,COL_AGE, COL_BANNED},
-                COL_FIRSTNAME+"=?"+" OR "+COL_LASTNAME+"=?"+" OR "+COL_AGE+"=?",new String[]{query},null,null,COL_AGE
-        );
-    }
+
     /**
      * @param name      The last name
      * @param firstname The first name
      */
     /*
-	 * the rest of the arguments have to be the paths of the card images
+     * the rest of the arguments have to be the paths of the card images
 	 */
     public void addPerson(int age, String firstname, String name, String date,
                           String profilepicture, String passport, String details, int banned) {
 
-        String[] arguments = {firstname, name, date, profilepicture,passport,  details};
+        String[] arguments = {firstname, name, date, profilepicture, passport, details};
 
         SQLiteDatabase db = this.getReadableDatabase();
         ContentValues data = new ContentValues();
@@ -218,17 +379,17 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
      *
      * @param backup
      */
-    protected void transferDataFromBackup(Database backup){
+    protected void transferDataFromBackup(Database backup) {
         ContentValues cv = new ContentValues();
         int age, banned;
-        String firstname,  name, date,
+        String firstname, name, date,
                 profilepicture, passport, details;
         Cursor c = backup.readData();
         int num = c.getCount();
-        System.out.println(num+ " Einträge gefunden");
+        System.out.println(num + " Einträge gefunden");
 
-        if(c != null &&  num > 0){
-            for(int i = 0; i < num; i++){
+        if (c != null && num > 0) {
+            for (int i = 0; i < num; i++) {
                 age = c.getInt(c.getColumnIndex(COL_AGE));
                 banned = c.getInt(c.getColumnIndex(COL_BANNED));
                 firstname = c.getString(c.getColumnIndex(COL_FIRSTNAME));
@@ -237,12 +398,22 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                 profilepicture = c.getString(c.getColumnIndex(COL_PROFILEPICTURE));
                 passport = c.getString(c.getColumnIndex(COL_PASSPORT));
                 details = c.getString(c.getColumnIndex(COL_DETAILS));
+
+                cv.put(COL_AGE, age);
+                cv.put(COL_BANNED, banned);
+                cv.put(COL_FIRSTNAME, firstname);
+                cv.put(COL_LASTNAME, name);
+                cv.put(COL_BIRTHDATE, date);
+                cv.put(COL_PROFILEPICTURE, profilepicture);
+                cv.put(COL_PASSPORT, passport);
+                cv.put(COL_DETAILS, details);
             }
         }
 
         db.insert(DATABASE_TABLE_PERSONS, null, cv);
         db.close();
     }
+
     public int countPersons() {
         String countQuery = "SELECT  * FROM " + DATABASE_TABLE_PERSONS;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -269,6 +440,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             c.moveToFirst();
         return c;
     }
+
     /*
         * Get the amount of all Entries
         *
@@ -289,10 +461,11 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     *
     *
     * */
+
     public Cursor readOver18() {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, COL_AGE+">=?",new String[]{"18"}, null, null, COL_AGE);
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, COL_AGE + ">=?", new String[]{"18"}, null, null, COL_AGE);
 
         if (c != null)
             c.moveToFirst();
@@ -303,15 +476,17 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     *
     *
     * */
+
     public Cursor readBanned() {
 
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, COL_BANNED+"=?",new String[]{"1"}, null, null, COL_AGE);
+        Cursor c = db.query(DATABASE_TABLE_PERSONS, COLUMNS, COL_BANNED + "=?", new String[]{"1"}, null, null, COL_AGE);
 
         if (c != null)
             c.moveToFirst();
         return c;
     }
+
     /*
     * Delete Database Entries
     * TODO Benutze die Pfad angaben gleich, um die Daten im Ordner zu löschen
@@ -326,8 +501,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
      * arg format: Fistname+" "+Lastname+" "+Age
      *
      * @param query
-     * @return
-     *  Index when entry was found. Otherwise return -1
+     * @return Index when entry was found. Otherwise return -1
      */
     public int getId(String query) {
         int id;
@@ -337,29 +511,31 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
 
         Cursor c = db.query(DATABASE_TABLE_PERSONS, null, WHERE, queries,
                 null, null, null);
-        if(c.getCount() > 0) {
+        if (c.getCount() > 0) {
             c.moveToFirst();
             id = c.getInt(0);
-        }else{
+        } else {
             id = -1;
         }
         return id;
     }
 
-    protected Cursor getSuggestionCursor(String[] columns,String selection, String[] selectionArgs){
+    protected Cursor getSuggestionCursor(String[] columns, String selection, String[] selectionArgs) {
 
         Cursor c = getReadableDatabase().query(DATABASE_TABLE_PERSONS, columns, selection, selectionArgs, null, null, null);
         return c;
     }
+
     protected Cursor getCursor(int index) {
 
         String WHERE = COL_ID + QM;
         String[] id = {index + ""};
-        String[] columns = {COL_ID,COL_PROFILEPICTURE};
+        String[] columns = {COL_ID, COL_PROFILEPICTURE};
         Cursor c = db.query(DATABASE_TABLE_PERSONS, null, WHERE, id,
                 null, null, null);
         return c;
     }
+
     protected Cursor getCursorFromSearchQuery(String QUERY) {
 
         //set also date and age as possible searchresults
@@ -435,10 +611,11 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             Toast.makeText(SearchActivity,
                     "Eingabe nicht erkannt!",
                     Toast.LENGTH_SHORT).show();*/
-           return null;
+            return null;
         }
         return null;
     }
+
     private Cursor getSearchCursor(String command, int identifier) {
         //System.out.println("getSearchCursor startet mit: " + command);
         //the coumns to select
@@ -527,7 +704,8 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         }
 
     }
-    protected void update(int id, int bannedStatus,String[] textColumnEntries) {
+
+    protected void update(int id, int bannedStatus, String[] textColumnEntries) {
         ContentValues cv = new ContentValues();
 
         int colums_last = COLUMNS.length - 1;
@@ -538,7 +716,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             if (i == colums_last)
                 cv.put(COL_BANNED, bannedStatus);
             if (i >= 2 && i < colums_last - 1) {
-                System.out.println("Set "+textColumnEntries[k]+" to Column("+COLUMNS[i]+")");
+                System.out.println("Set " + textColumnEntries[k] + " to Column(" + COLUMNS[i] + ")");
                 cv.put(COLUMNS[i], textColumnEntries[k]);
                 k++;
             }
@@ -550,7 +728,8 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             database.update(DATABASE_TABLE_PERSONS, cv, COL_ID + "=" + id, null);
 
     }
-    protected void updateBannedStatus(int index,int status){
+
+    protected void updateBannedStatus(int index, int status) {
 
         ContentValues cv = new ContentValues();
         cv.put(COL_BANNED, status);
@@ -560,7 +739,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
 
     }
 
-    protected void updateIndex(int index){
+    protected void updateIndex(int index) {
 
         ContentValues cv = new ContentValues();
         cv.put(COL_ID, index - 1);
@@ -586,7 +765,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         * set the new age to it
         * */
 
-         for (int i = 0; i < cursor.getCount(); i++) {
+        for (int i = 0; i < cursor.getCount(); i++) {
 
             int currentAgeInDatabase = cursor.getInt(cursor.getColumnIndex(COL_AGE));
             String dateOfBirth = cursor.getString(cursor.getColumnIndex(COL_BIRTHDATE));
@@ -601,14 +780,14 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             * required
             * */
 
-             //if the person has become older, update its age
-             if (compareAgeStatus(currentAgeInDatabase, dateOfBirth, cursor)) {
-                 hasBDay = true;
-             }
-             //the textview to show the birthday event
-             if(hasBDay) {
-                 String notificationText =
-                         firstname + " " + lastname + " ist heute " + (currentAgeInDatabase + 1) + " Jahre alt geworden";
+            //if the person has become older, update its age
+            if (compareAgeStatus(currentAgeInDatabase, dateOfBirth, cursor)) {
+                hasBDay = true;
+            }
+            //the textview to show the birthday event
+            if (hasBDay) {
+                String notificationText =
+                        firstname + " " + lastname + " ist heute " + (currentAgeInDatabase + 1) + " Jahre alt geworden";
                     /*
                  c.println(notificationText);
 
@@ -620,13 +799,14 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                  }else{
                      c.println("StartActivity not detected");
                  }*/
-             }else{
-                 //System.out.println("No birth day for "+firstname+" "+lastname);
-             }
+            } else {
+                //System.out.println("No birth day for "+firstname+" "+lastname);
+            }
             cursor.moveToNext();
         }
         cursor.close();
     }
+
     /*
     * If a person has its birthday, update its age
     *
@@ -659,7 +839,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     }
 
 
-    private boolean compareAgeStatus(int databaseAge, String databaseDate,Cursor cursor) {
+    private boolean compareAgeStatus(int databaseAge, String databaseDate, Cursor cursor) {
         String[] columns = {COL_AGE};
         DateHandler dh = new DateHandler();
 
@@ -677,19 +857,20 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         }
         return false;
     }
+
     /*
     * Backup Database to external Folder to have access from Computer
     *
     */
     public void exportDatabase() {
         try {
-            File sd = new File(Environment.getExternalStorageDirectory()+"/KWIMG/files", "backup");
+            File sd = new File(APP_EXT_STORAGE_FOLDER+"/", "backup");
             File data = Environment.getDataDirectory();
 
             if (sd.canWrite()) {
 
                 String currentDBPath = DATABASE_FILE;
-                String backupDBPath = DATABASE_BACKUP_FOLDER+"/"+DATABASE_BACKUP_NAME;
+                String backupDBPath = DATABASE_BACKUP_FOLDER + "/" + DATABASE_BACKUP_NAME;
                 File currentDB = new File(data, currentDBPath);
                 File backupDB = new File(sd, backupDBPath);
 
@@ -699,7 +880,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
                     dst.transferFrom(src, 0, src.size());
                     src.close();
                     dst.close();
-                }else{
+                } else {
                     System.out.println("Datenbank existiert nicht");
                 }
             }
@@ -709,21 +890,20 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     }
 
     /**
-     *
      * @return
      */
-    public SQLiteDatabase getBackupDatabase(){
+    public SQLiteDatabase getBackupDatabase() {
         try {
             File dbfile = new File(DATABASE_BACKUP_FILE);
 
             SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
-            if(db != null){
+            if (db != null) {
                 return db;
-            }else{
+            } else {
                 return null;
             }
-        }catch (Exception e){
-            Toast.makeText(context,"No backup db available\n("+e+")",Toast.LENGTH_LONG);
+        } catch (Exception e) {
+            Toast.makeText(context, "No backup db available\n(" + e + ")", Toast.LENGTH_LONG);
             System.err.println("No backup db available");
             return null;
         }

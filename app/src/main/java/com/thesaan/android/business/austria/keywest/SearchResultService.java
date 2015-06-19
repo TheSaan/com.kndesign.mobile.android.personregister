@@ -23,8 +23,8 @@ public class SearchResultService extends Service{
     private String lastSearchQuery;
 
     private final IBinder mBinder = new MyBinder();
-    protected Database db;
-    protected AndroidHandler ah;
+    public Database db;
+    public AndroidHandler ah;
     SQLiteDatabase.CursorFactory cf;
     Cursor cursor;
     boolean binded;
@@ -63,7 +63,7 @@ public class SearchResultService extends Service{
         return Service.START_STICKY;
     }
 
-    protected SimpleCursorAdapter loadCostumerEntries() {
+    public SimpleCursorAdapter loadCostumerEntries() {
 
         ah = new AndroidHandler(getApplicationContext());
         cursor = db.readData();
@@ -227,7 +227,7 @@ public class SearchResultService extends Service{
         return ca;
     }
 
-    protected void updateEntriesIndexesAfterRemovingOne(int startIndex) {
+    public void updateEntriesIndexesAfterRemovingOne(int startIndex) {
         int entriesNumber;
         if (cursor != null) {
             entriesNumber = cursor.getCount();
@@ -240,7 +240,7 @@ public class SearchResultService extends Service{
         }
     }
 
-    protected void restart() {
+    public void restart() {
         stopSelf();
         startService(new Intent(this, SearchResultService.class));
     }
@@ -257,7 +257,7 @@ public class SearchResultService extends Service{
 
 
         @Override
-        protected Boolean doInBackground(SimpleCursorAdapter... adapter) {
+        public Boolean doInBackground(SimpleCursorAdapter... adapter) {
 
             int count = adapter[0].getCount();
 
@@ -270,11 +270,11 @@ public class SearchResultService extends Service{
             return true;
         }
 
-       /* protected void onProgressUpdate(Integer... progress){
+       /* public void onProgressUpdate(Integer... progress){
             setProgressPercent(progress[0]);
         }*/
 
-       /*protected void onPostExecute(Long result) {
+       /*public void onPostExecute(Long result) {
            showDialog("Downloaded " + result + " bytes");
        }*/
 
@@ -290,10 +290,10 @@ public class SearchResultService extends Service{
         mAdapter = loadCostumerEntries();
     }
 
-    protected void setLastSearch(String query){
+    public void setLastSearch(String query){
         this.lastSearchQuery = query;
     }
-    protected String getLastSearchQuery(){
+    public String getLastSearchQuery(){
         return lastSearchQuery;
     }
 }

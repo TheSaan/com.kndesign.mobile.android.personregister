@@ -98,7 +98,7 @@ public class AndroidHandler {
         }
         return true;
     }
-    public static String[] splitIntoFILEPATHAndFILENAME(String path, String splitpoint, boolean printIt) {
+    public static String[] splitFileNameAndPath(String path, String splitpoint, boolean printIt) {
         /**
          * Splits the path @see java.io.String into the directory path and its filename. But
          * the split point will be added to the second part, the file name.

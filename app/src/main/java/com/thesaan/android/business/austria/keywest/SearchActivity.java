@@ -10,6 +10,7 @@ import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
@@ -40,6 +41,9 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
     //the last search query before pausing activity
     String lastQuery;
     Intent srsintent;
+
+    public static final int SUGGESTED = 20;
+    public static final int DIRECT_SEARCHED = 21;
     /*
         * initalize the Handlers for this activity
         * */
@@ -74,53 +78,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
         }
     };
 
-    public void onResume() {
-        super.onResume();
-        srsintent = new Intent(this, SearchResultService.class);
-        bindService(srsintent, SearchServiceConnection, Context.BIND_AUTO_CREATE);
-
-
-    }
-
-    public void onRestart() {
-        super.onRestart();
-
-        srsintent = new Intent(this, SearchResultService.class);
-        bindService(srsintent, SearchServiceConnection, Context.BIND_AUTO_CREATE);
-    }
-
-    public void onBackPressed() {
-        super.onBackPressed();
-        onDestroy();
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        if (srs != null) {
-            if (srs.binded) {
-                unbindService(SearchServiceConnection);
-            } else {
-                srs.onUnbind(srsintent);
-            }
-            srs.restart();
-        }
-    }
-
-    public void onStop() {
-        super.onStop();
-        if (srs.binded) {
-            unbindService(SearchServiceConnection);
-            srs.onUnbind(srsintent);
-            srs.restart();
-        } else {
-            srs.onUnbind(srsintent);
-            srs.restart();
-        }
-    }
-
     public void onCreate(Bundle savedInstanceState) {
-
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_results);
 
@@ -128,10 +86,20 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
         // The list of the results
         personList = (ListView) findViewById(R.id.resultList);
 
-
         // Get the intent, verify the action and get the query
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+        startSearch(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        startSearch(intent);
+    }
+
+    private void startSearch(Intent intent){
+        String action = intent.getAction();
+
+        if (Intent.ACTION_SEARCH.equals(action)) {
             String query = intent.getStringExtra(SearchManager.QUERY);
             c.println("go search " + query);
 
@@ -142,106 +110,13 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                 query = removeSpacesFromLineEnd(query);
             }
 
-            search(query);
-        }
-
-
-    }
-
-    private String correctLowerAndUppercase(String editString) {
-        String[] words = editString.split(" ");
-
-        //set editstring at first to null
-        //otherwise the first added word is a twin of it
-        editString = null;
-
-        //words
-        if (words.length > 1) {
-            for (int i = 0; i < words.length; i++) {
-
-                //split the word into first letter and rest
-                //
-                //the second letter
-                char cutLetter = words[i].charAt(1);
-
-                //split the word at the second letter
-                String firstLetter = words[i].substring(0, 1);
-                String rest = words[i].substring(1);
-                //make first letter uppercase
-                firstLetter = firstLetter.toUpperCase(Locale.GERMANY);
-
-                //make the rest lowercase
-                rest = rest.toLowerCase(Locale.GERMANY);
-
-                //now glue the word togheter
-                words[i] = firstLetter + rest;
-            }
-
-            editString = words[0];
-
-            for (int k = 1; k < words.length; k++) {
-                editString += " " + words[k];
-            }
-        } else {
-            //split the word into first letter and rest
-            //
-            //the second letter
-            //split the word at the second letter
-            String firstLetter = words[0].substring(0, 1);
-            String rest = words[0].substring(1);
-
-            //make first letter uppercase
-            firstLetter = firstLetter.toUpperCase(Locale.GERMAN);
-
-            //make the rest lowercase
-            rest = rest.toLowerCase(Locale.GERMAN);
-
-            editString = firstLetter + rest;
-        }
-
-        return editString;
-    }
-
-    private String removeSpacesFromLineEnd(String editString) {
-
-        String[] words;
-
-        if (editString.split(" ").length > 1) {
-            words = editString.split(" ");
-
-            for (int i = 1; i < words.length; i++) {
-                editString = words[0] + " " + words[i];
-            }
-            c.println(editString + "was edited");
-        } else {
-            editString = editString.split(" ")[0];
-        }
-        return editString;
-    }
-
-    private final void init(Context c) {
-        db = new Database(c);
-        dh = new DateHandler();
-        fh = new FilesHandler();
-        bh = new BitmapHandler(c);
-        ah = new AndroidHandler(c);
-    }
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-
-        String value = intent.getStringExtra(SearchManager.QUERY);
-        if(value != null && value != "") {
-            //set search value in the correct form
-            value = correctLowerAndUppercase(value);
-            value = removeSpacesFromLineEnd(value);
-
-            search(value);
+            search(query, DIRECT_SEARCHED);
+        }else if (Intent.ACTION_VIEW.equals(action)) {
+            search(intent.getData().toString(), SUGGESTED);
         }
     }
 
-    protected void search(final String query) {
+    protected void search(final String query, int identifier) {
         bh = new BitmapHandler(getApplicationContext());
         final String QUERY = query;
         lastQuery = query;
@@ -306,8 +181,18 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                 R.id.personLastname
         };
 
+
         //the cursor for the current list
-        Cursor resultCursor = getCursorFromSearchQuery(QUERY);
+        Cursor resultCursor;
+        if (identifier == DIRECT_SEARCHED) {
+            resultCursor = getCursorFromSearchQuery(QUERY);
+        } else if (identifier == SUGGESTED) {
+            resultCursor = getCursorFromId(QUERY);
+        } else {
+            resultCursor = db.readData();
+        }
+
+
         if (resultCursor != null) {
             //the adapter which adds the data to the views
             SimpleCursorAdapter ca2 = new SimpleCursorAdapter(SearchActivity.this, R.layout.search_list_item, resultCursor, select_from, add_to);
@@ -317,16 +202,12 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                 //if its bigger than 18 print "Max Musterm..."
 
                 boolean isNameTooLong = false;
-                int first_name_length
-                        ,
+                int first_name_length,
                         last_name_length;
-                int getIndex
-                        ,
+                int getIndex,
                         bannedState;
-                String firstName
-                        ,
-                        lastName
-                        ,
+                String firstName,
+                        lastName,
                         fileText;
 
 
@@ -468,6 +349,141 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                     Toast.LENGTH_SHORT).show();
             onBackPressed();
         }
+    }
+
+    public void onResume() {
+        super.onResume();
+        srsintent = new Intent(this, SearchResultService.class);
+        bindService(srsintent, SearchServiceConnection, Context.BIND_AUTO_CREATE);
+
+
+    }
+
+    public void onRestart() {
+        super.onRestart();
+
+        srsintent = new Intent(this, SearchResultService.class);
+        bindService(srsintent, SearchServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public void onBackPressed() {
+        super.onBackPressed();
+        onDestroy();
+    }
+
+    public void onDestroy() {
+        super.onDestroy();
+        if (srs != null) {
+            if (srs.binded) {
+                unbindService(SearchServiceConnection);
+            } else {
+                srs.onUnbind(srsintent);
+            }
+            srs.restart();
+        }
+    }
+
+    public void onStop() {
+        super.onStop();
+        if (srs.binded) {
+            unbindService(SearchServiceConnection);
+            srs.onUnbind(srsintent);
+            srs.restart();
+        } else {
+            srs.onUnbind(srsintent);
+            srs.restart();
+        }
+    }
+
+    private String correctLowerAndUppercase(String editString) {
+        String[] words = editString.split(" ");
+
+        //set editstring at first to null
+        //otherwise the first added word is a twin of it
+        editString = null;
+
+        //words
+        if (words.length > 1) {
+            for (int i = 0; i < words.length; i++) {
+
+                //split the word into first letter and rest
+                //
+                //the second letter
+                char cutLetter = words[i].charAt(1);
+
+                //split the word at the second letter
+                String firstLetter = words[i].substring(0, 1);
+                String rest = words[i].substring(1);
+                //make first letter uppercase
+                firstLetter = firstLetter.toUpperCase(Locale.GERMANY);
+
+                //make the rest lowercase
+                rest = rest.toLowerCase(Locale.GERMANY);
+
+                //now glue the word togheter
+                words[i] = firstLetter + rest;
+            }
+
+            editString = words[0];
+
+            for (int k = 1; k < words.length; k++) {
+                editString += " " + words[k];
+            }
+        } else {
+            //split the word into first letter and rest
+            //
+            //the second letter
+            //split the word at the second letter
+            String firstLetter = words[0].substring(0, 1);
+            String rest = words[0].substring(1);
+
+            //make first letter uppercase
+            firstLetter = firstLetter.toUpperCase(Locale.GERMAN);
+
+            //make the rest lowercase
+            rest = rest.toLowerCase(Locale.GERMAN);
+
+            editString = firstLetter + rest;
+        }
+
+        return editString;
+    }
+
+    private String removeSpacesFromLineEnd(String editString) {
+
+        String[] words;
+
+        if (editString.split(" ").length > 1) {
+            words = editString.split(" ");
+
+            for (int i = 1; i < words.length; i++) {
+                editString = words[0] + " " + words[i];
+            }
+            c.println(editString + "was edited");
+        } else {
+            editString = editString.split(" ")[0];
+        }
+        return editString;
+    }
+
+    private final void init(Context c) {
+        db = new Database(c);
+        dh = new DateHandler();
+        fh = new FilesHandler();
+        bh = new BitmapHandler(c);
+        ah = new AndroidHandler(c);
+    }
+
+    protected Cursor getCursorFromId(String query){
+        String[] columns = {Database.COL_ID, Database.COL_PROFILEPICTURE, Database.COL_BIRTHDATE, Database.COL_DETAILS,
+                Database.COL_AGE, Database.COL_FIRSTNAME, Database.COL_LASTNAME, Database.COL_BANNED};
+
+        String selection = COL_ID +"="+query;
+
+        Cursor c = db.getReadableDatabase().query(Database.DATABASE_TABLE_PERSONS,
+                columns, selection, null, null, null,
+                Database.COL_LASTNAME);
+        return c;
     }
 
     protected Cursor getCursorFromSearchQuery(String QUERY) {
@@ -756,7 +772,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.icon_all: {
-                search(ALL);
+                search(ALL, DIRECT_SEARCHED);
                 return false;
             }
             case R.id.action_search: {
@@ -764,15 +780,15 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
                 return false;
             }
             case R.id.icon_plus16: {
-                search(PLUS_SIXTEEN);
+                search(PLUS_SIXTEEN, DIRECT_SEARCHED);
                 return false;
             }
             case R.id.icon_plus18: {
-                search(PLUS_EIGHTEEN);
+                search(PLUS_EIGHTEEN, DIRECT_SEARCHED);
                 return false;
             }
             case R.id.icon_banned: {
-                search(BANNED);
+                search(BANNED, DIRECT_SEARCHED);
                 return false;
             }
             default:
@@ -870,14 +886,14 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
             if (lastname.getText().toString().contains("...")) {
                 c.println("DOTS FOUND<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
                 String ln = getNameIfTrimmedWithDots(
-                                Integer.parseInt(ageTextview.getText().toString()),
-                                firstname.getText().toString(),lastname.getText().toString());
-                if(ln != null) {
+                        Integer.parseInt(ageTextview.getText().toString()),
+                        firstname.getText().toString(), lastname.getText().toString());
+                if (ln != null) {
                     query =
                             firstname.getText().toString() + " " +
                                     ln +
                                     " " + ageTextview.getText().toString();
-                }else{
+                } else {
                     query = null;
                 }
             } else {
@@ -889,7 +905,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
 
             }
 
-            if (query != null){
+            if (query != null) {
                 i.putExtra("personData", query);
 
                 i.putExtra("lastSearchQuery", lastQuery);
@@ -902,7 +918,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
 
                 startActivityForResult(i, PERSON_INFO_REQUEST);
                 onStop();
-            }else {
+            } else {
                 Toast.makeText(SearchActivity.this,
                         "Data cannot be created from this source",
                         Toast.LENGTH_SHORT).show();
@@ -936,7 +952,7 @@ public class SearchActivity extends Activity implements PatternCollection, KeyWe
 
                                     c.println("Search again for " + srs.getLastSearchQuery() + "...");
 
-                                    search(srs.getLastSearchQuery());
+                                    search(srs.getLastSearchQuery(), DIRECT_SEARCHED);
                                     c.println("searched.");
                                 } else {
                                     c.println("SRS is null in onActivityResult()");

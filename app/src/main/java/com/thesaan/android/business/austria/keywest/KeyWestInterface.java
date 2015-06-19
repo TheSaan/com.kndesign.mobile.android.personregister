@@ -28,7 +28,7 @@ public interface KeyWestInterface {
 
       String NO_ENTRY = "KEIN EINTRAG";
 
-
+    String UNKNOWN_BIRTHDATE = "01.01.1950";
     //Date format
      int DATE_UNFORMATTED = 8;
      int DATE_FORMATTED = 10;
@@ -68,8 +68,8 @@ public interface KeyWestInterface {
     //Database Backup Name
 
       String DATABASE_BACKUP_NAME = "db_bkp.db";
-      String APP_EXT_STORAGE_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath()+"/KWIMG/files/";
-      String DATABASE_BACKUP_FOLDER = APP_EXT_STORAGE_FOLDER+"/backup/";
+      String APP_EXT_STORAGE_FOLDER = Environment.getExternalStorageDirectory().getAbsolutePath()+"/KWIMG/files";
+      String DATABASE_BACKUP_FOLDER = APP_EXT_STORAGE_FOLDER+"/backup";
       String DATABASE_BACKUP_FILE = DATABASE_BACKUP_FOLDER+DATABASE_BACKUP_NAME;
 
     //Database Tables
@@ -132,7 +132,7 @@ public interface KeyWestInterface {
       int[] idCardImageIds = {R.id.personsPassport};
       String PLUS_SIXTEEN = "unter 18";
       String PLUS_EIGHTEEN = "über 18";
-      String BANNED = "Verbot";
+      String BANNED = "Lokalerbot";
       String ALL = "Alle";
 
     /*
@@ -141,7 +141,7 @@ public interface KeyWestInterface {
     * */
       String[] orderedPathDescriptions = {
             "Profilepicture",
-            "Driverslicence"
+            "Passport"
     };
 
     /*
