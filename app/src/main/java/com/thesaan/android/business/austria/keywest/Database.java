@@ -9,7 +9,6 @@ import android.database.MatrixCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Environment;
 import android.util.Log;
@@ -18,14 +17,9 @@ import android.widget.Toast;
 
 import com.thesaan.android.business.austria.keywest.Handler.*;
 
-import org.xmlpull.v1.XmlPullParser;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.channels.FileChannel;
 import java.util.HashMap;
 
@@ -245,6 +239,286 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
         }
         return paths;
     }*/
+
+
+    /**
+     *
+     * @param username
+     * @param password
+     * @return
+     */
+    public boolean isPasswordCorrect(String username,String password){
+
+        //add selection information to the username for database
+        String[] args = {username};
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_PASSWORD}, COL_USERNAME+"=?", args, null, null, null);
+        c.moveToFirst();
+        String dbPWD = c.getString(c.getColumnIndex(COL_PASSWORD));
+
+        if(dbPWD.equals(password))
+            return true;
+        else
+            return false;
+    }
+
+    public synchronized boolean isUserAssigned(String username){
+        String[] args = {username};
+        //check uf username is already assigned
+        Cursor c;
+
+        if(db.isOpen()) {
+            c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_USERNAME}, COL_USERNAME + "=?", args, null, null, null);
+            c.moveToFirst();
+        }else{
+            System.err.println("[isUserAssigned()]Database is closed. Unable to read Usernames");
+            return false;
+        }
+
+        if(c.getCount() > 0 )
+            return true;
+        else
+            return false;
+    }
+    /**
+     *
+     * @return Cursor
+     */
+    public Cursor readKey(String username){
+
+        //add selection information to the username for database
+        String[] args = {username};
+
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_PASSWORD}, COL_USERNAME+"=?", args, null, null, null);
+
+        if (c != null)
+            c.moveToFirst();
+        return c;
+    }
+
+    public String changeIntoRankName(int rank_id){
+        switch (rank_id){
+            case RANK_STANDARD_ID: return RANK_STANDARD;
+            case RANK_STAFF_ID: return RANK_STAFF;
+            case RANK_MASTER_ID: return RANK_MASTER;
+            case RANK_ADMIN_ID: return RANK_ADMIN;
+            default:return null;
+        }
+    }
+
+    /**
+     *
+     * @param rank
+     * @return
+     */
+    public int changeIntoRankId(String rank){
+        System.out.println("Rank to change: "+rank);
+        if(RANK_STANDARD.equals(rank)){
+            return RANK_STANDARD_ID;
+        }
+        if(RANK_STAFF.equals(rank))   {
+            return RANK_STAFF_ID;
+        }
+        if(RANK_MASTER.equals(rank))  {
+            return RANK_MASTER_ID;
+        }
+        if(RANK_ADMIN.equals(rank))   {
+            return RANK_ADMIN_ID;
+        }else {
+            return RANK_UNKNOWN_ID;
+        }
+    }
+
+    public void changeUserPermission(String username, String newPermission){
+        String[] args = {username};
+        ContentValues cv = new ContentValues();
+
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_ID}, COL_USERNAME+"=?", args, null, null, null);
+        if (c != null)
+            c.moveToFirst();
+
+        if(newPermission == RANK_STAFF ||
+                newPermission == RANK_STANDARD ||
+                newPermission == RANK_ADMIN ||
+                newPermission == RANK_MASTER ) {
+            int id = c.getInt(c.getColumnIndex(COL_ID));
+
+            cv.put(COL_RANK,newPermission);
+
+
+
+            db.update(DATABASE_TABLE_ACCOUNTS, cv, COL_ID + "=" + id, null);
+
+            System.err.println("Berechtigung von "+ username + " auf "+ newPermission+" geändert.");
+        }
+    }
+
+    public void changeUserName(String oldUsername, String newUsername) {
+        String[] args = {oldUsername};
+        ContentValues cv = new ContentValues();
+
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_ID}, COL_USERNAME + "=?", args, null, null, null);
+        if (c != null){
+            c.moveToFirst();
+
+            int id = c.getInt(c.getColumnIndex(COL_ID));
+
+            cv.put(COL_USERNAME,newUsername);
+
+            db.update(DATABASE_TABLE_ACCOUNTS, cv, COL_ID + "=" + id, null);
+
+            System.err.println("Username von "+ oldUsername + " auf "+ newUsername+" geändert.");
+        }
+    }
+
+    public void changeUserPassword(String username, String newPassword) {
+        String[] args = {username};
+        ContentValues cv = new ContentValues();
+
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_ID}, COL_USERNAME + "=?", args, null, null, null);
+        if (c != null){
+            c.moveToFirst();
+
+            int id = c.getInt(c.getColumnIndex(COL_ID));
+
+            cv.put(COL_PASSWORD,newPassword);
+
+            db.update(DATABASE_TABLE_ACCOUNTS, cv, COL_ID + "=" + id, null);
+
+            System.err.println("Passwort von "+ username + " auf "+ newPassword+" geändert.");
+        }
+    }
+    /**
+     *
+     * @return Rank of the User
+     */
+    public String readRank(String username){
+
+        //add selection information to the username for database
+        String[] arg = {username};
+
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_RANK}, COL_USERNAME+"=?", arg, null, null, null);
+
+        if (c != null)
+            c.moveToFirst();
+        String rank = c.getString(c.getColumnIndex(COL_RANK));
+        return rank;
+    }
+
+    /**
+     *
+     * @return Rank of the User
+     */
+    public int readRankID(String username){
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS,new String[]{COL_RANK},COL_USERNAME+QM,new String[]{username},null,null,null);
+        c.moveToFirst();
+        return changeIntoRankId(c.getString(c.getColumnIndex(COL_RANK)));
+    }
+    /**
+     *
+     * @param rank_id
+     *  RANK_STANDARD_ID - shouldn't be set
+     *  RANK_STAFF_ID
+     *  RANK_MASTER_ID - primary for the owner of the company
+     *  RANK_ADMIN_ID - Only for the developer
+     *  RANK_UNKNOWN_ID
+     * @return Cursor
+     *  Cursor with the group of this rank.
+     *  Returns null if no group member was found for this rank;
+     */
+    public Cursor readUsersWithRank(int rank_id){
+        String rank = "";
+
+        Cursor c;
+        String[] arg= {rank};
+
+        String selection = COL_RANK+"=?";
+
+        switch (rank_id){
+            case RANK_STANDARD_ID:{
+                rank = RANK_STANDARD;
+                break;
+            }
+            case RANK_STAFF_ID:{
+                rank = RANK_STAFF;
+                break;
+            }
+            case RANK_MASTER_ID:{
+                rank = RANK_MASTER;
+                break;
+            }
+            case RANK_ADMIN_ID:{
+                rank = RANK_ADMIN;
+                break;
+            }
+            default: {
+                rank = null;
+                rank_id = RANK_UNKNOWN_ID;
+                break;
+            }
+
+        }
+
+        if(rank_id != RANK_UNKNOWN_ID && rank != null) {
+            c = db.query(DATABASE_TABLE_ACCOUNTS, new String[]{COL_USERNAME}, selection, arg, null, null, null);
+            if(c.getCount() > 0) {
+                return c;
+            }else{
+                return null;
+            }
+        }else{
+            return null;
+        }
+    }
+
+    public String[] getUsers(){
+        Cursor c = db.query(DATABASE_TABLE_ACCOUNTS, null, null, null, null, null, null);
+        int count = c.getCount();
+
+        if(count > 0) {
+            c.moveToFirst();
+            String[] users = new String[count];
+            for( int i = 0; i<count; i++){
+                users[i] = c.getString(c.getColumnIndex(COL_USERNAME));
+                System.out.println(users[i]);
+                c.moveToNext();
+            }
+            return users;
+        }else{
+            System.err.println("No users registered!");
+            return null;
+        }
+
+
+    }
+    /**Add a new  User to the database.
+     * Is checking also if the username is aleady assigned.
+     *
+     * @param username The username
+     * @param password The password
+     * @param rank
+     *  RANK_STANDARD   -   Standard
+     *  RANK_STAFF      -   Personal
+     *  RANK_MASTER     -   Chef
+     *  RANK_ADMIN      -   Administrator
+     */
+    protected synchronized void addUser(String username,String password, String rank){
+        ContentValues data = new ContentValues();
+        getWritableDatabase();
+        data.put(COL_USERNAME,username);
+        data.put(COL_PASSWORD,password);
+        data.put(COL_RANK,rank);
+
+
+
+        //if this username is not assigned
+        if(!isUserAssigned(username)) {
+            db.insert(DATABASE_TABLE_ACCOUNTS, null, data);
+            System.err.println("Benutzername gespeichert");
+        }else{
+            //TODO diese Aussage als Textview hinzufügen
+            System.err.println("Benutzername ist bereits vergeben");
+        }
+    }
 
     /**
      * Returns Persons
@@ -864,15 +1138,13 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     */
     public void exportDatabase() {
         try {
-            File sd = new File(APP_EXT_STORAGE_FOLDER+"/", "backup");
+            File sd = new File(APP_DB_BACKUP_FOLDER);
             File data = Environment.getDataDirectory();
 
             if (sd.canWrite()) {
 
-                String currentDBPath = DATABASE_FILE;
-                String backupDBPath = DATABASE_BACKUP_FOLDER + "/" + DATABASE_BACKUP_NAME;
-                File currentDB = new File(data, currentDBPath);
-                File backupDB = new File(sd, backupDBPath);
+                File currentDB = new File(data, DATABASE_FILE);
+                File backupDB = new File(sd, DATABASE_BACKUP_NAME);
 
                 if (currentDB.exists()) {
                     FileChannel src = new FileInputStream(currentDB).getChannel();
@@ -890,6 +1162,36 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
     }
 
     /**
+     * Restores the database from the existing files. Except for the details.
+     */
+    public boolean restoreDatabaseFromFiles(){
+
+        PersonRegister pr = new PersonRegister(context);
+
+        File[] f = pr.getEntryFolders();
+
+        try {
+            for (int i = 0; i < f.length; i++) {
+                String[] data = pr.getFolderData(f[i]);
+
+                System.err.println("i:"+i);
+                addPerson(
+                        Integer.getInteger(data[0]),
+                        data[1],
+                        data[2],
+                        data[3],
+                        data[4],
+                        data[5],
+                        data[6],
+                        Integer.decode(data[7]));
+            }
+            return true;
+        }catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
+    /**
      * @return
      */
     public SQLiteDatabase getBackupDatabase() {
@@ -897,6 +1199,7 @@ public class Database extends SQLiteOpenHelper implements PatternCollection, Key
             File dbfile = new File(DATABASE_BACKUP_FILE);
 
             SQLiteDatabase db = SQLiteDatabase.openOrCreateDatabase(dbfile, null);
+
             if (db != null) {
                 return db;
             } else {

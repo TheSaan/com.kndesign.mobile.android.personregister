@@ -19,12 +19,12 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int metaButtonBarStyle=0x7f010000;
     }
     public static final class color {
-        public static final int banned_red=0x7f050000;
-        public static final int black_overlay=0x7f050001;
-        public static final int bright_purple=0x7f050002;
-        public static final int confirmed_green=0x7f050003;
-        public static final int dark_purple=0x7f050004;
-        public static final int yellow=0x7f050005;
+        public static final int banned_red=0x7f070000;
+        public static final int black_overlay=0x7f070001;
+        public static final int bright_purple=0x7f070002;
+        public static final int confirmed_green=0x7f070003;
+        public static final int dark_purple=0x7f070004;
+        public static final int yellow=0x7f070005;
     }
     public static final class dimen {
         public static final int activity_horizontal_margin=0x7f060000;
@@ -200,105 +200,105 @@ or to a theme attribute in the form "<code>?[<i>package</i>:][<i>type</i>:]<i>na
         public static final int start=0x7f090005;
     }
     public static final class string {
-        public static final int AmountOfEntriesDesciption=0x7f070000;
-        public static final int action_settings=0x7f070001;
-        public static final int agb1=0x7f070002;
-        public static final int agb2=0x7f070003;
-        public static final int agb3=0x7f070004;
-        public static final int agb4=0x7f070005;
-        public static final int agb5=0x7f070006;
-        public static final int agb6=0x7f070007;
-        public static final int agb7=0x7f070008;
-        public static final int agb8=0x7f070009;
-        public static final int agb9=0x7f07000a;
-        public static final int agbHeaderAufnahme_von_Daten=0x7f07000b;
-        public static final int agbHeaderAushändigung_der_Daten=0x7f07000c;
-        public static final int agbHeaderBildinformationen_und_Inhalte=0x7f07000d;
-        public static final int agbHeaderEntfernen_des_Kunden_aus_dem_System=0x7f07000e;
-        public static final int agbHeaderHaftung=0x7f07000f;
-        public static final int agbHeaderHinweisungspflicht=0x7f070010;
-        public static final int agbHeaderNur_Offline_Nutzung_der_Daten=0x7f070011;
-        public static final int agbHeaderSichern_der_Daten_auf_weiterem_Medium=0x7f070012;
-        public static final int agbHeaderSoftwarebedingte_Fehler=0x7f070013;
-        public static final int agbTitle=0x7f070014;
-        public static final int app_name=0x7f070015;
-        public static final int app_title=0x7f070016;
-        public static final int bannedImageCD=0x7f070017;
-        public static final int buildNumberTitle=0x7f070018;
-        public static final int calcProgressAge=0x7f070019;
-        public static final int calculateAge=0x7f07001a;
-        public static final int cameraDescr=0x7f07001b;
-        public static final int currentAge=0x7f07001c;
-        public static final int dateHint=0x7f07001d;
-        public static final int default_minDate=0x7f07001e;
-        public static final int deleteButtonText=0x7f07001f;
-        public static final int designedForDescription=0x7f070020;
-        public static final int detailsImageCD=0x7f070021;
-        public static final int dummy_button=0x7f070022;
-        public static final int dummy_content=0x7f070023;
-        public static final int gallery_title=0x7f070024;
-        public static final int keepAndAbort=0x7f070025;
-        public static final int logoCD=0x7f070026;
-        public static final int min16_decr=0x7f070027;
-        public static final int min18_decr=0x7f070028;
-        public static final int newNameHint=0x7f070029;
-        public static final int newPersonEntry=0x7f07002a;
-        public static final int passport=0x7f07002b;
-        public static final int passportpictureCD=0x7f07002c;
-        public static final int personDetailsCD=0x7f07002d;
-        public static final int personDetailsHint=0x7f07002e;
-        public static final int personMatches=0x7f07002f;
-        public static final int personMatchesAmount=0x7f070030;
-        public static final int photoslash=0x7f070031;
-        public static final int photosshot=0x7f070032;
-        public static final int photostoshoot=0x7f070033;
-        public static final int profilePicture=0x7f070034;
-        public static final int profilepictureCD=0x7f070035;
-        public static final int save=0x7f070036;
-        public static final int search=0x7f070037;
-        public static final int searchLinearLayoutPersonRegisterButton=0x7f070038;
-        public static final int searchService=0x7f070039;
-        public static final int showAll=0x7f07003a;
-        public static final int showAllCD=0x7f07003b;
-        public static final int showBannedCD=0x7f07003c;
-        public static final int showBannedPersons=0x7f07003d;
-        public static final int showOver18=0x7f07003e;
-        public static final int showOver18CD=0x7f07003f;
-        public static final int showUnder18=0x7f070040;
-        public static final int showUnder18CD=0x7f070041;
-        public static final int takePictureInfo=0x7f070042;
-        public static final int thumbnailCD=0x7f070043;
-        public static final int titleSearch=0x7f070044;
-        public static final int title_activity_entry=0x7f070045;
-        public static final int title_activity_person_image_detailed=0x7f070046;
-        public static final int title_activity_person_info=0x7f070047;
-        public static final int title_activity_search=0x7f070048;
-        public static final int weiter=0x7f070049;
+        public static final int AmountOfEntriesDesciption=0x7f080000;
+        public static final int action_settings=0x7f080001;
+        public static final int agb1=0x7f080002;
+        public static final int agb2=0x7f080003;
+        public static final int agb3=0x7f080004;
+        public static final int agb4=0x7f080005;
+        public static final int agb5=0x7f080006;
+        public static final int agb6=0x7f080007;
+        public static final int agb7=0x7f080008;
+        public static final int agb8=0x7f080009;
+        public static final int agb9=0x7f08000a;
+        public static final int agbHeaderAufnahme_von_Daten=0x7f08000b;
+        public static final int agbHeaderAushändigung_der_Daten=0x7f08000c;
+        public static final int agbHeaderBildinformationen_und_Inhalte=0x7f08000d;
+        public static final int agbHeaderEntfernen_des_Kunden_aus_dem_System=0x7f08000e;
+        public static final int agbHeaderHaftung=0x7f08000f;
+        public static final int agbHeaderHinweisungspflicht=0x7f080010;
+        public static final int agbHeaderNur_Offline_Nutzung_der_Daten=0x7f080011;
+        public static final int agbHeaderSichern_der_Daten_auf_weiterem_Medium=0x7f080012;
+        public static final int agbHeaderSoftwarebedingte_Fehler=0x7f080013;
+        public static final int agbTitle=0x7f080014;
+        public static final int app_name=0x7f080015;
+        public static final int app_title=0x7f080016;
+        public static final int bannedImageCD=0x7f080017;
+        public static final int buildNumberTitle=0x7f080018;
+        public static final int calcProgressAge=0x7f080019;
+        public static final int calculateAge=0x7f08001a;
+        public static final int cameraDescr=0x7f08001b;
+        public static final int currentAge=0x7f08001c;
+        public static final int dateHint=0x7f08001d;
+        public static final int default_minDate=0x7f08001e;
+        public static final int deleteButtonText=0x7f08001f;
+        public static final int designedForDescription=0x7f080020;
+        public static final int detailsImageCD=0x7f080021;
+        public static final int dummy_button=0x7f080022;
+        public static final int dummy_content=0x7f080023;
+        public static final int gallery_title=0x7f080024;
+        public static final int keepAndAbort=0x7f080025;
+        public static final int logoCD=0x7f080026;
+        public static final int min16_decr=0x7f080027;
+        public static final int min18_decr=0x7f080028;
+        public static final int newNameHint=0x7f080029;
+        public static final int newPersonEntry=0x7f08002a;
+        public static final int passport=0x7f08002b;
+        public static final int passportpictureCD=0x7f08002c;
+        public static final int personDetailsCD=0x7f08002d;
+        public static final int personDetailsHint=0x7f08002e;
+        public static final int personMatches=0x7f08002f;
+        public static final int personMatchesAmount=0x7f080030;
+        public static final int photoslash=0x7f080031;
+        public static final int photosshot=0x7f080032;
+        public static final int photostoshoot=0x7f080033;
+        public static final int profilePicture=0x7f080034;
+        public static final int profilepictureCD=0x7f080035;
+        public static final int save=0x7f080036;
+        public static final int search=0x7f080037;
+        public static final int searchLinearLayoutPersonRegisterButton=0x7f080038;
+        public static final int searchService=0x7f080039;
+        public static final int showAll=0x7f08003a;
+        public static final int showAllCD=0x7f08003b;
+        public static final int showBannedCD=0x7f08003c;
+        public static final int showBannedPersons=0x7f08003d;
+        public static final int showOver18=0x7f08003e;
+        public static final int showOver18CD=0x7f08003f;
+        public static final int showUnder18=0x7f080040;
+        public static final int showUnder18CD=0x7f080041;
+        public static final int takePictureInfo=0x7f080042;
+        public static final int thumbnailCD=0x7f080043;
+        public static final int titleSearch=0x7f080044;
+        public static final int title_activity_entry=0x7f080045;
+        public static final int title_activity_person_image_detailed=0x7f080046;
+        public static final int title_activity_person_info=0x7f080047;
+        public static final int title_activity_search=0x7f080048;
+        public static final int weiter=0x7f080049;
     }
     public static final class style {
-        /** 
+        /**  API 14 theme customizations can go here. 
+
             Theme customizations available in newer API levels can go in
             res/values-vXX/styles.xml, while customizations related to
             backward-compatibility can go here.
         
- API 14 theme customizations can go here. 
          */
-        public static final int AppBaseTheme=0x7f080000;
+        public static final int AppBaseTheme=0x7f050000;
         /**  All customizations that are NOT specific to a particular API-level can go here. 
          */
-        public static final int AppTheme=0x7f080001;
-        public static final int ButtonBar=0x7f080002;
-        public static final int ButtonBarButton=0x7f080003;
-        public static final int FullscreenTheme=0x7f080004;
-        public static final int Thumbnail=0x7f080005;
-        public static final int agbHeader=0x7f080006;
-        public static final int agbText=0x7f080007;
-        public static final int confirmButton=0x7f080008;
-        public static final int defaultButton=0x7f080009;
-        public static final int defaultButtonRound=0x7f08000a;
-        public static final int deleteButton=0x7f08000b;
-        public static final int detailsTextField=0x7f08000c;
-        public static final int idCardHeaders=0x7f08000d;
+        public static final int AppTheme=0x7f050001;
+        public static final int ButtonBar=0x7f050002;
+        public static final int ButtonBarButton=0x7f050003;
+        public static final int FullscreenTheme=0x7f050004;
+        public static final int Thumbnail=0x7f050005;
+        public static final int agbHeader=0x7f050006;
+        public static final int agbText=0x7f050007;
+        public static final int confirmButton=0x7f050008;
+        public static final int defaultButton=0x7f050009;
+        public static final int defaultButtonRound=0x7f05000a;
+        public static final int deleteButton=0x7f05000b;
+        public static final int detailsTextField=0x7f05000c;
+        public static final int idCardHeaders=0x7f05000d;
     }
     public static final class xml {
         public static final int searchable=0x7f040000;

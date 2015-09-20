@@ -24,11 +24,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.thesaan.android.business.austria.keywest.Handler.*;
+import com.thesaan.android.business.austria.keywest.saandroid.ProActivity;
 
 import java.io.File;
 import java.util.Locale;
 
-public class EntryActivity extends Activity implements PatternCollection,KeyWestInterface{
+public class EntryActivity extends ProActivity implements PatternCollection,KeyWestInterface{
 
     private boolean isCameraActivated = false;
     final private static String[] pathNamesInOrder = {
@@ -261,13 +262,6 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                             + ": " + firstAndLastName[i]);*/
                     }
                 }
-
-                // root directory of the app data
-                externalRootFolder = new File(Environment.getExternalStorageDirectory(), "externalRootFolder");
-                //c.println("externalRootFolder path: " + externalRootFolder.getPath());
-                externalRootFolder.mkdir();
-                externalRootFolder.setWritable(true);
-
 			/*
              * create individualized folder with named by the persons full name
 			 * and its birthday
@@ -280,7 +274,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                 // assumption of all firstname and lastname
                 String fullName = firstAndLastName[0] + " " + firstAndLastName[1];
 
-                personDIR = new File(externalRootFolder.getPath() + "/" + PERSON_FOLDER);
+                personDIR = new File(APP_ENTRIES_FOLDER + PERSON_FOLDER);
 
                 personDIR.canWrite();
                 personDIR.mkdirs();
@@ -305,7 +299,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                             + "_"
                             + firstAndLastName[1].toUpperCase(Locale.GERMANY);
 
-                    fileName = "IMG" + "_" + path + "_" + datestring + IDCARD + FilesHandler.JPEG;
+                    fileName = IMAGE_SPLIT_POINT + path + "_" + datestring + IDCARD + FilesHandler.JPEG;
 
                     // save filepath and its name
                     String filePath = personFullSizedImages.getPath() + fileName;
@@ -321,24 +315,26 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                     };
 
 
-                    // set the file path to array for database
-                    for (int i = 0; i < PHOTO_BUTTON_IDS.length; i++) {
-                        //c.println("MAX: " + PHOTO_BUTTON_IDS.length);
-                        //c.println("i: " + i);
-                        if (PHOTO_BUTTON_IDS[i] == LayoutContainer.getChildAt(1)
-                                .getId()) {
-                            imagePaths[i] = filePath;
-                            //c.println("1 Set " + filePath + " to " + imagePaths[i] + "\n");
+                    try {
+                        // set the file path to array for database
+                        for (int i = 0; i < PHOTO_BUTTON_IDS.length; i++) {
+                            //c.println("MAX: " + PHOTO_BUTTON_IDS.length);
+                            //c.println("i: " + i);
+                            if (PHOTO_BUTTON_IDS[i] == LayoutContainer.getChildAt(1)
+                                    .getId()) {
+                                imagePaths[i] = filePath;
+                                //c.println("1 Set " + filePath + " to " + imagePaths[i] + "\n");
 
-                        }
-                        if (imagePaths[i] == "" || imagePaths[i] == null) {
+                            } else if (imagePaths[i] == "" || imagePaths[i] == null) {
 
-                            imagePaths[i] = "KEIN EINTRAG";
+                                imagePaths[i] = "KEIN EINTRAG";
+                            }
+                            //c.println("Add [" + imagePathsKeys[i] + "]" + imagePaths[i] + " to memory" + "\n\n\n");
+                            editor.putString(imagePathsKeys[i], imagePaths[i]);
                         }
-                        //c.println("Add [" + imagePathsKeys[i] + "]" + imagePaths[i] + " to memory" + "\n\n\n");
-                        editor.putString(imagePathsKeys[i], imagePaths[i]);
+                    }catch(Exception exc){
+                        System.err.println("Fehlerquelle:\n"+exc);
                     }
-
 
                     String date = dateText.getText().toString();
                     String name = newNameText.getText().toString();
@@ -674,7 +670,7 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
         if (db != null) {
 
             // add details to textfile
-            EditText detailsText = (EditText)findViewById(R.id.detailsText);
+            EditText detailsText = (EditText)findViewById(R.id.personDetails);
             String details = detailsText.getText().toString();
 
             isNewStart = true;
@@ -684,13 +680,13 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
                 db.addPerson(age, firstname, lastname, formattedDate,
                         imagePaths[0], imagePaths[1],
                         details, isBanned);
+                if(isBanned == 1){
+                    File bannedBackupFile = new File(personDIR,"LV.txt");
+                }
             } else {
                 String[] textBasedColumns = {firstname, lastname, formattedDate,
-                        imagePaths[0], imagePaths[1], imagePaths[2], imagePaths[3],
-                        imagePaths[4], imagePaths[5], "KEIN EINTRAG",
-                        detailsFile.getPath()
-                };
-                c.println("Firstname in array:  " + textBasedColumns[2]);
+                        imagePaths[0], imagePaths[1], details};
+
                 //update
                 db.update(mId, isBanned, textBasedColumns);
 
@@ -736,8 +732,6 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
     }
 
     private void addListeners() {
-
-
         // View Arrays
         Button[] buttons = {
                 profilePictureButton,
@@ -748,10 +742,8 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
         for (int i = 0; i < buttons.length; i++) {
 
             int id= 0;
-            if (i > linearlayouts.length - 1) {
 
-                id = linearlayouts[i];
-            }
+            id = linearlayouts[i];
 
             final int id2 = id;
             buttons[i].setOnClickListener(new View.OnClickListener() {
@@ -780,13 +772,9 @@ public class EntryActivity extends Activity implements PatternCollection,KeyWest
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
                     isBanned = 1;
-                    Toast.makeText(
-                            EntryActivity.this, "HV "+isBanned, Toast.LENGTH_SHORT).show();
                     buttonView.setBackgroundResource(R.drawable.banned_state_on_background);
                 } else {
                     isBanned = 0;
-                    Toast.makeText(
-                            EntryActivity.this, "HV "+isBanned, Toast.LENGTH_SHORT).show();
                     buttonView.setBackgroundResource(R.drawable.banned_state_off_background);
                 }
             }

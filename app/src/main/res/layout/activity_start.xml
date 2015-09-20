@@ -122,11 +122,8 @@
             android:text="Neu"
             android:id="@+id/newEntryButton"
             style="@style/defaultButtonRound"
-            android:layout_marginRight="51dp"
-            android:layout_marginEnd="51dp"
             android:layout_alignTop="@+id/searchButton"
-            android:layout_alignRight="@+id/minAge18Description"
-            android:layout_alignEnd="@+id/minAge18Description" />
+            android:layout_centerHorizontal="true" />
 
         <Button
             android:layout_width="wrap_content"
@@ -135,8 +132,8 @@
             android:id="@+id/listButton"
             style="@style/defaultButtonRound"
             android:layout_alignTop="@+id/newEntryButton"
-            android:layout_alignLeft="@+id/analogClock1"
-            android:layout_alignStart="@+id/analogClock1" />
+            android:layout_toRightOf="@+id/analogClock1"
+            android:layout_toEndOf="@+id/analogClock1" />
 
         <Button
             android:layout_width="wrap_content"
@@ -144,7 +141,7 @@
             android:text="Suchen"
             android:id="@+id/searchButton"
             style="@style/defaultButtonRound"
-            android:layout_marginTop="99dp"
+            android:layout_marginTop="104dp"
             android:layout_alignParentTop="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true" />

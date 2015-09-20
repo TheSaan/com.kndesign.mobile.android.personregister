@@ -1,9 +1,0 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.knoeflerdesign.keywest.PersonInfoActivity">
-    <!--
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" android:showAsAction="never" />
-        -->
-</menu>
-<!-- From: file:/G:/Geschaeftliche_Dateien/KW_Straden/KeyWest/app/src/main/res/menu/menu_person_info.xml -->

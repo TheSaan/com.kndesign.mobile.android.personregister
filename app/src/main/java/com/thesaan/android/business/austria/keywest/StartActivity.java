@@ -27,11 +27,12 @@ import com.thesaan.android.business.austria.keywest.Handler.BitmapHandler;
 import com.thesaan.android.business.austria.keywest.Handler.DateHandler;
 import com.thesaan.android.business.austria.keywest.Handler.FilesHandler;
 import com.thesaan.android.business.austria.keywest.Service.TestEntryCreationService;
+import com.thesaan.android.business.austria.keywest.saandroid.ProActivity;
 
 import java.io.File;
 
 
-public class StartActivity extends Activity implements KeyWestInterface {
+public class StartActivity extends ProActivity implements KeyWestInterface {
     TextView startInfoText;
     private ViewSwitcher viewSwitcher;
     Button newEntryButton, listButton, searchButton;
@@ -88,10 +89,10 @@ public class StartActivity extends Activity implements KeyWestInterface {
         setContentView(R.layout.activity_start);
         setMinAgeDate();
 
-        Toast.makeText(getApplicationContext(), DATABASE_BACKUP_FILE, Toast.LENGTH_LONG).show();
+//        Toast.makeText(getApplicationContext(), DATABASE_BACKUP_FILE, Toast.LENGTH_LONG).show();
         init(this);
 
-        File sd = new File(Environment.getExternalStorageDirectory() + "/KWIMG/files", "backup");
+        File sd = new File(APP_DB_BACKUP_FOLDER);
         sd.mkdir();
 
 
@@ -129,6 +130,14 @@ public class StartActivity extends Activity implements KeyWestInterface {
         setListeners();
         createAgbSwitches();
 
+        PasswordDialog pd = new PasswordDialog(StartActivity.this,false, StartActivity.this);
+
+//        db.addUser("admin","latinrce44",RANK_ADMIN);
+//        db.addUser("dieter","dieterp",RANK_MASTER);
+//        db.addUser("security","seckw",RANK_STAFF);
+//
+//        db.getUsers();
+        pd.show();
     }
 
     private void showAppInfos(TextView v) {
@@ -198,7 +207,7 @@ public class StartActivity extends Activity implements KeyWestInterface {
                 if (entries != null) {
                     int numColumns = entries.getColumnCount();
                     if (numColumns > 0) {
-                        Toast.makeText(getApplicationContext(), "Loading backup data into database...", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Stelle Sicherung wieder her...", Toast.LENGTH_SHORT).show();
                         entries.moveToFirst();
                         for (int i = 0; i < entries.getCount(); i++) {
                             age = entries.getInt(entries.getColumnIndex(COL_AGE));
@@ -213,22 +222,35 @@ public class StartActivity extends Activity implements KeyWestInterface {
                             db.addPerson(age, name, lastname, date, pp, pass, details, banned);
                             entries.moveToNext();
                         }
+
+                        Toast.makeText(getApplicationContext(), "App muss geschlossen werden um Änderungen wirksam zu machen!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Starten Sie die App einfach erneut um fortfahren zu können.", Toast.LENGTH_SHORT).show();
                     }else {
-                        Toast.makeText(getApplicationContext(), "Backup DB is readable but empty", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Datenbank Backup enthält keine Einträge!", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getApplicationContext(), "Backup DB Cursor is null", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Zeiger für Datenbank Backup leer", Toast.LENGTH_LONG).show();
                 }
             } else {
-                Toast.makeText(getApplicationContext(), "Backup DB is null", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Datenbank Backup nicht lesbar/vorhanden,\n" +
+                        "stelle Datenbank durch Dateien wieder her...", Toast.LENGTH_LONG).show();
+                boolean restored = db.restoreDatabaseFromFiles();
+
+                if(restored){
+                    Toast.makeText(getApplicationContext(), "Datenbank aus Dateien wiederhergestellt.", Toast.LENGTH_SHORT).show();
+
+                    onDestroy();
+                }else{
+                    Toast.makeText(getApplicationContext(), "Datenbank konnte nicht wiederhergestellt werden!", Toast.LENGTH_LONG).show();
+                }
             }
         } else {
-                Toast.makeText(getApplicationContext(), "Export database...", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Sichere Datenbank...", Toast.LENGTH_SHORT).show();
                 try {
                     db.exportDatabase();
-                    Toast.makeText(getApplicationContext(), "Export done", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Datenbank gesichert.", Toast.LENGTH_SHORT).show();
                 }catch (Exception e){
-                    Toast.makeText(getApplicationContext(), "Export failed because \n"+e, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Datenbank Sicherung fehlgeschlagen aufgrund von:\n"+e, Toast.LENGTH_LONG).show();
                 }
 
         }

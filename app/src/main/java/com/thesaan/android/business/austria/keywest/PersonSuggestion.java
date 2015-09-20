@@ -117,7 +117,7 @@ public class PersonSuggestion extends ContentProvider {
                         mc.newRow()
                                 .add(0)
                                 .add("Keine Treffer")
-                                .add("Gründe: Person nicht vorhanden/fehlerhafte Schreibweise/...")
+                                .add("GrÃ¼nde:\n\n- Person nicht vorhanden\n- fehlerhafte Schreibweise")
                                 .add(0);
                         return mc;
                     }else
